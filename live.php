@@ -24,6 +24,19 @@ font-weight:bold;
 box-shadow:0 2px 10px rgba(0,0,0,0.1);
 }
 
+.top-text{
+padding:15px;
+font-size:15px;
+background:#f3f4f6;
+line-height:1.8;
+}
+
+.top-text a{
+color:#e11d48;
+font-weight:bold;
+text-decoration:none;
+}
+
 .channels{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
@@ -46,13 +59,11 @@ transform:translateY(-6px);
 box-shadow:0 10px 25px rgba(0,0,0,0.18);
 }
 
-.logo{
-padding:15px;
+.title{
+padding:12px;
+font-size:17px;
+font-weight:bold;
 background:#f3f4f6;
-}
-
-.logo img{
-width:120px;
 }
 
 video{
@@ -75,12 +86,6 @@ cursor:pointer;
 background:#be123c;
 }
 
-footer{
-padding:20px;
-font-size:14px;
-color:#555;
-}
-
 </style>
 </head>
 
@@ -90,69 +95,69 @@ color:#555;
 📺 البث المباشر للقنوات الرياضية
 </header>
 
+<div class="top-text">
+جميع القنوات تعمل على الجوال والشاشات الذكية<br>
+للاشتراك في الباقة الكاملة تواصل واتساب<br>
+<a href="https://wa.me/966505571164">0505571164</a>
+</div>
+
 <div class="channels">
 
 <div class="card">
-<div class="logo"><img src="https://via.placeholder.com/120x60?text=beIN1"></div>
+<div class="title">beIN Sport 1</div>
 <video id="v1" controls></video>
 <button class="play" onclick="playStream('v1','b1.php')">تشغيل</button>
 </div>
 
 <div class="card">
-<div class="logo"><img src="https://via.placeholder.com/120x60?text=beIN2"></div>
+<div class="title">beIN Sport 2</div>
 <video id="v2" controls></video>
 <button class="play" onclick="playStream('v2','b2.php')">تشغيل</button>
 </div>
 
 <div class="card">
-<div class="logo"><img src="https://via.placeholder.com/120x60?text=beIN3"></div>
+<div class="title">beIN Sport 3</div>
 <video id="v3" controls></video>
 <button class="play" onclick="playStream('v3','b3.php')">تشغيل</button>
 </div>
 
 <div class="card">
-<div class="logo"><img src="https://via.placeholder.com/120x60?text=beIN4"></div>
+<div class="title">beIN Sport 4</div>
 <video id="v4" controls></video>
 <button class="play" onclick="playStream('v4','b4.php')">تشغيل</button>
 </div>
 
 <div class="card">
-<div class="logo"><img src="https://via.placeholder.com/120x60?text=beIN5"></div>
+<div class="title">beIN Sport 5</div>
 <video id="v5" controls></video>
 <button class="play" onclick="playStream('v5','b5.php')">تشغيل</button>
 </div>
 
 <div class="card">
-<div class="logo"><img src="https://via.placeholder.com/120x60?text=beIN6"></div>
+<div class="title">beIN Sport 6</div>
 <video id="v6" controls></video>
 <button class="play" onclick="playStream('v6','b6.php')">تشغيل</button>
 </div>
 
 <div class="card">
-<div class="logo"><img src="https://via.placeholder.com/120x60?text=beIN7"></div>
+<div class="title">beIN Sport 7</div>
 <video id="v7" controls></video>
 <button class="play" onclick="playStream('v7','b7.php')">تشغيل</button>
 </div>
 
 <div class="card">
-<div class="logo"><img src="https://via.placeholder.com/120x60?text=beIN8"></div>
+<div class="title">beIN Sport 8</div>
 <video id="v8" controls></video>
 <button class="play" onclick="playStream('v8','b8.php')">تشغيل</button>
 </div>
 
 <div class="card">
-<div class="logo"><img src="https://via.placeholder.com/120x60?text=beIN9"></div>
+<div class="title">beIN Sport 9</div>
 <video id="v9" controls></video>
 <button class="play" onclick="playStream('v9','b9.php')">تشغيل</button>
 </div>
 
 </div>
-
-<footer>
-جميع القنوات تعمل على الجوال والشاشات الذكية<br>
-للاشتراك في الباقة الكاملة تواصل واتساب<br>
-0505571164
-</footer>
 
 <script>
 
