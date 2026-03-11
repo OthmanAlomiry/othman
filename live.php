@@ -59,17 +59,24 @@
 </footer>
 
 <script>
-// --- رابط الـ Firebase الخاص بك تم دمجه هنا ---
+// --- كود العداد الفعلي ---
 const FIREBASE_URL = "https://scothman-42a6e.firebaseio.com/visits.json";
 
 async function updateVisitCount() {
     try {
-        const getRes = await fetch(FIREBASE_URL);
-        let count = await getRes.json();
-        if (count === null) count = 0;
-        count++;
-        document.getElementById('count-num').innerText = count.toLocaleString();
-        await fetch(FIREBASE_URL, { method: 'PUT', body: JSON.stringify(count) });
+        const response = await fetch(FIREBASE_URL);
+        const data = await response.json();
+        
+        // التحقق الفعلي: إذا كان null نجعله 0
+        let currentCount = (data !== null) ? parseInt(data) : 0;
+        let newCount = currentCount + 1;
+        
+        document.getElementById('count-num').innerText = newCount.toLocaleString();
+        
+        await fetch(FIREBASE_URL, {
+            method: 'PUT',
+            body: JSON.stringify(newCount)
+        });
     } catch (e) { document.getElementById('count-num').innerText = "1"; }
 }
 
@@ -87,7 +94,7 @@ async function fetchMatches() {
         for (let i = 1; i <= 9; i++) {
             const container = document.getElementById(`sch-${i}`);
             let m = matches[i - 1]; 
-            container.innerHTML = m ? `<div style="display:flex; justify-content:space-between;"><strong>${m.title}</strong><span style="color:#e11d48;font-weight:bold;">LIVE</span></div>` : "مباراة قادمة قريباً";
+            container.innerHTML = m ? `<div style="display:flex; justify-content:space-between;"><strong>${m.title}</strong><span style="color:#e11d48;font-weight:bold;">LIVE</span></div>` : "بث مباشر قريباً";
         }
     } catch (e) { console.log("Match Fetch Error"); }
 }
