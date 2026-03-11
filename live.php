@@ -55,11 +55,11 @@
 </div>
 
 <footer>
-    <div class="visitor-counter"><p style="margin:0 0 10px; font-size:12px; color:#94a3b8;">إجمالي زيارات الموقع الحقيقية</p><div id="count-num">0</div></div>
+    <div class="visitor-counter"><p style="margin:0 0 10px; font-size:12px; color:#94a3b8;">إجمالي زيارات الموقع الحقيقية</p><div id="count-num">جاري العد...</div></div>
 </footer>
 
 <script>
-// --- كود العداد الفعلي ---
+// --- كود العداد الفعلي المصلح ---
 const FIREBASE_URL = "https://scothman-42a6e.firebaseio.com/visits.json";
 
 async function updateVisitCount() {
@@ -67,12 +67,14 @@ async function updateVisitCount() {
         const response = await fetch(FIREBASE_URL);
         const data = await response.json();
         
-        // التحقق الفعلي: إذا كان null نجعله 0
-        let currentCount = (data !== null) ? parseInt(data) : 0;
+        // التحقق الذكي: إذا كان null أو ليس رقماً، نعتبره 0
+        let currentCount = (data !== null && !isNaN(data)) ? parseInt(data) : 0;
         let newCount = currentCount + 1;
         
+        // عرض الرقم
         document.getElementById('count-num').innerText = newCount.toLocaleString();
         
+        // حفظ الرقم في السيرفر
         await fetch(FIREBASE_URL, {
             method: 'PUT',
             body: JSON.stringify(newCount)
