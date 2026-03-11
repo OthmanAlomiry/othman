@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بث مباشر - مباريات اليوم 365</title>
+    <title>بوابة الرياضة - جلب جوجل المباشر</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
@@ -23,7 +23,7 @@
 </head>
 <body>
 
-<header>📺 بوابة الرياضة العربية - جلب تلقائي</header>
+<header>📺 بث مباشر - جدول مباريات اليوم</header>
 
 <div class="grid">
     <?php for($i = 1; $i <= 9; $i++): ?>
@@ -35,7 +35,29 @@
         <video id="vid<?php echo $i; ?>" controls></video>
         <button class="play-btn" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">▶ تشغيل الآن</button>
         <div class="sch" id="sch-<?php echo $i; ?>">
-            <div class="loading">جاري مزامنة مباريات اليوم...</div>
+            <?php
+            // نستخدم مصدر RSS الخاص بجوجل نيوز للرياضة لضمان الجلب
+            $rss_url = "https://news.google.com/rss/search?q=matches+today+bein+sports&hl=ar&gl=SA&ceid=SA:ar";
+            $xml = @simplexml_load_file($rss_url);
+            
+            if ($xml && isset($xml->channel->item)) {
+                $count = 0;
+                foreach ($xml->channel->item as $item) {
+                    if ($count >= 2) break; // عرض مباراتين لكل قناة
+                    // تنظيف النص من جوجل
+                    $title = (string)$item->title;
+                    $title = explode(" - ", $title)[0]; 
+                    
+                    echo '<div class="m-row">';
+                    echo '<span>' . htmlspecialchars($title) . '</span>';
+                    echo '<span class="m-time">بث اليوم</span>';
+                    echo '</div>';
+                    $count++;
+                }
+            } else {
+                echo '<div class="loading">لا توجد مباريات منقولة حالياً</div>';
+            }
+            ?>
         </div>
     </div>
     <?php endfor; ?>
@@ -48,43 +70,6 @@ function play(id, s) {
         var hls = new Hls(); hls.loadSource(s); hls.attachMedia(v); v.play();
     } else { v.src = s; v.play(); }
 }
-
-// دالة جلب البيانات بأسلوب يحاكي 365Scores
-async function get365Matches() {
-    try {
-        // نستخدم مصدر بيانات مفتوح سريع (Open Source Sports API) 
-        // لأن 365Scores الرسمي يتطلب مفتاح تشفير، هذا البديل يعطي نفس البيانات
-        const res = await fetch('https://api.scorebat.com/video-api/v3/');
-        const data = await res.json();
-        const allMatches = data.response;
-
-        for (let i = 1; i <= 9; i++) {
-            const container = document.getElementById(`sch-${i}`);
-            let html = '<strong style="font-size:11px; color:#888; display:block; margin-bottom:5px;">📅 جدول البث المباشر:</strong>';
-            
-            // توزيع ذكي: كل قناة تأخذ مباريات مختلفة عن الأخرى
-            let startIdx = (i - 1) * 2;
-            let matchGroup = allMatches.slice(startIdx, startIdx + 2);
-
-            if (matchGroup.length > 0) {
-                matchGroup.forEach(m => {
-                    html += `
-                        <div class="m-row">
-                            <span>${m.title}</span>
-                            <span class="m-time">LIVE</span>
-                        </div>`;
-                });
-            } else {
-                html += '<div class="loading">لا توجد مباريات مجدولة حالياً</div>';
-            }
-            container.innerHTML = html;
-        }
-    } catch (e) {
-        console.error("Fetch error");
-    }
-}
-
-window.onload = get365Matches;
 </script>
 </body>
 </html>
