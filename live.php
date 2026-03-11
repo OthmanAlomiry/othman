@@ -3,99 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة الرياضة -  القنوات</title>
+    <title>بوابة الرياضة - متجر الخدمة الرقمية</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
     <style>
-        :root { --main: #e11d48; --bg: #f8fafc; }
+        :root { --main: #e11d48; --bg: #f8fafc; --whatsapp: #25d366; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--bg); }
-        header { background: #fff; padding: 25px; text-align: center; font-size: 24px; font-weight: bold; border-bottom: 4px solid var(--main); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; max-width: 1300px; margin: auto; }
-        .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 1px solid #f1f5f9; }
-        .c-head { padding: 15px; background: #f8fafc; display: flex; justify-content: space-between; font-weight: bold; }
-        .dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        
+        /* تنسيق إعلان المتجر العلوي */
+        .promo-bar {
+            background: linear-gradient(90deg, #1e293b, #334155);
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.6;
+            border-bottom: 3px solid var(--whatsapp);
+        }
+        .promo-bar strong { color: var(--whatsapp); }
+        .wa-link {
+            display: inline-block;
+            margin-top: 8px;
+            background: var(--whatsapp);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .wa-link:hover { transform: scale(1.05); background: #128c7e; }
+
+        header { background: #fff; padding: 20px; text-align: center; font-size: 22px; font-weight: bold; border-bottom: 4px solid var(--main); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 15px; max-width: 1200px; margin: auto; }
+        .card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; transition: 0.3s; }
+        .c-head { padding: 12px; background: #fcfcfc; display: flex; justify-content: space-between; font-weight: bold; }
+        .live-tag { color: #22c55e; font-size: 13px; display: flex; align-items: center; gap: 5px; }
+        .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
-        .btn-play { width: 92%; margin: 15px auto; display: block; padding: 13px; border: none; border-radius: 12px; background: var(--main); color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .sch { padding: 15px; border-top: 1px solid #f1f5f9; min-height: 80px; }
-        .m-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; font-size: 14px; align-items: center; }
-        .m-time { color: var(--main); font-weight: bold; background: #fff1f2; padding: 3px 10px; border-radius: 8px; font-size: 12px; }
-        .loading-text { text-align: center; color: #94a3b8; font-size: 12px; padding: 10px; }
+        .play-btn { width: 90%; margin: 15px auto; display: block; background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .sch { padding: 12px; border-top: 1px solid #eee; min-height: 90px; }
+        .m-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px; align-items: center; }
+        .m-time { color: var(--main); font-weight: bold; font-size: 11px; background: #fff1f2; padding: 2px 5px; border-radius: 4px; }
+        .loading { text-align: center; color: #999; font-size: 12px; padding: 20px; }
     </style>
 </head>
 <body>
 
-<header>📺 بث مباشر - جدول مباريات اليوم</header>
+<div class="promo-bar">
+    هذه الصفحة مقدمة مجاناً من <strong>متجر الخدمة الرقمية</strong><br>
+    للاشتراك في الباقة كاملة (جميع القنوات الرياضية + مكتبة أفلام ومسلسلات) على التلفزيون والجوال<br>
+    <a href="https://wa.me/966505571164" class="wa-link">تواصل واتساب: 0505571164</a>
+</div>
+
+<header>📺 بوابة الرياضة - جدول المباريات الذكي</header>
 
 <div class="grid">
     <?php for($i = 1; $i <= 9; $i++): ?>
     <div class="card">
         <div class="c-head">
             <span>beIN Sport <?php echo $i; ?></span>
-            <span style="color:#22c55e"><span class="dot"></span> مباشر</span>
+            <span class="live-tag"><span class="dot"></span> مباشر</span>
         </div>
         <video id="vid<?php echo $i; ?>" controls poster="https://via.placeholder.com/400x225/111/fff?text=beIN+Sports+<?php echo $i; ?>"></video>
-        <button class="btn-play" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">▶ تشغيل البث المباشر</button>
+        <button class="play-btn" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">▶ تشغيل الآن</button>
         <div class="sch" id="sch-<?php echo $i; ?>">
-            <div class="loading-text">جاري مزامنة المباريات الحقيقية...</div>
+            <div class="loading">يتم الآن جلب جدول القناة...</div>
         </div>
     </div>
     <?php endfor; ?>
 </div>
 
 <script>
-// دالة تشغيل الفيديو
-function play(id, src) {
+function play(id, s) {
     var v = document.getElementById(id);
     if (Hls.isSupported()) {
-        var hls = new Hls(); hls.loadSource(src); hls.attachMedia(v); v.play();
-    } else { v.src = src; v.play(); }
+        var hls = new Hls(); hls.loadSource(s); hls.attachMedia(v); v.play();
+    } else { v.src = s; v.play(); }
 }
 
-// الجلب عبر المتصفح لتخطي حظر السيرفر
-async function fetchMatchesRealTime() {
-    const apiKey = "49e271c73amsh02ca0a4d3f5b237p145598jsn7c1cee0f8ec9";
-    const today = new Date().toISOString().split('T')[0];
-
+async function fetchMatches() {
     try {
-        const response = await fetch(`https://api-football-v1.p.rapidapi.com/v3/fixtures?date=${today}&timezone=Asia/Riyadh`, {
-            "method": "GET",
-            "headers": {
-                "x-rapidapi-host": "api-football-v1.p.rapidapi.com",
-                "x-rapidapi-key": apiKey
-            }
-        });
-        
+        const response = await fetch('https://api.scorebat.com/video-api/v3/');
         const data = await response.json();
         const matches = data.response;
 
-        if (matches && matches.length > 0) {
-            for (let i = 1; i <= 9; i++) {
-                const container = document.getElementById(`sch-${i}`);
-                let html = '<strong style="font-size:12px; color:#64748b; display:block; margin-bottom:10px;">📅 جدول البث الحقيقي:</strong>';
-                
-                // توزيع المباريات الحقيقية على القنوات
-                let m = matches[(i - 1) % matches.length];
-                let time = new Date(m.fixture.date).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false });
-                
-                html += `
-                    <div class="m-row">
-                        <span>${m.teams.home.name} × ${m.teams.away.name}</span>
-                        <span class="m-time">${time}</span>
-                    </div>`;
-                container.innerHTML = html;
+        for (let i = 1; i <= 9; i++) {
+            const container = document.getElementById(`sch-${i}`);
+            let html = '<strong style="font-size:11px; color:#888; display:block; margin-bottom:5px;">📅 مباريات منقولة اليوم:</strong>';
+            
+            let m1 = matches[i - 1]; 
+            let m2 = matches[i + 8]; 
+
+            if (m1) {
+                html += `<div class="m-row"><span>${m1.title}</span><span class="m-time">LIVE</span></div>`;
             }
-        } else {
-            document.querySelectorAll('.loading-text').forEach(el => el.innerText = "لا توجد مباريات دولية منقولة حالياً");
+            if (m2) {
+                html += `<div class="m-row"><span>${m2.title}</span><span class="m-time">بث مباشر</span></div>`;
+            }
+            
+            if (!m1 && !m2) {
+                html += '<div class="loading">لا توجد مباريات مسجلة حالياً</div>';
+            }
+            
+            container.innerHTML = html;
         }
-    } catch (error) {
-        document.querySelectorAll('.loading-text').forEach(el => el.innerText = "حدث خطأ أثناء مزامنة البيانات");
+    } catch (e) {
+        console.log("Fetch Error");
+        for (let i = 1; i <= 9; i++) {
+            document.getElementById(`sch-${i}`).innerHTML = '<div class="loading">المباريات قيد التحديث...</div>';
+        }
     }
 }
 
-// تفعيل الجلب عند التحميل
-window.onload = fetchMatchesRealTime;
+window.onload = fetchMatches;
 </script>
-
 </body>
 </html>
