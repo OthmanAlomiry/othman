@@ -6,39 +6,57 @@
     <title>بوابة الرياضة - متجر الخدمة الرقمية</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
-        :root { --main: #e11d48; --bg: #f8fafc; --whatsapp: #25d366; }
+        :root { 
+            --main: #e11d48; 
+            --bg: #f8fafc; 
+            --whatsapp: #25d366; 
+            --snapchat: #FFFC00; 
+            --x-black: #000000;
+        }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--bg); }
         
-        /* تنسيق إعلان المتجر العلوي */
+        /* تنسيق إعلان المتجر العلوي المطوّر */
         .promo-bar {
-            background: linear-gradient(90deg, #1e293b, #334155);
+            background: #1e293b;
             color: #fff;
-            padding: 15px;
+            padding: 20px 10px;
             text-align: center;
-            font-size: 14px;
-            line-height: 1.6;
-            border-bottom: 3px solid var(--whatsapp);
+            border-bottom: 4px solid var(--main);
         }
-        .promo-bar strong { color: var(--whatsapp); }
-        .wa-link {
-            display: inline-block;
-            margin-top: 8px;
-            background: var(--whatsapp);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 50px;
+        .promo-text { font-size: 15px; margin-bottom: 15px; line-height: 1.6; }
+        .promo-text strong { color: var(--main); }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .social-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
+            font-size: 13px;
             transition: 0.3s;
         }
-        .wa-link:hover { transform: scale(1.05); background: #128c7e; }
+        /* ألوان الأزرار */
+        .btn-wa { background: var(--whatsapp); color: white; }
+        .btn-snap { background: var(--snapchat); color: black; }
+        .btn-x { background: var(--x-black); color: white; }
+
+        .social-btn:hover { transform: translateY(-3px); opacity: 0.9; }
 
         header { background: #fff; padding: 20px; text-align: center; font-size: 22px; font-weight: bold; border-bottom: 4px solid var(--main); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 15px; max-width: 1200px; margin: auto; }
-        .card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; transition: 0.3s; }
+        .card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
         .c-head { padding: 12px; background: #fcfcfc; display: flex; justify-content: space-between; font-weight: bold; }
         .live-tag { color: #22c55e; font-size: 13px; display: flex; align-items: center; gap: 5px; }
         .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
@@ -48,15 +66,26 @@
         .sch { padding: 12px; border-top: 1px solid #eee; min-height: 90px; }
         .m-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px; align-items: center; }
         .m-time { color: var(--main); font-weight: bold; font-size: 11px; background: #fff1f2; padding: 2px 5px; border-radius: 4px; }
-        .loading { text-align: center; color: #999; font-size: 12px; padding: 20px; }
     </style>
 </head>
 <body>
 
 <div class="promo-bar">
-    هذه الصفحة مقدمة مجاناً من <strong>متجر الخدمة الرقمية</strong><br>
-    للاشتراك في الباقة كاملة (جميع القنوات الرياضية + مكتبة أفلام ومسلسلات) على التلفزيون والجوال<br>
-    <a href="https://wa.me/966505571164" class="wa-link">تواصل واتساب: 0505571164</a>
+    <div class="promo-text">
+        هذه الصفحة مقدمة مجاناً من <strong>متجر الخدمة الرقمية</strong><br>
+        للاشتراك في الباقة كاملة (قنوات رياضية + أفلام ومسلسلات) تواصل معنا:
+    </div>
+    <div class="social-links">
+        <a href="https://wa.me/966505571164" class="social-btn btn-wa">
+            <i class="fab fa-whatsapp"></i> واتساب
+        </a>
+        <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-snap">
+            <i class="fab fa-snapchat"></i> سناب شات
+        </a>
+        <a href="https://x.com/d_service_pro?s=21" class="social-btn btn-x">
+            <i class="fab fa-x-twitter"></i> تابعنا على X
+        </a>
+    </div>
 </div>
 
 <header>📺 بوابة الرياضة - جدول المباريات الذكي</header>
@@ -71,7 +100,7 @@
         <video id="vid<?php echo $i; ?>" controls poster="https://via.placeholder.com/400x225/111/fff?text=beIN+Sports+<?php echo $i; ?>"></video>
         <button class="play-btn" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">▶ تشغيل الآن</button>
         <div class="sch" id="sch-<?php echo $i; ?>">
-            <div class="loading">يتم الآن جلب جدول القناة...</div>
+            <div style="text-align:center; color:#999; font-size:12px; padding:20px;">جاري تحديث الجدول...</div>
         </div>
     </div>
     <?php endfor; ?>
@@ -90,35 +119,21 @@ async function fetchMatches() {
         const response = await fetch('https://api.scorebat.com/video-api/v3/');
         const data = await response.json();
         const matches = data.response;
-
         for (let i = 1; i <= 9; i++) {
             const container = document.getElementById(`sch-${i}`);
             let html = '<strong style="font-size:11px; color:#888; display:block; margin-bottom:5px;">📅 مباريات منقولة اليوم:</strong>';
-            
             let m1 = matches[i - 1]; 
-            let m2 = matches[i + 8]; 
-
             if (m1) {
                 html += `<div class="m-row"><span>${m1.title}</span><span class="m-time">LIVE</span></div>`;
+            } else {
+                html += '<div style="text-align:center; color:#ccc; font-size:11px;">لا توجد مباريات مسجلة حالياً</div>';
             }
-            if (m2) {
-                html += `<div class="m-row"><span>${m2.title}</span><span class="m-time">بث مباشر</span></div>`;
-            }
-            
-            if (!m1 && !m2) {
-                html += '<div class="loading">لا توجد مباريات مسجلة حالياً</div>';
-            }
-            
             container.innerHTML = html;
         }
     } catch (e) {
-        console.log("Fetch Error");
-        for (let i = 1; i <= 9; i++) {
-            document.getElementById(`sch-${i}`).innerHTML = '<div class="loading">المباريات قيد التحديث...</div>';
-        }
+        console.log("Error");
     }
 }
-
 window.onload = fetchMatches;
 </script>
 </body>
