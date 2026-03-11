@@ -3,39 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بث مباشر - جدول مباريات اليوم</title>
+    <title>بوابة الرياضة - جلب تلقائي نهائي</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
     <style>
         :root { --main: #e11d48; --bg: #f8fafc; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--bg); }
         header { background: #fff; padding: 20px; text-align: center; font-size: 22px; font-weight: bold; border-bottom: 4px solid var(--main); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 15px; max-width: 1200px; margin: auto; }
-        .card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
+        .card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; transition: 0.3s; }
         .c-head { padding: 12px; background: #fcfcfc; display: flex; justify-content: space-between; font-weight: bold; }
-        video { width: 100%; aspect-ratio: 16/9; background: #000; }
-        .play-btn { width: 90%; margin: 12px auto; display: block; background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .sch { padding: 12px; border-top: 1px solid #eee; min-height: 80px; }
+        .live-tag { color: #22c55e; font-size: 13px; display: flex; align-items: center; gap: 5px; }
+        .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
+        .play-btn { width: 90%; margin: 15px auto; display: block; background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .sch { padding: 12px; border-top: 1px solid #eee; min-height: 90px; }
         .m-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px; align-items: center; }
         .m-time { color: var(--main); font-weight: bold; font-size: 11px; background: #fff1f2; padding: 2px 5px; border-radius: 4px; }
-        .loading { text-align: center; color: #999; font-size: 12px; padding: 15px; }
+        .loading { text-align: center; color: #999; font-size: 12px; padding: 20px; }
     </style>
 </head>
 <body>
 
-<header>📺 بوابة الرياضة - جدول المباريات الحية</header>
+<header>📺 بوابة الرياضة - جدول المباريات الذكي</header>
 
 <div class="grid">
     <?php for($i = 1; $i <= 9; $i++): ?>
     <div class="card">
         <div class="c-head">
             <span>beIN Sport <?php echo $i; ?></span>
-            <span style="color:#22c55e">● مباشر</span>
+            <span class="live-tag"><span class="dot"></span> مباشر</span>
         </div>
-        <video id="vid<?php echo $i; ?>" controls></video>
+        <video id="vid<?php echo $i; ?>" controls poster="https://via.placeholder.com/400x225/111/fff?text=beIN+Sports+<?php echo $i; ?>"></video>
         <button class="play-btn" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">▶ تشغيل الآن</button>
         <div class="sch" id="sch-<?php echo $i; ?>">
-            <div class="loading">جاري جلب مباريات اليوم...</div>
+            <div class="loading">يتم الآن جلب جدول القناة...</div>
         </div>
     </div>
     <?php endfor; ?>
@@ -49,51 +54,46 @@ function play(id, s) {
     } else { v.src = s; v.play(); }
 }
 
-// دالة ذكية لجلب المباريات الحقيقية وتوزيعها بدون تكرار
-async function getLiveMatches() {
+// دالة الجلب التلقائي الذكي من مصدر عالمي مفتوح
+async function fetchMatches() {
     try {
-        // نستخدم API رياضي عالمي مفتوح للمباريات الحالية
-        const response = await fetch('https://worldcupjson.net/matches/today');
+        const response = await fetch('https://api.scorebat.com/video-api/v3/');
         const data = await response.json();
+        const matches = data.response;
 
-        // تصفية المباريات المتاحة اليوم
-        if (data && data.length > 0) {
-            for (let i = 1; i <= 9; i++) {
-                const container = document.getElementById(`sch-${i}`);
-                // نقوم باختيار مباراة مختلفة لكل قناة بناءً على رقم القناة
-                // (القناة 1 تأخذ المباراة الأولى، القناة 2 تأخذ الثانية.. وهكذا)
-                let matchIndex = (i - 1) % data.length;
-                let m = data[matchIndex];
-                
-                let html = `
-                    <div class="m-row">
-                        <span>${m.home_team.name} × ${m.away_team.name}</span>
-                        <span class="m-time">${new Date(m.datetime).getHours()}:00</span>
-                    </div>
-                `;
-                container.innerHTML = html;
+        for (let i = 1; i <= 9; i++) {
+            const container = document.getElementById(`sch-${i}`);
+            let html = '<strong style="font-size:11px; color:#888; display:block; margin-bottom:5px;">📅 مباريات منقولة اليوم:</strong>';
+            
+            // توزيع المباريات: كل قناة تأخذ مباراة مختلفة من القائمة المجلوبة
+            // إذا كانت القائمة تحتوي على مباريات كافية، سيتم عرضها
+            let m1 = matches[i - 1]; 
+            let m2 = matches[i + 8]; 
+
+            if (m1) {
+                html += `<div class="m-row"><span>${m1.title}</span><span class="m-time">LIVE</span></div>`;
             }
-        } else {
-            // في حال عدم وجود مباريات في الـ API، نستخدم بيانات حقيقية ثابتة للمباريات الكبرى اليوم
-            const dummyMatches = [
-                "ليفربول × جلطة سراي", "برشلونة × نيوكاسل", "مانشستر سيتي × نيوكاسل",
-                "ريال مدريد × بايرن ميونخ", "أرسنال × بورتو", "باريس × دورتموند",
-                "إنتر ميلان × أتلتيكو", "نابولي × برشلونة", "يوفنتوس × ميلان"
-            ];
-            for (let i = 1; i <= 9; i++) {
-                document.getElementById(`sch-${i}`).innerHTML = `
-                    <div class="m-row">
-                        <span>${dummyMatches[i-1]}</span>
-                        <span class="m-time">22:00</span>
-                    </div>`;
+            if (m2) {
+                html += `<div class="m-row"><span>${m2.title}</span><span class="m-time">بث مباشر</span></div>`;
             }
+            
+            if (!m1 && !m2) {
+                html += '<div class="loading">لا توجد مباريات مسجلة حالياً</div>';
+            }
+            
+            container.innerHTML = html;
         }
     } catch (e) {
-        console.error("Fetch error");
+        console.log("Fetch Error");
+        // في حال فشل الجلب، نعرض رسالة ثابتة بدلاً من التحميل اللانهائي
+        for (let i = 1; i <= 9; i++) {
+            document.getElementById(`sch-${i}`).innerHTML = '<div class="loading">المباريات قيد التحديث...</div>';
+        }
     }
 }
 
-window.onload = getLiveMatches;
+// البدء بالجلب بمجرد تحميل الصفحة
+window.onload = fetchMatches;
 </script>
 </body>
 </html>
