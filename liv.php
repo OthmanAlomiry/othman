@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
-        :root { --main: #e11d48; --bg: #030712; --whatsapp: #25d366; }
+        :root { --main: #e11d48; --bg: #030712; --whatsapp: #25d366; --snapchat: #FFFC00; }
         
         body { 
             margin: 0; 
@@ -21,7 +21,7 @@
             color: #fff;
         }
 
-        /* --- محرك الخلفية الرياضية المتحركة (VFX Background) --- */
+        /* --- محرك الخلفية الرياضية المتحركة الحماسي (VFX) --- */
         .bg-vfx {
             position: fixed;
             top: 0; left: 0;
@@ -31,7 +31,7 @@
             overflow: hidden;
         }
 
-        /* تأثير الشبكة الرياضية (Grid) */
+        /* تأثير الشبكة (Grid) */
         .bg-vfx::after {
             content: "";
             position: absolute;
@@ -41,11 +41,10 @@
                 linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
             background-size: 40px 40px;
-            perspective: 500px;
             mask-image: radial-gradient(ellipse at center, black, transparent 80%);
         }
 
-        /* أضواء النيون المتحركة (Animated Energy Waves) */
+        /* أمواج الطاقة المتحركة */
         .energy-wave {
             position: absolute;
             width: 800px; height: 800px;
@@ -55,13 +54,32 @@
             animation: moveEnergy 15s infinite alternate ease-in-out;
         }
 
-        @keyframes moveEnergy {
-            0% { transform: translate(-20%, -20%) scale(1); }
-            50% { transform: translate(40%, 10%) scale(1.2); }
-            100% { transform: translate(-10%, 40%) scale(0.9); }
+        /* تأثير البرق (Lightning Flash) */
+        .lightning-flash {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #fff;
+            opacity: 0;
+            z-index: -1;
+            pointer-events: none;
+            animation: flashAnim 8s infinite;
         }
 
-        /* --- شاشة الدخول السينمائية الواقعية --- */
+        @keyframes flashAnim {
+            0%, 92%, 100% { opacity: 0; }
+            93% { opacity: 0.1; }
+            94% { opacity: 0; }
+            96% { opacity: 0.2; }
+            97% { opacity: 0; }
+        }
+
+        @keyframes moveEnergy {
+            0% { transform: translate(-20%, -20%) scale(1); }
+            100% { transform: translate(30%, 30%) scale(1.2); }
+        }
+
+        /* --- شاشة الدخول السينمائية --- */
         #intro-video-wrap {
             position: fixed;
             top: 0; left: 0;
@@ -73,125 +91,94 @@
             z-index: 1000000;
             transition: 1s cubic-bezier(0.85, 0, 0.15, 1);
         }
-
-        .intro-ui { text-align: center; }
-        .ball-glow {
-            font-size: 100px;
-            color: #fff;
-            filter: drop-shadow(0 0 30px var(--main));
-            animation: logoIntro 2s infinite ease-in-out;
-        }
-        
-        .intro-title-ar {
-            font-size: 50px; font-weight: 900; color: #fff; margin-top: 20px;
-            background: linear-gradient(to bottom, #fff 50%, #94a3b8 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
-        @keyframes logoIntro {
-            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
-            50% { transform: scale(1.1) rotate(10deg); opacity: 1; filter: drop-shadow(0 0 50px var(--main)); }
-        }
-
+        .ball-glow { font-size: 100px; filter: drop-shadow(0 0 30px var(--main)); animation: logoIntro 2s infinite ease-in-out; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
+        @keyframes logoIntro { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        /* --- تنسيق المحتوى (Glassmorphism) --- */
-        .promo-bar { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(15px); border-bottom: 2px solid var(--main); padding: 15px; text-align: center; }
-        header { background: #fff; color: #000; padding: 12px; text-align: center; font-weight: 900; }
+        /* --- الهيدر (إرجاع كافة النصوص والروابط) --- */
+        .promo-sticky-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .promo-bar { background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); color: #fff; padding: 15px 12px; text-align: center; border-bottom: 3px solid var(--main); }
+        .promo-text { font-size: 13px; line-height: 1.6; max-width: 900px; margin: auto; }
+        .social-links { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        .social-btn { display: flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 12px; transition: 0.3s; }
+        .btn-wa { background: var(--whatsapp); color: white; }
+        .btn-snap { background: var(--snapchat); color: black; }
+        .btn-x { background: #000; color: white; }
+        header { background: #fff; padding: 12px; text-align: center; font-size: 18px; font-weight: bold; color: #000; border-bottom: 3px solid var(--main); }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; padding: 25px; max-width: 1400px; margin: auto; }
-        
-        /* كروت شفافة باحترافية */
-        .card { 
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px; 
-            overflow: hidden; 
-            transition: 0.4s;
-        }
-        .card:hover { transform: translateY(-10px); border-color: var(--main); box-shadow: 0 0 30px rgba(225, 29, 72, 0.2); }
-        
-        .c-head { padding: 12px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; color: #ddd; }
-        
+        /* --- الشبكة والكروت --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; max-width: 1400px; margin: auto; }
+        .card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; overflow: hidden; }
+        .c-head { padding: 12px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; font-weight: bold; }
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
-        
-        .play-btn { 
-            width: 90%; margin: 15px auto; display: block; 
-            background: linear-gradient(45deg, var(--main), #9f1239); 
-            color: #fff; border: none; padding: 14px; border-radius: 12px; 
-            font-weight: 900; cursor: pointer; transition: 0.3s;
-        }
+        .play-btn { width: 90%; margin: 15px auto; display: block; background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        footer { text-align: center; padding: 60px 20px; }
-        #count-num { font-size: 45px; color: #22c55e; font-weight: 900; text-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
+        footer { text-align: center; padding: 50px; }
+        #count-num { font-size: 40px; color: #22c55e; font-weight: 900; }
     </style>
 </head>
 <body>
 
     <div class="bg-vfx">
         <div class="energy-wave" style="top: -10%; left: -10%;"></div>
-        <div class="energy-wave" style="bottom: -10%; right: -10%; animation-delay: -7s; background: radial-gradient(circle, rgba(30, 64, 175, 0.15) 0%, transparent 70%);"></div>
+        <div class="energy-wave" style="bottom: -10%; right: -10%; background: radial-gradient(circle, rgba(30, 64, 175, 0.1) 0%, transparent 70%);"></div>
     </div>
+    <div class="lightning-flash"></div>
 
     <div id="intro-video-wrap">
-        <div class="intro-ui">
+        <div style="text-align:center;">
             <i class="fas fa-futbol ball-glow"></i>
-            <h1 class="intro-title-ar">الخدمة الرقمية</h1>
-            <div style="color:var(--main); letter-spacing: 5px; font-weight: bold; margin-top: 10px;">D-SERVICE PRO</div>
+            <h1 style="color:#fff; font-size:50px; font-weight:900; margin-top:20px;">الخدمة الرقمية</h1>
         </div>
     </div>
 
-    <div style="position:fixed; top:0; width:100%; z-index:1000;">
+    <div class="promo-sticky-container">
         <div class="promo-bar">
-            <div style="font-size: 14px; font-weight: bold;">بث حصري مجاني من متجر الخدمة الرقمية</div>
-            <div style="display:flex; justify-content:center; gap:15px; margin-top:10px;">
-                <a href="https://wa.me/966505571164" style="color:#fff; text-decoration:none; background:var(--whatsapp); padding:5px 15px; border-radius:50px; font-size:12px;"><i class="fab fa-whatsapp"></i> واتساب</a>
-                <a href="https://snapchat.com/t/4DVEkM5k" style="color:#000; text-decoration:none; background:#FFFC00; padding:5px 15px; border-radius:50px; font-size:12px;"><i class="fab fa-snapchat"></i> سناب</a>
+            <div class="promo-text">هذه الصفحة مقدمة مجاناً من <strong>متجر الخدمة الرقمية</strong> للاشتراك في الباقة كاملة يدعم جميع القنوات الرياضة ومكتبة الأفلام والمسلسلات على شاشة التلفزون والجوال تواصل واتساب</div>
+            <div class="social-links">
+                <a href="https://wa.me/966505571164" class="social-btn btn-wa"><i class="fab fa-whatsapp"></i> تواصل واتساب</a>
+                <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-snap"><i class="fab fa-snapchat"></i> سناب شات</a>
+                <a href="https://x.com/d_service_pro?s=21" class="social-btn btn-x"><i class="fab fa-x-twitter"></i> تابعنا على X</a>
             </div>
         </div>
-        <header>المباريات المباشرة - جودة عالية 4K</header>
+        <header>📺 بوابة الرياضة - مباريات اليوم المباشرة</header>
     </div>
 
     <div class="grid">
         <?php for($i = 1; $i <= 9; $i++): ?>
         <div class="card">
-            <div class="c-head">
-                <span>beIN Sport <?php echo $i; ?></span>
-                <span style="color: #22c55e;"><i class="fas fa-circle" style="font-size: 8px;"></i> مباشر</span>
-            </div>
+            <div class="c-head"><span>beIN Sport <?php echo $i; ?></span><span style="color: #22c55e;">● مباشر</span></div>
             <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/111/fff?text=beIN+Sports"></video>
-            <button class="play-btn" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">تفعيل البث المباشر</button>
+            <button class="play-btn" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">▶ تشغيل البث الآن</button>
         </div>
         <?php endfor; ?>
     </div>
 
     <footer>
-        <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; display: inline-block; border: 1px solid rgba(255,255,255,0.1);">
-            <p style="margin:0; font-size:12px; opacity:0.6;">إجمالي المشاهدات الحقيقية</p>
+        <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; display: inline-block;">
+            <p style="margin:0; font-size:12px; opacity:0.6;">إجمالي زيارات الموقع الحقيقية</p>
             <div id="count-num">0</div>
         </div>
     </footer>
 
     <script>
-    // إخفاء الانترو بعد 3 ثواني
     window.addEventListener('load', () => {
         setTimeout(() => {
             const intro = document.getElementById('intro-video-wrap');
-            intro.classList.add('intro-hide');
-            setTimeout(() => intro.remove(), 1000);
+            if(intro) {
+                intro.classList.add('intro-hide');
+                setTimeout(() => intro.remove(), 1000);
+            }
         }, 3000);
     });
 
-    // عداد الزيارات
     function updateCounter() {
-        let count = localStorage.getItem('vCount') || 2840;
+        let count = localStorage.getItem('vCount') || 1452;
         count = parseInt(count) + 1;
         localStorage.setItem('vCount', count);
         document.getElementById('count-num').innerText = count.toLocaleString();
     }
 
-    // تشغيل الفيديو بدون تكبير
     function play(id, src) {
         var video = document.getElementById(id);
         if (Hls.isSupported()) {
