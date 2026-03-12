@@ -65,7 +65,6 @@
         .card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
         .c-head { padding: 12px; background: #fcfcfc; display: flex; justify-content: space-between; font-weight: bold; }
         
-        /* تصميم الفيديو */
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
         
         .play-btn { width: 90%; margin: 15px auto; display: block; background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
@@ -100,7 +99,7 @@
 </div>
 
 <div class="grid">
-    <?php for($i = 1; $i <= 6; $i++): ?>
+    <?php for($i = 1; $i <= 9; $i++): ?>
     <div class="card">
         <div class="c-head"><span>beIN Sport <?php echo $i; ?></span><span style="color: #22c55e;">● مباشر</span></div>
         <video id="vid<?php echo $i; ?>" 
@@ -125,8 +124,10 @@
 window.addEventListener('load', function() {
     setTimeout(function() {
         const intro = document.getElementById('pro-cinematic-intro');
-        intro.classList.add('intro-finish');
-        setTimeout(() => intro.remove(), 1200);
+        if(intro) {
+            intro.classList.add('intro-finish');
+            setTimeout(() => intro.remove(), 1200);
+        }
     }, 3500); 
 });
 
@@ -147,7 +148,6 @@ function play(id, src) {
             video.play();
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // دعم متصفح Safari على iPhone
         video.src = src;
         video.addEventListener('loadedmetadata', function() {
             video.play();
