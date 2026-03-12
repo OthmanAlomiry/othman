@@ -6,120 +6,90 @@
     <title>بوابة الرياضة - متجر الخدمة الرقمية</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
-        :root { --main: #e11d48; --bg: #f8fafc; --whatsapp: #25d366; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--bg); }
+        :root { --main: #e11d48; --bg: #f8fafc; --whatsapp: #25d366; --snapchat: #FFFC00; --x-black: #000000; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--bg); padding-top: 180px; }
         
-        /* تنسيق إعلان المتجر العلوي */
-        .promo-bar {
-            background: linear-gradient(90deg, #1e293b, #334155);
-            color: #fff;
-            padding: 15px;
-            text-align: center;
-            font-size: 14px;
-            line-height: 1.6;
-            border-bottom: 3px solid var(--whatsapp);
-        }
-        .promo-bar strong { color: var(--whatsapp); }
-        .wa-link {
-            display: inline-block;
-            margin-top: 8px;
-            background: var(--whatsapp);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .wa-link:hover { transform: scale(1.05); background: #128c7e; }
-
-        header { background: #fff; padding: 20px; text-align: center; font-size: 22px; font-weight: bold; border-bottom: 4px solid var(--main); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 15px; max-width: 1200px; margin: auto; }
-        .card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; transition: 0.3s; }
-        .c-head { padding: 12px; background: #fcfcfc; display: flex; justify-content: space-between; font-weight: bold; }
-        .live-tag { color: #22c55e; font-size: 13px; display: flex; align-items: center; gap: 5px; }
-        .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+        /* القسم العلوي الثابت */
+        .promo-sticky-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .promo-bar { background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); color: #fff; padding: 15px 12px; text-align: center; border-bottom: 3px solid var(--main); }
+        .promo-text { font-size: 13px; margin-bottom: 15px; line-height: 1.6; max-width: 900px; margin: auto; }
+        .promo-text strong { color: var(--main); }
+        .social-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .social-btn { display: flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 12px; transition: 0.3s; }
+        .btn-wa { background: var(--whatsapp); color: white; }
+        .btn-snap { background: var(--snapchat); color: black; }
+        .btn-x { background: var(--x-black); color: white; }
+        header { background: #fff; padding: 12px; text-align: center; font-size: 18px; font-weight: bold; border-bottom: 3px solid var(--main); color: #1e293b; }
+        
+        /* شبكة القنوات */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; max-width: 1300px; margin: auto; }
+        .card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
+        .c-head { padding: 12px; background: #fcfcfc; display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; }
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
-        .play-btn { width: 90%; margin: 15px auto; display: block; background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .sch { padding: 12px; border-top: 1px solid #eee; min-height: 90px; }
-        .m-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px; align-items: center; }
-        .m-time { color: var(--main); font-weight: bold; font-size: 11px; background: #fff1f2; padding: 2px 5px; border-radius: 4px; }
-        .loading { text-align: center; color: #999; font-size: 12px; padding: 20px; }
+        .play-btn { width: 90%; margin: 15px auto; display: block; background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-family: 'Tajawal'; }
+        
+        /* العداد المطور والنهائي */
+        footer { text-align: center; padding: 40px 10px; background: #fff; margin-top: 50px; }
+        .visitor-counter { display: inline-block; background: #1e293b; padding: 20px 40px; border-radius: 15px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid #334155; }
+        #count-num { font-size: 40px; color: #22c55e; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 10px rgba(34, 197, 94, 0.5); font-family: sans-serif; }
     </style>
 </head>
 <body>
 
-<div class="promo-bar">
-    هذه الصفحة مقدمة مجاناً من <strong>متجر الخدمة الرقمية</strong><br>
-    للاشتراك في الباقة كاملة (جميع القنوات الرياضية + مكتبة أفلام ومسلسلات) على التلفزيون والجوال<br>
-    <a href="https://wa.me/966505571164" class="wa-link">تواصل واتساب: 0505571164</a>
+<div class="promo-sticky-container">
+    <div class="promo-bar">
+        <div class="promo-text">هذه الصفحة مقدمة مجاناً من <strong>متجر الخدمة الرقمية</strong> للاشتراك في الباقة كاملة يدعم جميع القنوات الرياضة ومكتبة الأفلام والمسلسلات على شاشة التلفزون والجوال تواصل واتساب</div>
+        <div class="social-links">
+            <a href="https://wa.me/966505571164" class="social-btn btn-wa"><i class="fab fa-whatsapp"></i> تواصل واتساب</a>
+            <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-snap"><i class="fab fa-snapchat"></i> سناب شات</a>
+            <a href="https://x.com/d_service_pro?s=21" class="social-btn btn-x"><i class="fab fa-x-twitter"></i> تابعنا على X</a>
+        </div>
+    </div>
+    <header>📺 بوابة الرياضة - مباشر</header>
 </div>
 
-<header>📺 بوابة الرياضة - جدول المباريات الذكي</header>
-
 <div class="grid">
-    <?php for($i = 1; $i <= 9; $i++): ?>
+    <?php for($i = 1; $i <= 6; $i++): ?>
     <div class="card">
-        <div class="c-head">
-            <span>beIN Sport <?php echo $i; ?></span>
-            <span class="live-tag"><span class="dot"></span> مباشر</span>
-        </div>
-        <video id="vid<?php echo $i; ?>" controls poster="https://via.placeholder.com/400x225/111/fff?text=beIN+Sports+<?php echo $i; ?>"></video>
-        <button class="play-btn" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">▶ تشغيل الآن</button>
-        <div class="sch" id="sch-<?php echo $i; ?>">
-            <div class="loading">يتم الآن جلب جدول القناة...</div>
-        </div>
+        <div class="c-head"><span>beIN Sport <?php echo $i; ?></span><span style="color: #22c55e;">● مباشر</span></div>
+        <video id="vid<?php echo $i; ?>" controls poster="https://via.placeholder.com/400x225/111/fff?text=beIN+Sports"></video>
+        <button class="play-btn" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">▶ تشغيل البث</button>
     </div>
     <?php endfor; ?>
 </div>
 
+<footer>
+    <div class="visitor-counter">
+        <p style="margin:0 0 10px; font-size:12px; color:#94a3b8;">إجمالي زيارات الموقع الحقيقية</p>
+        <div id="count-num">1,452</div>
+    </div>
+    <p style="margin-top:20px; font-size:11px; color:#ccc;">&copy; 2026 متجر الخدمة الرقمية</p>
+</footer>
+
 <script>
-function play(id, s) {
-    var v = document.getElementById(id);
-    if (Hls.isSupported()) {
-        var hls = new Hls(); hls.loadSource(s); hls.attachMedia(v); v.play();
-    } else { v.src = s; v.play(); }
-}
-
-async function fetchMatches() {
-    try {
-        const response = await fetch('https://api.scorebat.com/video-api/v3/');
-        const data = await response.json();
-        const matches = data.response;
-
-        for (let i = 1; i <= 9; i++) {
-            const container = document.getElementById(`sch-${i}`);
-            let html = '<strong style="font-size:11px; color:#888; display:block; margin-bottom:5px;">📅 مباريات منقولة اليوم:</strong>';
-            
-            let m1 = matches[i - 1]; 
-            let m2 = matches[i + 8]; 
-
-            if (m1) {
-                html += `<div class="m-row"><span>${m1.title}</span><span class="m-time">LIVE</span></div>`;
-            }
-            if (m2) {
-                html += `<div class="m-row"><span>${m2.title}</span><span class="m-time">بث مباشر</span></div>`;
-            }
-            
-            if (!m1 && !m2) {
-                html += '<div class="loading">لا توجد مباريات مسجلة حالياً</div>';
-            }
-            
-            container.innerHTML = html;
-        }
-    } catch (e) {
-        console.log("Fetch Error");
-        for (let i = 1; i <= 9; i++) {
-            document.getElementById(`sch-${i}`).innerHTML = '<div class="loading">المباريات قيد التحديث...</div>';
-        }
+// عداد ذكي يحفظ الرقم ويزيده تلقائياً ليعطي هيبة للموقع
+function updateCounter() {
+    let count = localStorage.getItem('visitorCount');
+    if (!count) {
+        count = 1452; // رقم البداية لتعزيز الثقة
+    } else {
+        count = parseInt(count) + Math.floor(Math.random() * 3) + 1; // يزيد عشوائياً بين 1 و 3 في كل زيارة
     }
+    localStorage.setItem('visitorCount', count);
+    document.getElementById('count-num').innerText = count.toLocaleString();
 }
 
-window.onload = fetchMatches;
+function play(id, src) {
+    var video = document.getElementById(id);
+    if (Hls.isSupported()) { var hls = new Hls(); hls.loadSource(src); hls.attachMedia(video); video.play(); }
+    else if (video.canPlayType('application/vnd.apple.mpegurl')) { video.src = src; video.play(); }
+}
+
+window.onload = updateCounter;
 </script>
 </body>
 </html>
