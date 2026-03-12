@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بوابة الرياضة - متجر الخدمة الرقمية</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
         :root { --main: #e11d48; --bg: #0f172a; --whatsapp: #25d366; --snapchat: #FFFC00; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background: #f1f5f9; padding-top: 180px; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background: #f1f5f9; padding-top: 180px; overflow-x: hidden; }
 
-        /* --- شاشة الدخول السينمائية (Cinematic Video Intro) --- */
-        #cinematic-intro {
+        /* --- شاشة الدخول الاحترافية: فيديو واقعي عربي --- */
+        #pro-cinematic-intro {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
@@ -22,120 +22,135 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 100000;
+            z-index: 1000000;
             overflow: hidden;
-            transition: all 1s cubic-bezier(0.9, 0, 0.1, 1);
+            transition: all 1.2s cubic-bezier(0.7, 0, 0.3, 1);
         }
 
-        /* خلفية ضوئية متحركة تشبه الفيديو */
-        #cinematic-intro::before {
-            content: '';
+        /* تأثير الدخان والضوء المتحرك (VFX) */
+        .video-bg-effect {
             position: absolute;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 50%);
-            animation: moveLight 8s infinite alternate;
+            width: 150%; height: 150%;
+            background: radial-gradient(circle at center, rgba(225, 29, 72, 0.2) 0%, transparent 40%),
+                        repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, transparent 1px, transparent 100px);
+            animation: moveVFX 15s infinite linear;
+            filter: blur(50px);
         }
 
-        .intro-content {
+        .content-wrap {
             position: relative;
+            z-index: 10;
             text-align: center;
-            z-index: 2;
         }
 
-        .logo-box {
-            position: relative;
-            animation: logoEntrance 1.5s ease-out forwards;
-        }
-
-        .logo-box i {
-            font-size: 100px;
+        /* شعار متوهج */
+        .main-logo {
+            font-size: 90px;
             color: #fff;
-            filter: drop-shadow(0 0 30px var(--main));
-            animation: pulseGlow 2s infinite ease-in-out;
+            margin-bottom: 20px;
+            display: inline-block;
+            filter: drop-shadow(0 0 25px var(--main));
+            animation: logoPulse 2s infinite ease-in-out;
         }
 
-        .brand-name {
-            margin-top: 25px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 35px;
+        /* النص العربي السينمائي */
+        .brand-title-ar {
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 900;
+            font-size: clamp(35px, 8vw, 60px);
             color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 15px; /* حروف متباعدة جداً كالأفلام */
+            margin: 0;
+            letter-spacing: -1px;
             opacity: 0;
-            animation: textReveal 2s 0.5s forwards;
+            transform: translateY(30px);
+            animation: textRevealAr 1s 0.5s forwards;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
-        .loading-line-container {
-            width: 300px;
-            height: 2px;
+        .sub-title-ar {
+            font-size: 18px;
+            color: var(--main);
+            font-weight: 700;
+            margin-top: 10px;
+            letter-spacing: 5px;
+            opacity: 0;
+            animation: fadeInAr 1s 1.2s forwards;
+        }
+
+        /* شريط التحميل الرقمي */
+        .loading-frame {
+            width: 280px;
+            height: 3px;
             background: rgba(255,255,255,0.1);
-            margin: 30px auto;
+            margin: 40px auto;
             position: relative;
+            border-radius: 5px;
             overflow: hidden;
         }
 
-        .loading-line {
+        .loading-fill {
             position: absolute;
             width: 0%; height: 100%;
-            background: var(--main);
+            background: linear-gradient(to right, transparent, var(--main));
             box-shadow: 0 0 15px var(--main);
-            animation: lineFill 3s ease-in-out forwards;
+            animation: proLoading 3s cubic-bezier(0.1, 0.5, 0.5, 1) forwards;
         }
 
-        .scanning-text {
-            color: rgba(255,255,255,0.5);
-            font-size: 12px;
+        .status-msg {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 400;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-top: 10px;
+            letter-spacing: 2px;
         }
 
-        /* حركات الأنيميشن */
-        @keyframes moveLight {
-            from { transform: translate(-20%, -20%); }
-            to { transform: translate(10%, 10%); }
+        /* --- الحركات (Animations) --- */
+        @keyframes moveVFX {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(360deg) scale(1.2); }
         }
 
-        @keyframes logoEntrance {
-            0% { transform: scale(0.5); opacity: 0; filter: blur(20px); }
-            100% { transform: scale(1); opacity: 1; filter: blur(0); }
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px var(--main)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 45px var(--main)); }
         }
 
-        @keyframes pulseGlow {
-            0%, 100% { filter: drop-shadow(0 0 20px var(--main)); transform: scale(1); }
-            50% { filter: drop-shadow(0 0 50px var(--main)); transform: scale(1.05); }
+        @keyframes textRevealAr {
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes textReveal {
-            to { opacity: 1; letter-spacing: 5px; }
+        @keyframes fadeInAr {
+            to { opacity: 1; letter-spacing: 2px; }
         }
 
-        @keyframes lineFill {
-            to { width: 100%; }
+        @keyframes proLoading {
+            0% { width: 0%; }
+            100% { width: 100%; }
         }
 
-        /* خروج السينما */
-        .intro-fade-out {
-            transform: scale(1.5);
+        /* تأثير الخروج السينمائي */
+        .intro-finish {
+            transform: scale(1.2);
+            filter: blur(20px);
             opacity: 0;
             visibility: hidden;
         }
 
-        /* ------------------------------------------------ */
+        /* ------------------------------------------- */
 
         .promo-sticky-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
         .promo-bar { background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px); color: #fff; padding: 15px 12px; text-align: center; border-bottom: 3px solid var(--main); }
-        .promo-text { font-size: 13px; margin-bottom: 15px; line-height: 1.6; max-width: 900px; margin: auto; }
-        .social-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .promo-text { font-size: 13px; line-height: 1.6; max-width: 900px; margin: auto; }
+        .social-links { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         .social-btn { display: flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 12px; transition: 0.3s; }
         .btn-wa { background: var(--whatsapp); color: white; }
         .btn-snap { background: var(--snapchat); color: black; }
         .btn-x { background: #000; color: white; }
-        header { background: #fff; padding: 12px; text-align: center; font-size: 18px; font-weight: bold; border-bottom: 3px solid var(--main); color: #1e293b; }
+        header { background: #fff; padding: 12px; text-align: center; font-size: 18px; font-weight: bold; border-bottom: 3px solid var(--main); }
         
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; max-width: 1300px; margin: auto; }
         .card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
-        .c-head { padding: 12px; background: #fcfcfc; display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; }
+        .c-head { padding: 12px; background: #fcfcfc; display: flex; justify-content: space-between; font-weight: bold; }
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         .play-btn { width: 90%; margin: 15px auto; display: block; background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         
@@ -145,26 +160,30 @@
 </head>
 <body>
 
-<div id="cinematic-intro">
-    <div class="intro-content">
-        <div class="logo-box">
-            <i class="fas fa-futbol"></i>
+<div id="pro-cinematic-intro">
+    <div class="video-bg-effect"></div>
+    <div class="content-wrap">
+        <div class="main-logo">
+            <i class="fas fa-play-circle"></i>
         </div>
-        <div class="brand-name">D-SERVICE PRO</div>
-        <div class="loading-line-container">
-            <div class="loading-line"></div>
+        <h1 class="brand-title-ar">الخدمة الرقمية</h1>
+        <div class="sub-title-ar">D-SERVICE PRO</div>
+        
+        <div class="loading-frame">
+            <div class="loading-fill"></div>
         </div>
-        <div class="scanning-text">Encrypting Live Stream Servers...</div>
+        
+        <div class="status-msg">تشفير سيرفرات البث المباشر...</div>
     </div>
 </div>
 
 <div class="promo-sticky-container">
     <div class="promo-bar">
-        <div class="promo-text">هذه الصفحة مقدمة مجاناً من <strong>متجر الخدمة الرقمية</strong> للاشتراك في الباقة كاملة يدعم جميع القنوات الرياضة ومكتبة الأفلام والمسلسلات تواصل واتساب</div>
+        <div class="promo-text">هذه الصفحة مقدمة مجاناً من <strong>متجر الخدمة الرقمية</strong> للاشتراك في الباقة كاملة تواصل واتساب</div>
         <div class="social-links">
-            <a href="https://wa.me/966505571164" class="social-btn btn-wa"><i class="fab fa-whatsapp"></i> تواصل واتساب</a>
-            <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-snap"><i class="fab fa-snapchat"></i> سناب شات</a>
-            <a href="https://x.com/d_service_pro?s=21" class="social-btn btn-x"><i class="fab fa-x-twitter"></i> تابعنا على X</a>
+            <a href="https://wa.me/966505571164" class="social-btn btn-wa"><i class="fab fa-whatsapp"></i> واتساب</a>
+            <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-snap"><i class="fab fa-snapchat"></i> سناب</a>
+            <a href="https://x.com/d_service_pro?s=21" class="social-btn btn-x"><i class="fab fa-x-twitter"></i> تويتر X</a>
         </div>
     </div>
     <header>📺 بوابة الرياضة - مباشر</header>
@@ -182,19 +201,18 @@
 
 <footer>
     <div style="background: #1e293b; color:#fff; display:inline-block; padding:20px 40px; border-radius:15px;">
-        <p style="margin:0; font-size:12px; opacity:0.6;">إجمالي زيارات الموقع</p>
+        <p style="margin:0; font-size:12px; opacity:0.6;">زيارات الموقع</p>
         <div id="count-num">1,452</div>
     </div>
 </footer>
 
 <script>
-// التحكم في الانترو السينمائي (3 ثواني)
+// التحكم في شاشة الدخول (3 ثواني)
 window.addEventListener('load', function() {
     setTimeout(function() {
-        const intro = document.getElementById('cinematic-intro');
-        intro.classList.add('intro-fade-out');
-        // إزالة العنصر تماماً من المتصفح بعد انتهاء الحركة لتسريع الموقع
-        setTimeout(() => intro.remove(), 1000);
+        const intro = document.getElementById('pro-cinematic-intro');
+        intro.classList.add('intro-finish');
+        setTimeout(() => intro.remove(), 1200);
     }, 3500); 
 });
 
@@ -208,7 +226,6 @@ function updateCounter() {
 function play(id, src) {
     var video = document.getElementById(id);
     if (Hls.isSupported()) { var hls = new Hls(); hls.loadSource(src); hls.attachMedia(video); video.play(); }
-    else if (video.canPlayType('application/vnd.apple.mpegurl')) { video.src = src; video.play(); }
 }
 
 window.onload = updateCounter;
