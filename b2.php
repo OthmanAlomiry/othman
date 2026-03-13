@@ -1,7 +1,7 @@
 <?php
 
-$base = "http://sportfet.shop/BEIN-SPO--2/tracks-v1a1/";
-$file = "mono.m3u8";
+$base = "http://135.125.109.73:9000/";
+$file = "beinsport2_.m3u8";
 
 function stream($url){
 
