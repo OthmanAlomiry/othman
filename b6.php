@@ -1,7 +1,7 @@
 <?php
 
-$base = "http://135.125.109.73:9000/";
-$stream = $base . "beinsport6_.m3u8";
+$base = "http://xmrcars.org:8080/bn6hd/";
+$stream = $base . "mono.m3u8";
 
 header("Access-Control-Allow-Origin: *");
 
