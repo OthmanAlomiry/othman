@@ -1,7 +1,7 @@
 <?php
 
-$base = "http://135.125.109.73:9000/";
-$file = "beinsport3_.m3u8";
+$base = "http://xmrcars.org:8080/bn3hd/";
+$file = "mono.m3u8";
 
 function stream($url){
 
