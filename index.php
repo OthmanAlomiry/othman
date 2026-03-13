@@ -5,29 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>بوابة الرياضة - متجر الخدمة الرقمية</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Poppins:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
         :root { 
             --main: #e11d48; 
-            --main-glow: rgba(225, 29, 72, 0.6); /* لون التوهج */
             --bg-deep: #061626; 
-            --pattern-color: #0d2d44; 
             --whatsapp: #25d366; 
             --snapchat: #FFFC00; 
         }
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* --- محرك الخلفية الزخرفية المتحركة --- */
+        /* --- الخلفية الزخرفية المتحركة --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: url('https://www.transparenttextures.com/patterns/black-paper.png'), linear-gradient(135deg, var(--bg-deep) 0%, #0a1f33 100%); background-color: var(--bg-deep); }
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.15; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
         .side-glow { position: fixed; top: 0; right: 0; width: 50%; height: 100%; background: radial-gradient(circle at right, rgba(13, 45, 68, 0.6) 0%, transparent 70%); z-index: -1; pointer-events: none; }
 
-        /* --- شاشة الدخول (Splash) --- */
+        /* --- شاشة الدخول --- */
         #intro-video-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #040c16; display: flex; justify-content: center; align-items: center; z-index: 1000000; transition: 1s ease-in-out; }
         .ball-glow { font-size: 80px; color: #fff; filter: drop-shadow(0 0 20px var(--main)); animation: pulseLogo 2s infinite; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
@@ -42,74 +40,94 @@
         .btn-wa { background: var(--whatsapp); } .btn-snap { background: var(--snapchat); color: #000; } .btn-x { background: #000; }
         header { background: #fff; padding: 12px; text-align: center; font-size: 18px; font-weight: 900; color: #061626; }
 
-        /* --- القنوات والكروت --- */
+        /* --- شبكة القنوات --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; max-width: 1400px; margin: auto; }
-        .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
-        .c-head { padding: 12px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; font-weight: bold; color: #cbd5e1; font-size: 14px; }
-        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
+        .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; }
 
         /* =======================================================
-           قـمـة الـفـخـامـة: زر الـزجـاج الـمـتـوهـج (Neon Glass)
+           تـصـمـيـم أسـمـاء الـقـنـوات الـمـسـتـقـيـم والأنـيـق الـمـطـور
            ======================================================= */
-        .play-btn-premium { 
-            width: 90%; 
-            margin: 20px auto; 
-            display: flex;
-            justify-content: center;
+        .c-head { 
+            padding: 10px 15px; /* تقليل الارتفاع الإجمالي للهيدر */
+            background: rgba(0,0,0,0.2); 
+            display: flex; 
+            justify-content: space-between; 
             align-items: center;
-            gap: 12px;
-            /* زجاج شفاف */
-            background: rgba(225, 29, 72, 0.05); 
-            backdrop-filter: blur(5px); /* تمويه خفيف خلف الزجاج */
-            color: #fff; 
-            /* إطار رفيع جداً متوهج باللون الأحمر النابض */
-            border: 1.5px solid rgba(225, 29, 72, 0.4); 
-            padding: 15px; 
-            border-radius: 50px; /* دائرية انسيابية */
-            font-weight: 900; 
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer; 
-            position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            /* هالة ضوئية أساسية ناعمة */
-            box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            overflow: hidden;
-            animation: borderPulse 2s infinite ease-in-out;
+        }
+        
+        .channel-name-box {
+            background: linear-gradient(45deg, #7c3aed, #fff); /* التدرج البنفسجي والأبيض */
+            padding: 3px 15px; /* تقليل الارتفاع الداخلي للمستطيل */
+            transform: none; /* إزالة الانحراف (جعل المستطيل مستقيماً) */
+            border-radius: 6px; /* حواف دائرية ناعمة */
+            box-shadow: 0 3px 8px rgba(124, 58, 237, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.2);
         }
 
-        /* إضافة أيقونة تشغيل سينمائية صغيرة قبل النص */
-        .play-btn-premium::before {
-            content: "\f04b"; /* أيقونة Play من FontAwesome */
-            font-family: "Font Awesome 6 Free";
+        .channel-name {
+            display: flex;
+            align-items: center;
+            gap: 6px; /* مسافة بين وسم 4K والاسم */
+            transform: none; /* إزالة الانحراف عن النص */
+            font-family: 'Poppins', 'Tajawal', sans-serif;
+            font-size: 14px; /* تقليل حجم الخط قليلاً ليناسب النحافة */
             font-weight: 900;
-            font-size: 14px;
-            color: rgba(255,255,255,0.7);
+            color: #061626; /* لون نص غامق للوضوح */
         }
 
-        /* عند تمرير الماوس (Hover) - تفعيل التوهج الكامل */
-        .play-btn-premium:hover { 
-            background: var(--main); 
-            border-color: var(--main);
-            box-shadow: 0 8px 30px rgba(225, 29, 72, 0.8);
-            transform: translateY(-4px) scale(1.03);
-            text-shadow: 0 0 10px rgba(255,255,255,0.8);
+        .tag-4k {
+            background: #000;
+            color: #fff;
+            font-size: 9px;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: 900;
+            vertical-align: middle;
+            border: 1px solid #7c3aed;
         }
 
-        /* عند الضغط (Click) */
-        .play-btn-premium:active {
-            transform: translateY(1px) scale(0.98);
-            box-shadow: 0 2px 10px rgba(225, 29, 72, 0.3);
+        .live-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0,0,0,0.4);
+            padding: 3px 10px; /* تقليل الارتفاع للحالة */
+            border-radius: 6px;
+            transform: none; /* جعل مستطيل الحالة مستقيماً */
+            border-right: 2px solid #22c55e;
         }
 
-        /* حركات الأنيميشن لتوجه الإطار */
-        @keyframes borderPulse {
-            0%, 100% { border-color: rgba(225, 29, 72, 0.4); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2); }
-            50% { border-color: rgba(225, 29, 72, 0.8); box-shadow: 0 4px 20px rgba(225, 29, 72, 0.5); }
+        .live-text {
+            transform: none;
+            font-size: 9px;
+            font-weight: 900;
+            color: #22c55e;
+            text-transform: uppercase;
         }
-        /* ======================================================= */
+
+        .live-dot {
+            width: 5px;
+            height: 5px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
+
+        /* زر التشغيل الزجاجي الفخم */
+        .play-btn-premium { 
+            width: 90%; margin: 20px auto; display: flex; justify-content: center; align-items: center; gap: 12px;
+            background: rgba(225, 29, 72, 0.05); backdrop-filter: blur(5px); color: #fff; 
+            border: 1.5px solid rgba(225, 29, 72, 0.4); padding: 15px; border-radius: 50px; 
+            font-weight: 900; font-size: 16px; cursor: pointer; position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); overflow: hidden; animation: borderPulse 2s infinite ease-in-out;
+        }
+        .play-btn-premium:hover { background: var(--main); border-color: var(--main); box-shadow: 0 8px 30px rgba(225, 29, 72, 0.8); transform: translateY(-4px) scale(1.03); }
+        @keyframes borderPulse { 0%, 100% { border-color: rgba(225, 29, 72, 0.4); } 50% { border-color: rgba(225, 29, 72, 0.8); } }
 
         footer { text-align: center; padding: 50px; }
         .footer-counter { background: rgba(255,255,255,0.02); padding: 20px 45px; border-radius: 20px; display: inline-block; border: 1px solid rgba(255,255,255,0.05); }
@@ -143,10 +161,23 @@
     <div class="grid">
         <?php for($i = 1; $i <= 9; $i++): ?>
         <div class="card">
-            <div class="c-head"><span>beIN Sport <?php echo $i; ?></span><span style="color:#22c55e;">● مباشر</span></div>
+            <div class="c-head">
+                <div class="channel-name-box">
+                    <span class="channel-name">
+                        <span class="tag-4k">4K</span>
+                        beIN Sport <?php echo $i; ?>
+                    </span>
+                </div>
+                <div class="live-status">
+                    <div class="live-dot"></div>
+                    <span class="live-text">Live Stream</span>
+                </div>
+            </div>
+            
             <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=beIN+Sports"></video>
+            
             <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">
-                تشغيل البث الآن
+                 ▶ تشغيل البث الآن
             </button>
         </div>
         <?php endfor; ?>
