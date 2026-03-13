@@ -12,6 +12,7 @@
     <style>
         :root { 
             --main: #e11d48; 
+            --main-glow: rgba(225, 29, 72, 0.6);
             --bg-deep: #061626; 
             --whatsapp: #25d366; 
             --snapchat: #FFFC00; 
@@ -29,8 +30,9 @@
         #intro-video-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #040c16; display: flex; justify-content: center; align-items: center; z-index: 1000000; transition: 1s ease-in-out; }
         .ball-glow { font-size: 80px; color: #fff; filter: drop-shadow(0 0 20px var(--main)); animation: pulseLogo 2s infinite; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
+        @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        /* --- الهيدر الاحترافي الجديد (Main Header) --- */
+        /* --- الهيدر الاحترافي والمطور (Sticky) --- */
         .promo-sticky-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
         
         /* شريط التواصل العلوي */
@@ -41,47 +43,57 @@
         .social-btn { display: flex; align-items: center; gap: 6px; padding: 6px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; transition: 0.3s; }
         .btn-wa { background: var(--whatsapp); } .btn-snap { background: var(--snapchat); color: #000; } .btn-x { background: #000; }
 
-        /* تصميم عبارة "بوابة الرياضة - البث المباشر" الفخم */
+        /* =======================================================
+           قـمـة الـفـخـامـة: هـيـدر الـزجـاج الـعـمـيـق (Deep Glass Header)
+           ======================================================= */
         .main-portal-header {
+            /* زجاج شفاف مع تعتيم خفيف ليناسب الخلفية الفخمة */
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            padding: 15px;
+            backdrop-filter: blur(25px) saturate(150%);
+            -webkit-backdrop-filter: blur(25px) saturate(150%);
+            padding: 18px;
             text-align: center;
-            border-bottom: 2px solid var(--main);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            /* حافة رفيعة جداً متوهجة باللون الأحمر الملكي */
+            border-bottom: 2px solid rgba(225, 29, 72, 0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* إضافة تأثير "الشعاع الزجاجي" (Glass Ray) المتحرك */
+        .main-portal-header::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -150%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: glassRay 5s infinite linear;
         }
 
         .portal-title {
             margin: 0;
-            font-size: 22px;
-            font-weight: 900;
-            letter-spacing: 1px;
-            background: linear-gradient(to bottom, #ffffff 40%, #a1a1aa 100%);
+            font-size: 24px;
+            font-weight: 900; /* أقصى سمك للخط */
+            letter-spacing: 1.5px;
+            /* تدرج لوني معدني فخم للنص */
+            background: linear-gradient(to bottom, #ffffff 40%, #c4cfdd 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
-            position: relative;
+            text-shadow: 0 2px 10px rgba(255,255,255,0.2);
         }
 
-        .portal-title::after {
-            content: "LIVE";
-            position: absolute;
-            top: -10px;
-            left: -35px;
-            background: var(--main);
-            -webkit-text-fill-color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'Poppins', sans-serif;
-            animation: blink 1.5s infinite;
+        @keyframes glassRay {
+            0% { left: -150%; }
+            100% { left: 150%; }
         }
+        /* ======================================================= */
 
-        /* --- شبكة القنوات --- */
+        /* --- شبكة القنوات والكروت --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; padding: 25px; max-width: 1400px; margin: auto; }
         .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; }
 
-        /* هيدر القنوات البنفسجي المستقيم */
+        /* هيدر القنوات البنفسجي المستقيم الأنيق */
         .c-head { padding: 10px 15px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
         .channel-name-box { background: linear-gradient(45deg, #7c3aed, #fff); padding: 3px 15px; border-radius: 6px; border: 1px solid rgba(124, 58, 237, 0.2); }
         .channel-name { display: flex; align-items: center; gap: 6px; font-family: 'Poppins', 'Tajawal', sans-serif; font-size: 14px; font-weight: 900; color: #061626; }
@@ -94,7 +106,7 @@
 
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
 
-        /* زر التشغيل الزجاجي الفخم */
+        /* زر التشغيل الزجاجي الفخم النابض */
         .play-btn-premium { 
             width: 90%; margin: 20px auto; display: flex; justify-content: center; align-items: center; gap: 12px;
             background: rgba(225, 29, 72, 0.05); backdrop-filter: blur(5px); color: #fff; 
@@ -104,6 +116,7 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.5); overflow: hidden; animation: borderPulse 2s infinite ease-in-out;
         }
         .play-btn-premium:hover { background: var(--main); border-color: var(--main); box-shadow: 0 8px 30px rgba(225, 29, 72, 0.8); transform: translateY(-4px) scale(1.03); }
+        @keyframes borderPulse { 0%, 100% { border-color: rgba(225, 29, 72, 0.4); } 50% { border-color: rgba(225, 29, 72, 0.8); } }
 
         footer { text-align: center; padding: 50px; }
         .footer-counter { background: rgba(255,255,255,0.02); padding: 20px 45px; border-radius: 20px; display: inline-block; border: 1px solid rgba(255,255,255,0.05); }
