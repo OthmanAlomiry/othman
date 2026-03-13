@@ -12,13 +12,13 @@
     <style>
         :root { 
             --main: #e11d48; 
-            --main-glow: rgba(225, 29, 72, 0.6);
+            --main-hover: #be123c;
             --bg-deep: #061626; 
             --whatsapp: #25d366; 
             --snapchat: #FFFC00; 
         }
         
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 200px; overflow-x: hidden; color: #e2e8f0; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 190px; overflow-x: hidden; color: #e2e8f0; }
 
         /* --- الخلفية الزخرفية المتحركة --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: url('https://www.transparenttextures.com/patterns/black-paper.png'), linear-gradient(135deg, var(--bg-deep) 0%, #0a1f33 100%); background-color: var(--bg-deep); }
@@ -32,95 +32,101 @@
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
         @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        /* --- الهيدر الاحترافي والمطور (Sticky) --- */
+        /* --- الهيدر الاحترافي (Sticky) --- */
         .promo-sticky-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
-        
-        /* شريط التواصل العلوي */
-        .promo-bar { background: rgba(6, 22, 38, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .promo-text { font-size: 12px; opacity: 0.8; }
-        
-        .social-links { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
-        .social-btn { display: flex; align-items: center; gap: 6px; padding: 6px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; transition: 0.3s; }
+        .promo-bar { background: rgba(6, 22, 38, 0.96); backdrop-filter: blur(10px); color: #fff; padding: 15px 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .promo-text { font-size: 13px; font-weight: 700; opacity: 0.85; } 
+        .social-links { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        .social-btn { display: flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 11px; color: #fff; transition: 0.3s; } 
         .btn-wa { background: var(--whatsapp); } .btn-snap { background: var(--snapchat); color: #000; } .btn-x { background: #000; }
+        .social-btn i { font-size: 13px; } 
 
-        /* =======================================================
-           قـمـة الـفـخـامـة: هـيـدر الـزجـاج الـعـمـيـق (Deep Glass Header)
-           ======================================================= */
-        .main-portal-header {
-            /* زجاج شفاف مع تعتيم خفيف ليناسب الخلفية الفخمة */
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(25px) saturate(150%);
-            -webkit-backdrop-filter: blur(25px) saturate(150%);
-            padding: 18px;
-            text-align: center;
-            /* حافة رفيعة جداً متوهجة باللون الأحمر الملكي */
-            border-bottom: 2px solid rgba(225, 29, 72, 0.5);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            position: relative;
-            overflow: hidden;
-        }
+        /* الهيدر الزجاجي للعنوان */
+        .main-portal-header { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); padding: 12px 20px; text-align: center; border-bottom: 2px solid rgba(225, 29, 72, 0.5); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .portal-title { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 0.5px; background: linear-gradient(to bottom, #ffffff 40%, #c4cfdd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* إضافة تأثير "الشعاع الزجاجي" (Glass Ray) المتحرك */
-        .main-portal-header::after {
-            content: "";
-            position: absolute;
-            top: 0; left: -150%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            animation: glassRay 5s infinite linear;
-        }
-
-        .portal-title {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 900; /* أقصى سمك للخط */
-            letter-spacing: 1.5px;
-            /* تدرج لوني معدني فخم للنص */
-            background: linear-gradient(to bottom, #ffffff 40%, #c4cfdd 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-            text-shadow: 0 2px 10px rgba(255,255,255,0.2);
-        }
-
-        @keyframes glassRay {
-            0% { left: -150%; }
-            100% { left: 150%; }
-        }
-        /* ======================================================= */
-
-        /* --- شبكة القنوات والكروت --- */
+        /* --- شبكة القنوات --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; padding: 25px; max-width: 1400px; margin: auto; }
         .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; }
 
-        /* هيدر القنوات البنفسجي المستقيم الأنيق */
+        /* هيدر القناة */
         .c-head { padding: 10px 15px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
-        .channel-name-box { background: linear-gradient(45deg, #7c3aed, #fff); padding: 3px 15px; border-radius: 6px; border: 1px solid rgba(124, 58, 237, 0.2); }
-        .channel-name { display: flex; align-items: center; gap: 6px; font-family: 'Poppins', 'Tajawal', sans-serif; font-size: 14px; font-weight: 900; color: #061626; }
-        .tag-4k { background: #000; color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 3px; font-weight: 900; border: 1px solid #7c3aed; }
+        .channel-name-box { background: linear-gradient(45deg, #7c3aed, #fff); padding: 3px 15px; border-radius: 6px; }
+        .channel-name { display: flex; align-items: center; gap: 6px; font-family: 'Poppins', 'Tajawal', sans-serif; font-size: 13px; font-weight: 900; color: #061626; }
+        .tag-4k { background: #000; color: #fff; font-size: 8px; padding: 1px 4px; border-radius: 3px; font-weight: 900; }
         .live-status { display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.4); padding: 3px 10px; border-radius: 6px; border-right: 2px solid #22c55e; }
-        .live-text { font-size: 9px; font-weight: 900; color: #22c55e; }
-        .live-dot { width: 5px; height: 5px; background-color: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
-
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .live-text { font-size: 8px; font-weight: 900; color: #22c55e; }
+        .live-dot { width: 5px; height: 5px; background-color: #22c55e; border-radius: 50%; animation: blinkStatus 1s infinite; }
+        @keyframes blinkStatus { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
 
-        /* زر التشغيل الزجاجي الفخم النابض */
+        /* --- تصميم زر التشغيل الجديد (المتوهج والجميل جداً) --- */
         .play-btn-premium { 
-            width: 90%; margin: 20px auto; display: flex; justify-content: center; align-items: center; gap: 12px;
-            background: rgba(225, 29, 72, 0.05); backdrop-filter: blur(5px); color: #fff; 
-            border: 1.5px solid rgba(225, 29, 72, 0.4); padding: 15px; border-radius: 50px; 
-            font-weight: 900; font-size: 16px; cursor: pointer; position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5); overflow: hidden; animation: borderPulse 2s infinite ease-in-out;
+            width: 90%; 
+            margin: 20px auto; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 12px;
+            /* تدرج لوني سينمائي فخم */
+            background: linear-gradient(45deg, var(--main) 0%, #ff4d6d 100%); 
+            color: #fff; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 50px; 
+            font-weight: 900; 
+            font-size: 15px; 
+            cursor: pointer; 
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* تأثير التوهج النيوني الأساسي (Neon Glow) */
+            box-shadow: 0 0 10px rgba(225, 29, 72, 0.5), 
+                        0 0 20px rgba(225, 29, 72, 0.3), 
+                        0 5px 15px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
-        .play-btn-premium:hover { background: var(--main); border-color: var(--main); box-shadow: 0 8px 30px rgba(225, 29, 72, 0.8); transform: translateY(-4px) scale(1.03); }
-        @keyframes borderPulse { 0%, 100% { border-color: rgba(225, 29, 72, 0.4); } 50% { border-color: rgba(225, 29, 72, 0.8); } }
+
+        /* إضافة تأثير النبض الضوئي خلف الزر (Pulsing Light) */
+        .play-btn-premium::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50px;
+            background: var(--main);
+            opacity: 0.7;
+            z-index: -1;
+            animation: pulsePlayBtn 2s infinite;
+        }
+
+        /* حركات الأنيميشن للزر */
+        @keyframes pulsePlayBtn {
+            0% { transform: scale(1); opacity: 0.7; box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
+            70% { transform: scale(1.15); opacity: 0; box-shadow: 0 0 0 15px rgba(225, 29, 72, 0); }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        /* عند تمرير الماوس (Hover) */
+        .play-btn-premium:hover { 
+            background: linear-gradient(45deg, var(--main-hover) 0%, var(--main) 100%);
+            transform: translateY(-3px) scale(1.02);
+            /* زيادة التوهج عند التمرير */
+            box-shadow: 0 0 15px rgba(225, 29, 72, 0.7), 
+                        0 0 30px rgba(225, 29, 72, 0.5), 
+                        0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        /* عند الضغط (Active) */
+        .play-btn-premium:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 0 5px rgba(225, 29, 72, 0.5), 
+                        0 2px 5px rgba(0,0,0,0.3);
+        }
+        /* ----------------------------------------------- */
 
         footer { text-align: center; padding: 50px; }
-        .footer-counter { background: rgba(255,255,255,0.02); padding: 20px 45px; border-radius: 20px; display: inline-block; border: 1px solid rgba(255,255,255,0.05); }
-        #count-num { font-size: 40px; color: #22c55e; font-weight: 900; }
+        #count-num { font-size: 35px; color: #22c55e; font-weight: 900; }
     </style>
 </head>
 <body>
@@ -168,8 +174,8 @@
     </div>
 
     <footer>
-        <div class="footer-counter">
-            <p style="margin:0; font-size:12px; opacity:0.6;">إجمالي زيارات الموقع</p>
+        <div style="background: rgba(255,255,255,0.02); padding: 15px 40px; border-radius: 20px; display: inline-block; border: 1px solid rgba(255,255,255,0.05);">
+            <p style="margin:0; font-size:11px; opacity:0.6;">إجمالي زيارات الموقع</p>
             <div id="count-num">0</div>
         </div>
     </footer>
