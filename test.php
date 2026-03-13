@@ -12,7 +12,7 @@
     <style>
         :root { 
             --main: #e11d48; 
-            --main-hover: #be123c;
+            --main-glow: rgba(225, 29, 72, 0.6); /* لون التوهج */
             --bg-deep: #061626; 
             --pattern-color: #0d2d44; 
             --whatsapp: #25d366; 
@@ -48,63 +48,68 @@
         .c-head { padding: 12px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; font-weight: bold; color: #cbd5e1; font-size: 14px; }
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
 
-        /* --- تصميم زر التشغيل الاحترافي والفخم الجديد --- */
+        /* =======================================================
+           قـمـة الـفـخـامـة: زر الـزجـاج الـمـتـوهـج (Neon Glass)
+           ======================================================= */
         .play-btn-premium { 
             width: 90%; 
-            margin: 18px auto; 
+            margin: 20px auto; 
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            /* تدرج لوني سينمائي فخم */
-            background: linear-gradient(45deg, var(--main) 0%, #ff4d6d 100%); 
+            gap: 12px;
+            /* زجاج شفاف */
+            background: rgba(225, 29, 72, 0.05); 
+            backdrop-filter: blur(5px); /* تمويه خفيف خلف الزجاج */
             color: #fff; 
-            border: none; 
-            padding: 14px; 
-            border-radius: 50px; /* زوايا دائرية بالكامل */
+            /* إطار رفيع جداً متوهج باللون الأحمر النابض */
+            border: 1.5px solid rgba(225, 29, 72, 0.4); 
+            padding: 15px; 
+            border-radius: 50px; /* دائرية انسيابية */
             font-weight: 900; 
-            font-size: 15px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer; 
             position: relative;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            /* تأثير هالة ضوئية أساسي */
-            box-shadow: 0 5px 15px rgba(225, 29, 72, 0.3);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* هالة ضوئية أساسية ناعمة */
+            box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             overflow: hidden;
+            animation: borderPulse 2s infinite ease-in-out;
         }
 
-        /* تأثير النبض الخارجي (Pulsing Glow) */
-        .play-btn-premium::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 50px;
-            background: var(--main);
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulseBtn 2s infinite;
+        /* إضافة أيقونة تشغيل سينمائية صغيرة قبل النص */
+        .play-btn-premium::before {
+            content: "\f04b"; /* أيقونة Play من FontAwesome */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
         }
 
-        /* عند تمرير الماوس (Hover) */
+        /* عند تمرير الماوس (Hover) - تفعيل التوهج الكامل */
         .play-btn-premium:hover { 
-            background: linear-gradient(45deg, var(--main-hover) 0%, var(--main) 100%);
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(225, 29, 72, 0.5);
+            background: var(--main); 
+            border-color: var(--main);
+            box-shadow: 0 8px 30px rgba(225, 29, 72, 0.8);
+            transform: translateY(-4px) scale(1.03);
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
         }
 
         /* عند الضغط (Click) */
         .play-btn-premium:active {
             transform: translateY(1px) scale(0.98);
-            box-shadow: 0 3px 10px rgba(225, 29, 72, 0.2);
+            box-shadow: 0 2px 10px rgba(225, 29, 72, 0.3);
         }
 
-        /* حركات الأنيميشن */
-        @keyframes pulseBtn {
-            0% { transform: scale(1); opacity: 0.6; box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.5); }
-            70% { transform: scale(1.08); opacity: 0; box-shadow: 0 0 0 15px rgba(225, 29, 72, 0); }
-            100% { transform: scale(1); opacity: 0; }
+        /* حركات الأنيميشن لتوجه الإطار */
+        @keyframes borderPulse {
+            0%, 100% { border-color: rgba(225, 29, 72, 0.4); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2); }
+            50% { border-color: rgba(225, 29, 72, 0.8); box-shadow: 0 4px 20px rgba(225, 29, 72, 0.5); }
         }
-        /* ----------------------------------------------- */
+        /* ======================================================= */
 
         footer { text-align: center; padding: 50px; }
         .footer-counter { background: rgba(255,255,255,0.02); padding: 20px 45px; border-radius: 20px; display: inline-block; border: 1px solid rgba(255,255,255,0.05); }
@@ -141,7 +146,7 @@
             <div class="c-head"><span>beIN Sport <?php echo $i; ?></span><span style="color:#22c55e;">● مباشر</span></div>
             <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=beIN+Sports"></video>
             <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">
-                <i class="fas fa-play"></i> ▶ تشغيل البث الآن
+                تشغيل البث الآن
             </button>
         </div>
         <?php endfor; ?>
