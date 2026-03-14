@@ -1,29 +1,43 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/vnd.apple.mpegurl");
 
-// الرابط الأساسي للبث
 $main_url = "http://sportfet.shop/AD1/tracks-v1a1/mono.m3u8";
-// المسار الأساسي لقطع الفيديو
 $base_path = "http://sportfet.shop/AD1/tracks-v1a1/";
 
+// دالة لجلب البيانات باستخدام CURL مع محاكاة متصفح
+function get_data($url) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    // محاكاة متصفح كروم على ويندوز لتجنب الحظر
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    curl_setopt($ch, CURLOPT_REFERER, 'http://sportfet.shop/');
+    $data = curl_exec($ch);
+    curl_close($ch);
+    return $data;
+}
+
+// إذا كان الطلب لقطعة فيديو
 if (isset($_GET['ts'])) {
-    $ts_file = $_GET['ts'];
-    // جلب قطعة الفيديو وتمريرها مباشرة
+    $ts_url = $base_path . $_GET['ts'];
     header("Content-Type: video/mp2t");
-    readfile($base_path . $ts_file);
+    echo get_data($ts_url);
     exit;
 }
 
-// جلب ملف الـ m3u8
-$content = file_get_contents($main_url);
+// جلب ملف البث
+$content = get_data($main_url);
 
-if ($content === false) {
-    die("خطأ: تعذر الوصول إلى سيرفر البث.");
+if (!$content) {
+    header("HTTP/1.1 500 Internal Server Error");
+    echo "تعذر الاتصال بمصدر البث. قد يكون الرابط متوقفاً من المصدر.";
+    exit;
 }
 
-// استبدال أسماء قطع الـ .ts لتعمل عبر هذا الملف (Proxy)
-$content = preg_replace('/([0-9a-zA-Z_\-]+\.ts)/', 'b10.php?ts=$1', $content);
+header("Content-Type: application/vnd.apple.mpegurl");
+// استبدال روابط القطع لتعمل عبر هذا الملف
+$content = preg_replace('/([a-zA-Z0-9_\-]+\.ts)/', 'b10.php?ts=$1', $content);
 
 echo $content;
 ?>
