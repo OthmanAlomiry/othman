@@ -15,27 +15,24 @@
             --bg-deep: #061626; 
             --whatsapp: #25d366; 
             --snapchat: #FFFC00; 
-            /* تعريف تدرجات الألوان الجديدة */
             --purple-grad: linear-gradient(45deg, #7c3aed, #fff); 
-            --green-grad: linear-gradient(45deg, #16a34a, #fff); /* تدرج أخضر فخم */
+            --green-grad: linear-gradient(45deg, #16a34a, #fff); 
         }
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 190px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* --- شاشة الدخول الاحترافية --- */
+        /* --- شاشة الدخول --- */
         #pro-cinematic-intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
             display: flex; justify-content: center; align-items: center; z-index: 1000000;
             overflow: hidden; transition: all 1.2s cubic-bezier(0.7, 0, 0.3, 1);
         }
-
         .video-bg-effect {
             position: absolute; width: 150%; height: 150%;
             background: radial-gradient(circle at center, rgba(225, 29, 72, 0.2) 0%, transparent 40%),
                         repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, transparent 1px, transparent 100px);
             animation: moveVFX 15s infinite linear; filter: blur(50px);
         }
-
         .content-wrap { position: relative; z-index: 10; text-align: center; }
         .main-logo-vfx { font-size: 90px; color: #fff; margin-bottom: 20px; display: inline-block; filter: drop-shadow(0 0 25px var(--main)); animation: logoPulsePro 2s infinite ease-in-out; }
         .brand-title-ar { font-weight: 900; font-size: clamp(35px, 8vw, 60px); color: #fff; margin: 0; opacity: 0; transform: translateY(30px); animation: textRevealAr 1s 0.5s forwards; }
@@ -68,29 +65,18 @@
         /* شبكة القنوات */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; padding: 25px; max-width: 1400px; margin: auto; }
         .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; }
-        
         .c-head { padding: 10px 15px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
-        
-        /* التنسيق الأساسي لمستطيل اسم القناة */
         .channel-name-box { padding: 3px 15px; border-radius: 6px; }
-        
-        /* الكلاس الافتراضي البنفسجي (1-9) */
         .box-purple { background: var(--purple-grad); }
-        
-        /* الكلاس الجديد الأخضر (10-11) */
         .box-green { background: var(--green-grad); border: 1px solid rgba(22, 163, 74, 0.3); }
-
         .channel-name { display: flex; align-items: center; gap: 6px; font-family: 'Poppins', 'Tajawal', sans-serif; font-size: 13px; font-weight: 900; color: #061626; }
         .tag-4k { background: #000; color: #fff; font-size: 8px; padding: 1px 4px; border-radius: 3px; font-weight: 900; }
         .live-status { display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.4); padding: 3px 10px; border-radius: 6px; border-right: 2px solid #22c55e; }
         .live-text { font-size: 8px; font-weight: 900; color: #22c55e; }
         .live-dot { width: 5px; height: 5px; background-color: #22c55e; border-radius: 50%; animation: blinkStatus 1s infinite; }
-        
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
         .play-btn-premium { width: 90%; margin: 20px auto; display: flex; justify-content: center; align-items: center; gap: 12px; background: rgba(225, 29, 72, 0.05); backdrop-filter: blur(5px); color: #fff; border: 1.5px solid rgba(225, 29, 72, 0.4); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 15px; cursor: pointer; transition: 0.3s; animation: borderPulse 2s infinite ease-in-out; }
         .play-btn-premium:hover { background: var(--main); box-shadow: 0 8px 30px rgba(225, 29, 72, 0.8); }
-        @keyframes borderPulse { 0%, 100% { border-color: rgba(225, 29, 72, 0.4); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2); } 50% { border-color: rgba(225, 29, 72, 0.8); box-shadow: 0 4px 20px rgba(225, 29, 72, 0.5); } }
-        
         footer { text-align: center; padding: 50px; }
         #count-num { font-size: 35px; color: #22c55e; font-weight: 900; }
     </style>
@@ -129,20 +115,30 @@
     <?php for($i = 1; $i <= 11; $i++): ?>
     
     <?php 
-        $box_class = ($i == 10 || $i == 11) ? 'box-green' : 'box-purple'; 
+        // منطق تحديد اللون والاسم بناءً على رقم القناة
+        if ($i == 10) {
+            $box_class = 'box-green';
+            $channel_title = 'STARZPLAY 1';
+        } elseif ($i == 11) {
+            $box_class = 'box-green';
+            $channel_title = 'STARZPLAY 2';
+        } else {
+            $box_class = 'box-purple';
+            $channel_title = 'beIN Sport ' . $i;
+        }
     ?>
     
     <div class="card">
         <div class="c-head">
             <div class="channel-name-box <?php echo $box_class; ?>">
-                <span class="channel-name"><span class="tag-4k">4K</span> beIN Sport <?php echo $i; ?></span>
+                <span class="channel-name"><span class="tag-4k">4K</span> <?php echo $channel_title; ?></span>
             </div>
             <div class="live-status">
                 <div class="live-dot"></div>
                 <span class="live-text">Live Stream</span>
             </div>
         </div>
-        <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=beIN+Sports"></video>
+        <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=<?php echo urlencode($channel_title); ?>"></video>
         <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')"> ▶ تشغيل البث الآن</button>
     </div>
     <?php endfor; ?>
