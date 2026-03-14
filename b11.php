@@ -1,6 +1,6 @@
 <?php
 
-$base = "http://sportfet.shop/AD2/tracks-v1a1/";
+$base = "https://sportfet.shop/AD2/tracks-v1a1/";
 $stream = $base . "mono.m3u8";
 
 header("Access-Control-Allow-Origin: *");
