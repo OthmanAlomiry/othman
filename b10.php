@@ -1,22 +1,21 @@
 <?php
-// تشفير الرابط بـ Base64 ليبقى بعيداً عن أعين المتصفح العادي
-$secret_link = base64_encode("http://sportfet.shop/AD1/tracks-v1a1/mono.m3u8");
-?>
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/vnd.apple.mpegurl");
 
-<link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+// الرابط الجديد الذي قدمته لـ STARZPLAY 1
+$remote_url = "http://sportfet.shop/AD2/tracks-v1a1/mono.m3u8";
+$base_path  = "http://sportfet.shop/AD2/tracks-v1a1/";
 
-<video id="my-video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264">
-</video>
+// معالجة قطع الفيديو
+if (isset($_GET['ts'])) {
+    header("Content-Type: video/mp2t");
+    echo file_get_contents($base_path . $_GET['ts']);
+    exit;
+}
 
-<script>
-    // فك التشفير برمجياً وتشغيله
-    var encoded = "<?php echo $secret_link; ?>";
-    var decoded = atob(encoded); // تحويل Base64 إلى نص عادي
-    
-    var player = videojs('my-video');
-    player.src({
-        src: decoded,
-        type: 'application/x-mpegURL'
-    });
-</script>
+// جلب وتعديل ملف m3u8
+$m3u8_content = file_get_contents($remote_url);
+$my_url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+$m3u8_content = preg_replace('/([a-zA-Z0-9_\-]+\.ts)/', $my_url . '?ts=$1', $m3u8_content);
+
+echo $m3u8_content;
