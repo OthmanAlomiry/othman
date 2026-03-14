@@ -15,6 +15,9 @@
             --bg-deep: #061626; 
             --whatsapp: #25d366; 
             --snapchat: #FFFC00; 
+            /* تعريف تدرجات الألوان الجديدة */
+            --purple-grad: linear-gradient(45deg, #7c3aed, #fff); 
+            --green-grad: linear-gradient(45deg, #16a34a, #fff); /* تدرج أخضر فخم */
         }
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 190px; overflow-x: hidden; color: #e2e8f0; }
@@ -62,12 +65,21 @@
         .main-portal-header { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); padding: 12px 20px; text-align: center; border-bottom: 2px solid rgba(225, 29, 72, 0.5); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
         .portal-title { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 0.5px; background: linear-gradient(to bottom, #ffffff 40%, #c4cfdd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* تحسين شبكة القنوات لتناسب 11 قناة */
+        /* شبكة القنوات */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; padding: 25px; max-width: 1400px; margin: auto; }
         .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; }
         
         .c-head { padding: 10px 15px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
-        .channel-name-box { background: linear-gradient(45deg, #7c3aed, #fff); padding: 3px 15px; border-radius: 6px; }
+        
+        /* التنسيق الأساسي لمستطيل اسم القناة */
+        .channel-name-box { padding: 3px 15px; border-radius: 6px; }
+        
+        /* الكلاس الافتراضي البنفسجي (1-9) */
+        .box-purple { background: var(--purple-grad); }
+        
+        /* الكلاس الجديد الأخضر (10-11) */
+        .box-green { background: var(--green-grad); border: 1px solid rgba(22, 163, 74, 0.3); }
+
         .channel-name { display: flex; align-items: center; gap: 6px; font-family: 'Poppins', 'Tajawal', sans-serif; font-size: 13px; font-weight: 900; color: #061626; }
         .tag-4k { background: #000; color: #fff; font-size: 8px; padding: 1px 4px; border-radius: 3px; font-weight: 900; }
         .live-status { display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.4); padding: 3px 10px; border-radius: 6px; border-right: 2px solid #22c55e; }
@@ -115,9 +127,14 @@
 
 <div class="grid">
     <?php for($i = 1; $i <= 11; $i++): ?>
+    
+    <?php 
+        $box_class = ($i == 10 || $i == 11) ? 'box-green' : 'box-purple'; 
+    ?>
+    
     <div class="card">
         <div class="c-head">
-            <div class="channel-name-box">
+            <div class="channel-name-box <?php echo $box_class; ?>">
                 <span class="channel-name"><span class="tag-4k">4K</span> beIN Sport <?php echo $i; ?></span>
             </div>
             <div class="live-status">
