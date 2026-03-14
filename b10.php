@@ -1,30 +1,27 @@
 <?php
-// السماح للمتصفح بالوصول للملف من أي مكان
+// إعدادات الوصول
 header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/vnd.apple.mpegurl");
 
-// الرابط الأساسي الذي يعمل لديك
-$remote_url = "http://sportfet.shop/AD1/tracks-v1a1/mono.m3u8";
+// الرابط الذي أكدت أنه يعمل
+$stream_url = "http://sportfet.shop/AD1/tracks-v1a1/mono.m3u8";
 
-// جلب المحتوى من الرابط الأساسي
-$content = file_get_contents($remote_url);
+// إذا طلب المشغل الملف، نعطيه محتوى m3u8 مع روابط كاملة
+$content = file_get_contents($stream_url);
 
 if ($content === false) {
-    // إذا فشل السيرفر في جلب البيانات، سنحاول بطريقة أخرى (CURL)
+    // محاولة أخيرة باستخدام CURL في حال فشل file_get_contents
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $remote_url);
+    curl_setopt($ch, CURLOPT_URL, $stream_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     $content = curl_exec($ch);
     curl_close($ch);
 }
 
-// إخبار المتصفح أن هذا ملف بث مباشر
-header("Content-Type: application/vnd.apple.mpegurl");
-
-// أهم خطوة: تحويل الروابط الداخلية لتكون روابط كاملة (Absolute URLs)
-// لكي يعرف المشغل أين يجد قطع الفيديو (.ts)
-$base_url = "http://sportfet.shop/AD1/tracks-v1a1/";
-$content = preg_replace('/([a-zA-Z0-9_\-]+\.ts)/', $base_url . '$1', $content);
+// تعديل الروابط الداخلية لتكون روابط كاملة (Absolute) لكي لا يبحث المتصفح في موقعك
+$base_path = "http://sportfet.shop/AD1/tracks-v1a1/";
+$content = preg_replace('/([a-zA-Z0-9_\-]+\.ts)/', $base_path . '$1', $content);
 
 echo $content;
 ?>
