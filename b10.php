@@ -1,24 +1,29 @@
 <?php
-// إعدادات الرابط الأساسي (تأكد من صحة الرابط)
-$remote_url = "http://sportfet.shop/AD1/tracks-v1a1/mono.m3u8";
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/vnd.apple.mpegurl");
+
+// الرابط الأساسي للبث
+$main_url = "http://sportfet.shop/AD1/tracks-v1a1/mono.m3u8";
+// المسار الأساسي لقطع الفيديو
 $base_path = "http://sportfet.shop/AD1/tracks-v1a1/";
 
-header("Access-Control-Allow-Origin: *");
-
-// إذا كان الطلب لقطعة فيديو (.ts)
 if (isset($_GET['ts'])) {
-    $ts_url = $base_path . $_GET['ts'];
+    $ts_file = $_GET['ts'];
+    // جلب قطعة الفيديو وتمريرها مباشرة
     header("Content-Type: video/mp2t");
-    echo file_get_contents($ts_url);
+    readfile($base_path . $ts_file);
     exit;
 }
 
-// إذا كان الطلب لملف البث الأساسي (.m3u8)
-header("Content-Type: application/vnd.apple.mpegurl");
-$m3u8_content = file_get_contents($remote_url);
+// جلب ملف الـ m3u8
+$content = file_get_contents($main_url);
 
-// تعديل روابط قطع الفيديو داخل الملف لتعمل عبر هذا الملف نفسه
-$m3u8_content = preg_replace('/([a-zA-Z0-9_\-]+\.ts)/', 'b10.php?ts=$1', $m3u8_content);
+if ($content === false) {
+    die("خطأ: تعذر الوصول إلى سيرفر البث.");
+}
 
-echo $m3u8_content;
+// استبدال أسماء قطع الـ .ts لتعمل عبر هذا الملف (Proxy)
+$content = preg_replace('/([0-9a-zA-Z_\-]+\.ts)/', 'b10.php?ts=$1', $content);
+
+echo $content;
 ?>
