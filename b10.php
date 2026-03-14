@@ -1,42 +1,24 @@
 <?php
-
-$base = "http://sportfet.shop/AD1/tracks-v1a1/";
-$stream = $base . "mono.m3u8";
+// إعدادات الرابط الأساسي (تأكد من صحة الرابط)
+$remote_url = "http://sportfet.shop/AD1/tracks-v1a1/mono.m3u8";
+$base_path = "http://sportfet.shop/AD1/tracks-v1a1/";
 
 header("Access-Control-Allow-Origin: *");
 
-if(isset($_GET['ts'])){
-
-    $ts = basename($_GET['ts']);
-    $url = $base . $ts;
-
+// إذا كان الطلب لقطعة فيديو (.ts)
+if (isset($_GET['ts'])) {
+    $ts_url = $base_path . $_GET['ts'];
     header("Content-Type: video/mp2t");
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
-
-    $data = curl_exec($ch);
-    curl_close($ch);
-
-    echo $data;
+    echo file_get_contents($ts_url);
     exit;
-
 }
 
+// إذا كان الطلب لملف البث الأساسي (.m3u8)
 header("Content-Type: application/vnd.apple.mpegurl");
+$m3u8_content = file_get_contents($remote_url);
 
-$ch = curl_init($stream);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
+// تعديل روابط قطع الفيديو داخل الملف لتعمل عبر هذا الملف نفسه
+$m3u8_content = preg_replace('/([a-zA-Z0-9_\-]+\.ts)/', 'b10.php?ts=$1', $m3u8_content);
 
-$m3u8 = curl_exec($ch);
-curl_close($ch);
-
-$m3u8 = preg_replace('/(.*\.ts)/', 'b10.php?ts=$1', $m3u8);
-
-echo $m3u8;
-
+echo $m3u8_content;
 ?>
