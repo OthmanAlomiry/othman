@@ -35,7 +35,7 @@ curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
 $m3u8 = curl_exec($ch);
 curl_close($ch);
 
-$m3u8 = preg_replace('/(.*\.ts)/', 'b9.php?ts=$1', $m3u8);
+$m3u8 = preg_replace('/(.*\.ts)/', 'b10.php?ts=$1', $m3u8);
 
 echo $m3u8;
 
