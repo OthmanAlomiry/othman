@@ -117,31 +117,35 @@
 <footer><div id="count-num">0</div></footer>
 
 <script>
-// فك التشفير والتشغيل
+// دالة التشغيل الرئيسية
 function playChannel(videoId, chNum) {
     var video = document.getElementById(videoId);
     var srcFile = 'b' + chNum + '.php';
 
     if (chNum >= 10) {
-        // نظام فك التشفير برمجياً لقنوات ستارز بلاي
-        // نطلب رابط البروكسي لتخطي حماية HTTPS في Render
-        var proxyUrl = window.location.origin + '/' + srcFile + '?proxy=1';
-        var secretEncoded = btoa(proxyUrl); // محاكاة تشفير
-        var finalSource = atob(secretEncoded); // فك التشفير والتشغيل
-        
-        startStream(video, finalSource);
+        // لقنوات ستارز بلاي: نستخدم الرابط الذي يوفره نظام البروكسي داخل الملف
+        // هذا الرابط سيعمل بـ HTTPS عبر موقعك
+        var proxyUrl = window.location.origin + '/' + srcFile + '?get_stream=1';
+        startStream(video, proxyUrl);
     } else {
-        // قنوات beIN العادية
+        // قنوات beIN العادية: نقرأ الرابط النصي من الملف
         fetch(srcFile).then(r => r.text()).then(url => startStream(video, url.trim()));
     }
 }
 
 function startStream(video, url) {
     if (Hls.isSupported()) {
-        var hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
+        var hls = new Hls({
+            xhrSetup: function (xhr, url) {
+                xhr.withCredentials = false;
+            }
+        });
+        hls.loadSource(url);
+        hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url; video.play();
+        video.src = url;
+        video.play();
     }
 }
 
