@@ -1,6 +1,6 @@
 <?php
 
-$base = "http://sportfet.shop/BEIN-SP1/tracks-v1a1/";
+$base = "http://sportfet.shop/BEIN-P1/tracks-v1a1/";
 $file = "mono.m3u8";
 
 function stream($url){
