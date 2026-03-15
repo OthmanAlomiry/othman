@@ -163,7 +163,7 @@
             </div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=beIN+Sports"></video>
-        <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')"> 
+        <button class="play-btn-premium" onclick="smartPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php')"> 
             <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
         </button>
     </div>
@@ -185,7 +185,7 @@
             </div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=STARZPLAY"></video>
-        <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')"> 
+        <button class="play-btn-premium" onclick="smartPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php')"> 
             <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
         </button>
     </div>
@@ -216,13 +216,50 @@ function updateCounter() {
     document.getElementById('count-num').innerText = count.toLocaleString();
 }
 
-function play(id, src) {
-    var video = document.getElementById(id);
+/**
+ * دالة التشغيل الذكية مع نظام التحويل التلقائي للاحتياطي
+ * @param {string} videoId - معرف عنصر الفيديو
+ * @param {string} primarySrc - رابط القناة الأساسي
+ * @param {string} backupSrc - رابط القناة الاحتياطي
+ */
+async function smartPlay(videoId, primarySrc, backupSrc) {
+    const video = document.getElementById(videoId);
+    const btn = event.currentTarget; // الزر الذي تم الضغط عليه
+    const originalText = btn.innerHTML;
+    
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري فحص البث...</span>';
+    btn.style.pointerEvents = 'none';
+
+    try {
+        // فحص الرابط الأساسي
+        const response = await fetch(primarySrc);
+        if (response.ok) {
+            console.log("تم تفعيل البث الأساسي: " + primarySrc);
+            runHls(video, primarySrc);
+        } else {
+            throw new Error("Primary failed");
+        }
+    } catch (error) {
+        console.warn("البث الأساسي معطل، يتم التحويل للاحتياطي: " + backupSrc);
+        btn.innerHTML = '<i class="fas fa-shield-alt"></i> <span>تم تفعيل البث الاحتياطي</span>';
+        runHls(video, backupSrc);
+    } finally {
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.pointerEvents = 'auto';
+        }, 3000);
+    }
+}
+
+function runHls(video, url) {
     if (Hls.isSupported()) {
-        var hls = new Hls(); hls.loadSource(src); hls.attachMedia(video);
+        var hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = src; video.play();
+        video.src = url;
+        video.play();
     }
 }
 </script>
