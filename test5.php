@@ -24,15 +24,14 @@
         .main-logo-vfx { font-size: 80px; color: #fff; margin-bottom: 20px; display: inline-block; filter: drop-shadow(0 0 25px var(--main)); animation: logoPulsePro 2s infinite ease-in-out; }
         .brand-title-ar { font-weight: 900; font-size: clamp(30px, 7vw, 55px); color: #fff; margin: 0; opacity: 0; transform: translateY(30px); animation: textRevealAr 1s 0.5s forwards; }
         .loading-frame { width: 250px; height: 3px; background: rgba(255,255,255,0.1); margin: 35px auto; position: relative; border-radius: 5px; overflow: hidden; }
-        .loading-fill-vfx { position: absolute; width: 0%; height: 100%; background: linear-gradient(to right, transparent, var(--main), #fff); box-shadow: 0 0 15px var(--main); animation: proLoadingFlow 3s cubic-bezier(0.1, 0.5, 0.5, 1) forwards; }
+        .loading-fill-vfx { position: absolute; width: 0%; height: 100%; background: linear-gradient(to right, transparent, var(--main), #fff); box-shadow: 0 0 15px var(--main); animation: proLoadingFlow 3s forwards; }
         @keyframes moveVFX { 0% { transform: rotate(0deg) scale(1); } 100% { transform: rotate(360deg) scale(1.2); } }
         @keyframes logoPulsePro { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes textRevealAr { to { opacity: 1; transform: translateY(0); } }
         @keyframes proLoadingFlow { 0% { width: 0%; } 100% { width: 100%; } }
         .intro-finish-vfx { transform: scale(1.2); filter: blur(20px); opacity: 0; visibility: hidden; }
 
-        /* --- الهيدر والقنوات --- */
-        .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: url('https://www.transparenttextures.com/patterns/black-paper.png'), linear-gradient(135deg, var(--bg-deep) 0%, #0a1f33 100%); }
+        /* --- الهيدر والبطاقات --- */
         .promo-sticky-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
         .promo-bar { background: rgba(6, 22, 38, 0.96); backdrop-filter: blur(15px); color: #fff; padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08); }
         .social-links { display: flex; justify-content: center; gap: 8px; }
@@ -46,7 +45,7 @@
         .section-divider { grid-column: 1 / -1; padding: 10px 0; font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 10px; color: #fff; }
         .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
         .c-head { padding: 10px 15px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
-        .live-status-box { display: flex; align-items: center; gap: 5px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .live-status-box { display: flex; align-items: center; gap: 5px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; }
         .live-dot { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: blinkStatus 1s infinite; }
         @keyframes blinkStatus { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
@@ -89,8 +88,8 @@
             <div style="background:var(--purple-grad); padding:4px 12px; border-radius:6px; color:#000; font-weight:900; font-size:12px;">beIN Sport <?php echo $i; ?></div>
             <div class="live-status-box"><div class="live-dot"></div><span style="font-size:9px;color:#22c55e;font-weight:900;">LIVE STREAM</span></div>
         </div>
-        <video id="vid<?php echo $i; ?>" playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=beIN+Sports"></video>
-        <button class="play-btn-premium" onclick="smartPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php')"> 
+        <video id="vid<?php echo $i; ?>" playsinline controls></video>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
             <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
         </button>
     </div>
@@ -103,8 +102,8 @@
             <div style="background:var(--green-grad); padding:4px 12px; border-radius:6px; color:#000; font-weight:900; font-size:12px;">STARZPLAY <?php echo ($i-9); ?></div>
             <div class="live-status-box"><div class="live-dot"></div><span style="font-size:9px;color:#22c55e;font-weight:900;">LIVE STREAM</span></div>
         </div>
-        <video id="vid<?php echo $i; ?>" playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=STARZPLAY"></video>
-        <button class="play-btn-premium" onclick="smartPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php')"> 
+        <video id="vid<?php echo $i; ?>" playsinline controls></video>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
             <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
         </button>
     </div>
@@ -119,54 +118,77 @@ window.addEventListener('load', function() {
     }, 3500); 
 });
 
-async function smartPlay(videoId, primary, backup) {
+/**
+ * دالة تشغيل قوية ومخصصة لحل مشاكل القنوات (6-9)
+ */
+async function robustPlay(videoId, primary, backup, btn) {
     const video = document.getElementById(videoId);
-    const btn = event.currentTarget;
     const originalText = btn.innerHTML;
     
-    btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> <span>جاري تهيئة البث...</span>';
+    btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> <span>جاري جلب البث...</span>';
     btn.style.pointerEvents = 'none';
 
+    // تنظيف المشغل تماماً قبل كل محاولة
     if (video.hls) { video.hls.destroy(); delete video.hls; }
 
     try {
+        // فحص الرابط الأساسي برمجياً
         const response = await fetch(primary);
-        const url = await response.text();
-        const finalUrl = url.trim();
+        const streamUrl = (await response.text()).trim();
 
-        if (finalUrl && finalUrl.startsWith('http')) {
-            runHls(video, finalUrl);
-            let playCheck = false;
-            video.onplaying = () => { 
-                playCheck = true; 
-                btn.innerHTML = '<i class="fas fa-check-circle"></i> <span>بث مباشر يعمل</span>';
-                setTimeout(() => { btn.innerHTML = originalText; btn.style.pointerEvents = 'auto'; }, 2000);
-            };
-            setTimeout(() => { if (!playCheck) triggerBackup(video, backup, btn, originalText); }, 10000);
-        } else { triggerBackup(video, backup, btn, originalText); }
-    } catch (e) { triggerBackup(video, backup, btn, originalText); }
+        if (streamUrl && streamUrl.startsWith('http')) {
+            startHlsStream(video, streamUrl, backup, btn, originalText);
+        } else {
+            throw new Error('Invalid Stream URL');
+        }
+    } catch (e) {
+        console.warn("الأساسي معطل، الانتقال للاحتياطي...");
+        triggerBackup(video, backup, btn, originalText);
+    }
+}
+
+function startHlsStream(video, url, backup, btn, originalText) {
+    if (Hls.isSupported()) {
+        const hls = new Hls({
+            manifestLoadingTimeOut: 15000,
+            manifestLoadingMaxRetry: 5,
+            enableWorker: true,
+            xhrSetup: function(xhr) { xhr.withCredentials = false; }
+        });
+
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        video.hls = hls;
+
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            video.play();
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> <span>بث مباشر يعمل</span>';
+            setTimeout(() => { btn.innerHTML = originalText; btn.style.pointerEvents = 'auto'; }, 2000);
+        });
+
+        hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) { triggerBackup(video, backup, btn, originalText); }
+        });
+    } else {
+        video.src = url;
+        video.play().catch(() => triggerBackup(video, backup, btn, originalText));
+    }
 }
 
 function triggerBackup(video, backupFile, btn, originalText) {
     btn.innerHTML = '<i class="fas fa-shield-alt"></i> <span>تفعيل الاحتياطي...</span>';
     fetch(backupFile).then(r => r.text()).then(url => {
-        runHls(video, url.trim());
+        const bUrl = url.trim();
+        if (Hls.isSupported()) {
+            const hls = new Hls(); hls.loadSource(bUrl); hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+            video.hls = hls;
+        } else { video.src = bUrl; video.play(); }
         setTimeout(() => { btn.innerHTML = originalText; btn.style.pointerEvents = 'auto'; }, 3000);
     }).catch(() => {
         btn.innerHTML = 'خطأ في المصدر';
         setTimeout(() => { btn.innerHTML = originalText; btn.style.pointerEvents = 'auto'; }, 3000);
     });
-}
-
-function runHls(video, url) {
-    if (Hls.isSupported()) {
-        const hls = new Hls({ manifestLoadingTimeOut: 15000, enableWorker: true });
-        hls.loadSource(url); hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-        video.hls = hls;
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url; video.play();
-    }
 }
 </script>
 </body>
