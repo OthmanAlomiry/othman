@@ -23,7 +23,7 @@
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* --- شاشة الدخول الاحترافية (VFX Intro) --- */
+        /* --- شاشة الدخول --- */
         #pro-cinematic-intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
             display: flex; justify-content: center; align-items: center; z-index: 1000000;
@@ -46,12 +46,10 @@
         @keyframes proLoadingFlow { 0% { width: 0%; } 100% { width: 100%; } }
         .intro-finish-vfx { transform: scale(1.2); filter: blur(20px); opacity: 0; visibility: hidden; }
 
-        /* --- الخلفية الزجاجية المتحركة --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: url('https://www.transparenttextures.com/patterns/black-paper.png'), linear-gradient(135deg, var(--bg-deep) 0%, #0a1f33 100%); }
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.15; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* --- الهيدر الملتصق --- */
         .promo-sticky-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
         .promo-bar { background: rgba(6, 22, 38, 0.96); backdrop-filter: blur(15px); color: #fff; padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08); }
         .promo-text { font-size: 11px; font-weight: 700; margin-bottom: 8px; opacity: 0.9; } 
@@ -59,16 +57,11 @@
         .social-btn { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; transition: 0.3s; } 
         .btn-wa { background: var(--whatsapp); } .btn-snap { background: var(--snapchat); color: #000; } .btn-tg { background: var(--telegram); } .btn-x { background: #000; }
 
-        .nav-shortcuts {
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px);
-            display: flex; justify-content: center; gap: 12px; padding: 10px;
-            border-bottom: 1px solid rgba(225, 29, 72, 0.3);
-        }
+        .nav-shortcuts { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); display: flex; justify-content: center; gap: 12px; padding: 10px; border-bottom: 1px solid rgba(225, 29, 72, 0.3); }
         .nav-box-purple, .nav-box-green { padding: 6px 18px; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 12px; color: #061626; text-decoration: none; transition: 0.3s; }
         .nav-box-purple { background: var(--purple-grad); }
         .nav-box-green { background: var(--green-grad); }
 
-        /* --- تصميم القنوات والبطاقات --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 10px 25px; max-width: 1400px; margin: auto; }
         .section-divider { grid-column: 1 / -1; padding: 10px 0; font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 10px; margin: 0; color: #fff; }
         .section-divider::after { content: ""; height: 1px; flex: 1; background: linear-gradient(to left, transparent, rgba(255,255,255,0.1)); }
@@ -76,10 +69,7 @@
         .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; }
         .c-head { padding: 10px 15px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
         
-        .live-status-box { 
-            display: flex; align-items: center; gap: 5px; background: rgba(34, 197, 94, 0.1); 
-            padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3);
-        }
+        .live-status-box { display: flex; align-items: center; gap: 5px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3); }
         .live-text { font-size: 9px; font-weight: 900; color: #22c55e; }
         .live-dot { width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; animation: blinkStatus 1s infinite; }
         @keyframes blinkStatus { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -90,7 +80,7 @@
         
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
 
-        /* --- الزر الاحترافي المطور --- */
+        /* --- الزر المطور --- */
         .play-btn-premium {
             width: 92%; margin: 18px auto; display: flex; justify-content: center; align-items: center; gap: 12px;
             background: linear-gradient(135deg, rgba(225, 29, 72, 0.2) 0%, rgba(225, 29, 72, 0.1) 100%);
@@ -99,18 +89,7 @@
             position: relative; overflow: hidden; transition: 0.4s;
             animation: buttonPulse 3s infinite;
         }
-        .play-btn-premium::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-        .play-btn-premium:hover::before { left: 100%; }
-        .play-btn-premium:hover {
-            background: var(--main); transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(225, 29, 72, 0.5); border-color: #fff;
-        }
-        .play-btn-premium i { animation: iconBounce 2s infinite ease-in-out; }
-        @keyframes iconBounce { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+        .play-btn-premium:hover { background: var(--main); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(225, 29, 72, 0.5); border-color: #fff; }
         @keyframes buttonPulse { 0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(225, 29, 72, 0); } 100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); } }
 
         footer { text-align: center; padding: 40px; }
@@ -163,7 +142,7 @@
             </div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=beIN+Sports"></video>
-        <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')"> 
+        <button class="play-btn-premium" onclick="smartPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php')"> 
             <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
         </button>
     </div>
@@ -185,7 +164,7 @@
             </div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=STARZPLAY"></video>
-        <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')"> 
+        <button class="play-btn-premium" onclick="smartPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php')"> 
             <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
         </button>
     </div>
@@ -194,18 +173,13 @@
 
 <footer>
     <div id="count-num">0</div>
-    <p style="opacity: 0.5; font-size: 11px;">جميع الحقوق محفوظة &copy; متجر الخدمة الرقمية</p>
 </footer>
 
 <script>
 window.addEventListener('load', function() {
     setTimeout(function() {
         const intro = document.getElementById('pro-cinematic-intro');
-        if(intro) {
-            intro.classList.add('intro-finish-vfx');
-            setTimeout(() => intro.remove(), 1200);
-            updateCounter();
-        }
+        if(intro) { intro.classList.add('intro-finish-vfx'); setTimeout(() => intro.remove(), 1200); updateCounter(); }
     }, 3500); 
 });
 
@@ -216,13 +190,41 @@ function updateCounter() {
     document.getElementById('count-num').innerText = count.toLocaleString();
 }
 
-function play(id, src) {
-    var video = document.getElementById(id);
+function smartPlay(videoId, primary, backup) {
+    const video = document.getElementById(videoId);
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري بدء البث...</span>';
+    btn.style.pointerEvents = 'none';
+
+    runHls(video, primary);
+
+    let isPlayed = false;
+    video.onplaying = function() { 
+        isPlayed = true; 
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> <span>البث الأساسي يعمل</span>';
+        setTimeout(() => { btn.innerHTML = originalText; btn.style.pointerEvents = 'auto'; }, 2000);
+    };
+
+    setTimeout(() => {
+        if (!isPlayed) {
+            btn.innerHTML = '<i class="fas fa-shield-alt"></i> <span>تفعيل الاحتياطي...</span>';
+            runHls(video, backup);
+            setTimeout(() => { btn.innerHTML = originalText; btn.style.pointerEvents = 'auto'; }, 3000);
+        }
+    }, 7000);
+}
+
+function runHls(video, url) {
+    if (video.hls) { video.hls.destroy(); }
     if (Hls.isSupported()) {
-        var hls = new Hls(); hls.loadSource(src); hls.attachMedia(video);
+        var hls = new Hls({ manifestLoadingTimeOut: 5000 });
+        hls.loadSource(url); hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+        video.hls = hls;
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = src; video.play();
+        video.src = url; video.play();
     }
 }
 </script>
