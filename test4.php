@@ -18,12 +18,10 @@
             --telegram: #0088cc;
             --purple-grad: linear-gradient(45deg, #7c3aed, #9ca3af); 
             --green-grad: linear-gradient(45deg, #16a34a, #facc15);
-            --bein-color: #f68b1e;
-            --starz-color: #00ff00;
         }
         
         html { scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 240px; overflow-x: hidden; color: #e2e8f0; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 290px; overflow-x: hidden; color: #e2e8f0; }
 
         /* --- شاشة الدخول --- */
         #pro-cinematic-intro {
@@ -49,57 +47,49 @@
         @keyframes proLoadingFlow { 0% { width: 0%; } 100% { width: 100%; } }
         .intro-finish-vfx { transform: scale(1.2); filter: blur(20px); opacity: 0; visibility: hidden; }
 
-        /* --- تنسيقات الهيدر الجديد المطور --- */
-        .promo-sticky-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; transition: 0.3s; }
-        .promo-bar { background: rgba(6, 22, 38, 0.96); backdrop-filter: blur(10px); color: #fff; padding: 10px 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        /* --- تنسيقات الهيدر --- */
+        .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: url('https://www.transparenttextures.com/patterns/black-paper.png'), linear-gradient(135deg, var(--bg-deep) 0%, #0a1f33 100%); }
+        .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.15; animation: movePattern 60s linear infinite; }
+        @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
+        .side-glow { position: fixed; top: 0; right: 0; width: 50%; height: 100%; background: radial-gradient(circle at right, rgba(13, 45, 68, 0.6) 0%, transparent 70%); z-index: -1; pointer-events: none; }
+        .promo-sticky-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
+        .promo-bar { background: rgba(6, 22, 38, 0.96); backdrop-filter: blur(10px); color: #fff; padding: 15px 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .promo-text { font-size: 13px; font-weight: 700; opacity: 0.85; margin-bottom: 10px; } 
         
-        /* شريط أيقونات التنقل السريع */
+        .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .social-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 11px; color: #fff; transition: transform 0.2s; } 
+        .social-btn:hover { transform: translateY(-3px); }
+        .btn-wa { background: var(--whatsapp); } 
+        .btn-snap { background: var(--snapchat); color: #000; } 
+        .btn-tg { background: var(--telegram); }
+        .btn-x { background: #000; }
+
+        .main-portal-header { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); padding: 12px 20px; text-align: center; border-bottom: 2px solid rgba(225, 29, 72, 0.5); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .portal-title { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 0.5px; background: linear-gradient(to bottom, #ffffff 40%, #c4cfdd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* شريط التنقل الجديد بالمستطيلات المتدرجة */
         .nav-shortcuts {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(25px);
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px;
-            padding: 15px;
-            border-bottom: 2px solid rgba(225, 29, 72, 0.3);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            gap: 15px;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .nav-item {
-            cursor: pointer;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             text-decoration: none;
-            position: relative;
+            transition: 0.3s;
         }
 
-        .nav-item:hover { transform: scale(1.15); }
+        .nav-item:hover { transform: scale(1.05); }
 
-        .nav-icon-wrap {
-            width: 60px;
-            height: 60px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 5px;
-            font-size: 24px;
-            position: relative;
-            overflow: hidden;
-        }
+        /* مستطيلات التنقل مثل مستطيلات الأسماء */
+        .nav-box-purple { background: var(--purple-grad); padding: 5px 20px; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 13px; color: #061626; }
+        .nav-box-green { background: var(--green-grad); padding: 5px 20px; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 13px; color: #061626; }
 
-        /* لمسات احترافية للأيقونات */
-        .bein-nav .nav-icon-wrap { color: var(--bein-color); border-bottom: 3px solid var(--bein-color); }
-        .starz-nav .nav-icon-wrap { color: var(--starz-color); border-bottom: 3px solid var(--starz-color); }
-
-        .nav-label { font-size: 11px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* --- تنسيقات الشبكة --- */
+        /* تنسيقات الفواصل العناوين */
         .section-divider {
             grid-column: 1 / -1;
             padding: 20px;
@@ -113,12 +103,14 @@
         }
         .section-divider::after { content: ""; height: 2px; flex: 1; background: linear-gradient(to left, transparent, rgba(255,255,255,0.1)); }
 
-        .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: url('https://www.transparenttextures.com/patterns/black-paper.png'); }
+        /* شبكة القنوات */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; padding: 25px; max-width: 1400px; margin: auto; }
         .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); }
         .c-head { padding: 10px 15px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
+        
         .name-box-purple { background: var(--purple-grad); padding: 3px 15px; border-radius: 6px; }
         .name-box-green { background: var(--green-grad); padding: 3px 15px; border-radius: 6px; }
+        
         .channel-name { display: flex; align-items: center; gap: 6px; font-family: 'Poppins', 'Tajawal', sans-serif; font-size: 13px; font-weight: 900; color: #061626; }
         .tag-4k { background: #000; color: #fff; font-size: 8px; padding: 1px 4px; border-radius: 3px; font-weight: 900; }
         .live-status { display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.4); padding: 3px 10px; border-radius: 6px; border-right: 2px solid #22c55e; }
@@ -140,41 +132,42 @@
         <h1 class="brand-title-ar">الخدمة الرقمية</h1>
         <div class="sub-title-pro">D-SERVICE PRO</div>
         <div class="loading-frame"><div class="loading-fill-vfx"></div></div>
+        <div class="status-msg-vfx">تشفير سيرفرات البث المباشر...</div>
     </div>
 </div>
 
 <div class="bg-pattern-animated"></div>
+<div class="side-glow"></div>
 
 <div class="promo-sticky-container">
     <div class="promo-bar">
+        <div class="promo-text">هذه الصفحة مقدمة من <strong>متجر الخدمة الرقمية</strong> للاشتراك في الباقة كاملة تواصل معنا:</div>
         <div class="social-links">
-            <a href="https://wa.me/966505571164" class="social-btn btn-wa"><i class="fab fa-whatsapp"></i></a>
-            <a href="https://t.me/d_s_pro" class="social-btn btn-tg"><i class="fab fa-telegram-plane"></i></a>
-            <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-snap"><i class="fab fa-snapchat"></i></a>
-            <a href="https://x.com/d_service_pro" class="social-btn btn-x"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://wa.me/966505571164" class="social-btn btn-wa"><i class="fab fa-whatsapp"></i> واتساب</a>
+            <a href="https://t.me/d_s_pro" class="social-btn btn-tg"><i class="fab fa-telegram-plane"></i> تليجرام</a>
+            <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-snap"><i class="fab fa-snapchat"></i> سناب</a>
+            <a href="https://x.com/d_service_pro" class="social-btn btn-x"><i class="fab fa-x-twitter"></i> تويتر</a>
         </div>
     </div>
     
     <div class="nav-shortcuts">
-        <a href="#bein-section" class="nav-item bein-nav">
-            <div class="nav-icon-wrap">
-                <i class="fas fa-satellite-dish"></i>
+        <a href="#bein-section" class="nav-item">
+            <div class="nav-box-purple">
+                <i class="fas fa-satellite-dish"></i> beIN Sport
             </div>
-            <span class="nav-label">beIN Sport</span>
         </a>
         
-        <a href="#starz-section" class="nav-item starz-nav">
-            <div class="nav-icon-wrap">
-                <i class="fas fa-play"></i>
+        <a href="#starz-section" class="nav-item">
+            <div class="nav-box-green">
+                <i class="fas fa-play"></i> STARZPLAY
             </div>
-            <span class="nav-label">STARZPLAY</span>
         </a>
     </div>
 </div>
 
 <div class="grid">
     <div id="bein-section" class="section-divider">
-        <i class="fas fa-trophy" style="color: var(--bein-color);"></i> باقة beIN Sports
+        <i class="fas fa-trophy" style="color: #7c3aed;"></i> باقة beIN Sports
     </div>
     
     <?php for($i = 1; $i <= 9; $i++): ?>
@@ -189,12 +182,12 @@
             </div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=beIN+Sports"></video>
-        <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')"> ▶ تشغيل </button>
+        <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')"> ▶ تشغيل البث الآن</button>
     </div>
     <?php endfor; ?>
 
     <div id="starz-section" class="section-divider">
-        <i class="fas fa-star" style="color: var(--starz-color);"></i> باقة STARZPLAY
+        <i class="fas fa-star" style="color: #16a34a;"></i> باقة STARZPLAY
     </div>
 
     <?php for($i = 10; $i <= 11; $i++): ?>
@@ -209,14 +202,16 @@
             </div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=STARZPLAY"></video>
-        <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')"> ▶ تشغيل </button>
+        <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')"> ▶ تشغيل البث الآن</button>
     </div>
     <?php endfor; ?>
 </div>
 
 <footer>
-    <div id="count-num">0</div>
-    <p style="font-size: 12px; opacity: 0.5;">متجر الخدمة الرقمية - جميع الحقوق محفوظة</p>
+    <div style="background: rgba(255,255,255,0.02); padding: 15px 40px; border-radius: 20px; display: inline-block; border: 1px solid rgba(255,255,255,0.05);">
+        <p style="margin:0; font-size:11px; opacity:0.6;">إجمالي زيارات الموقع</p>
+        <div id="count-num">0</div>
+    </div>
 </footer>
 
 <script>
