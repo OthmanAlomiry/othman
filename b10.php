@@ -1,19 +1,44 @@
 <?php
-// إعدادات البروكسي في b10.php
-$remote_url = "http://sportfet.shop/AD1/tracks-v1a1/mono.m3u8";
-$base_path = "http://sportfet.shop/AD1/tracks-v1a1/";
 
-if (isset($_GET['ts'])) {
-    header("Content-Type: video/mp2t");
-    echo file_get_contents($base_path . $_GET['ts']);
-    exit;
+$base = "http://sportfet.shop/AD2/tracks-v1a1/";
+$file = "mono.m3u8";
+
+function stream($url){
+
+$ch = curl_init($url);
+
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_BUFFERSIZE, 8192);
+curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
+curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch,$data){
+echo $data;
+flush();
+return strlen($data);
+});
+
+curl_exec($ch);
+curl_close($ch);
+
 }
 
-if (isset($_GET['get_stream'])) {
-    header("Content-Type: application/vnd.apple.mpegurl");
-    $m3u8 = file_get_contents($remote_url);
-    // تحويل الروابط لتعمل عبر هذا الملف
-    echo preg_replace('/([a-zA-Z0-9_\-]+\.ts)/', 'b10.php?ts=$1', $m3u8);
-    exit;
+if(isset($_GET['ts'])){
+header("Content-Type: video/mp2t");
+stream($base.$_GET['ts']);
+exit;
 }
+
+header("Content-Type: application/vnd.apple.mpegurl");
+
+$m3u8 = file_get_contents($base.$file);
+$lines = explode("\n",$m3u8);
+
+foreach($lines as &$line){
+if(strpos($line,'.ts') !== false){
+$line = "b10.php?ts=".$line;
+}
+}
+
+echo implode("\n",$lines);
+
 ?>
