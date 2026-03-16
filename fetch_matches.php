@@ -39,25 +39,21 @@ if (isset($match_data['matches'])):
             $is_live = ($m['status'] == 'IN_PLAY' || $m['status'] == 'PAUSED');
             $is_fin = ($m['status'] == 'FINISHED');
             
-            // --- نظام حساب الدقيقة المطور ---
+            // حساب الدقيقة
             $minute_display = "";
             if ($m['status'] == 'IN_PLAY') {
                 $startTime = strtotime($m['utcDate']);
                 $now = time();
                 $diffInMinutes = floor(($now - $startTime) / 60);
+                if ($diffInMinutes < 45) { $minute_display = $diffInMinutes . "'"; }
+                elseif ($diffInMinutes >= 45 && $diffInMinutes <= 60) { $minute_display = "45+"; }
+                elseif ($diffInMinutes > 60 && $diffInMinutes < 105) { $minute_display = ($diffInMinutes - 15) . "'"; }
+                else { $minute_display = "90+"; }
+            } elseif ($m['status'] == 'PAUSED') { $minute_display = "بين الشوطين"; }
 
-                if ($diffInMinutes < 45) {
-                    $minute_display = $diffInMinutes . "'"; // الشوط الأول
-                } elseif ($diffInMinutes >= 45 && $diffInMinutes <= 60) {
-                    $minute_display = "45+"; // نهاية الشوط الأول أو بدل ضائع
-                } elseif ($diffInMinutes > 60 && $diffInMinutes < 105) {
-                    $minute_display = ($diffInMinutes - 15) . "'"; // الشوط الثاني (خصم 15 دقيقة استراحة)
-                } else {
-                    $minute_display = "90+";
-                }
-            } elseif ($m['status'] == 'PAUSED') {
-                $minute_display = "بين الشوطين";
-            }
+            // جلب الأهداف
+            $homeScore = $m['score']['fullTime']['home'] ?? 0;
+            $awayScore = $m['score']['fullTime']['away'] ?? 0;
 ?>
         <div class="match-card">
             <div class="league-title-box">
@@ -68,9 +64,12 @@ if (isset($match_data['matches'])):
                     <img src="<?php echo $m['homeTeam']['crest']; ?>" onerror="this.src='https://via.placeholder.com/40'">
                     <span class="team-name"><?php echo translate_name($m['homeTeam']['name']); ?></span>
                 </div>
-                <div class="m-status" style="flex:0.6; text-align:center;">
+                
+                <div style="flex:0.6; text-align:center;">
                     <?php if ($is_live || $is_fin): ?>
-                        <div class="m-score" style="color:#fff;"><?php echo $m['score']['fullTime']['home'].'-'.$m['score']['fullTime']['away']; ?></div>
+                        <div style="direction: ltr; font-size: 1.4em; font-weight: 900; letter-spacing: 2px; color: #fff;">
+                            <?php echo $homeScore . " - " . $awayScore; ?>
+                        </div>
                         <?php if($is_live): ?>
                             <span style="color:#ff4d4d; font-size:9px; font-weight:900; display:block; margin-top:2px;">● مباشر</span>
                             <span style="color:#22c55e; font-size:10px; font-weight:bold;"><?php echo $minute_display; ?></span>
@@ -81,6 +80,7 @@ if (isset($match_data['matches'])):
                         <div style="font-size:11px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
                     <?php endif; ?>
                 </div>
+
                 <div class="team">
                     <img src="<?php echo $m['awayTeam']['crest']; ?>" onerror="this.src='https://via.placeholder.com/40'">
                     <span class="team-name"><?php echo translate_name($m['awayTeam']['name']); ?></span>
@@ -93,5 +93,5 @@ if (isset($match_data['matches'])):
         </div>
 <?php endif; endforeach; 
 else:
-    echo '<div style="padding:20px; opacity:0.5; font-size:12px;">لا توجد مباريات كبرى جارية حالياً</div>';
+    echo '<div style="padding:20px; opacity:0.5; font-size:12px;">لا توجد مباريات جارية حالياً</div>';
 endif; ?>
