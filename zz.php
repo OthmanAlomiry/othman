@@ -48,6 +48,7 @@ date_default_timezone_set('Asia/Riyadh');
             --glass-border: rgba(255, 255, 255, 0.15);
             --purple-grad: linear-gradient(45deg, #7c3aed, #fff); 
             --green-grad: linear-gradient(45deg, #16a34a, #fff);
+            --anim-speed: 0.4s;
         }
         
         html { scroll-behavior: smooth; }
@@ -78,33 +79,35 @@ date_default_timezone_set('Asia/Riyadh');
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
-        .promo-text { 
-            font-size: 11px; font-weight: 700; color: #fff; 
-            margin-bottom: 10px; line-height: 1.6; 
-            width: 90%; max-width: 600px; 
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5); margin-inline: auto;
-        }
+        .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); margin-inline: auto; }
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; width: 95%; margin-inline: auto; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
 
-        /* --- جدول المباريات (إصلاح التوسيط) --- */
+        /* --- جدول المباريات --- */
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-scroll::-webkit-scrollbar { display: none; }
-        .match-card { min-width: 270px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); text-align: center; }
-        .m-league { font-size: 9px; color: #00ff87; font-weight: 800; text-align: center; margin-bottom: 10px; }
+        .match-card { 
+            min-width: 270px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); 
+            transition: all var(--anim-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .match-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
         .match-main { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
-        .team { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .team img { width: 38px; height: 38px; object-fit: contain; display: block; margin: 0 auto; }
+        .team img { width: 38px; height: 38px; object-fit: contain; }
         .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; display: block; text-align: center; }
         .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; flex: 0.6; text-align: center; }
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
         /* --- القنوات --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
-        .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
+        .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s ease; }
+        .card:hover { transform: scale(1.01); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+        
+        /* المستطيلات المتدرجة الملونة */
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
+        .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
+        
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.2; } }
@@ -184,6 +187,20 @@ date_default_timezone_set('Asia/Riyadh');
     <div class="card" id="ch-row-<?php echo $i; ?>">
         <div class="c-head">
             <div class="name-box-purple">beIN Sport <?php echo $i; ?></div>
+            <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
+        </div>
+        <video id="vid<?php echo $i; ?>" playsinline controls></video>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
+            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
+        </button>
+    </div>
+    <?php endfor; ?>
+
+    <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-top:20px; padding-bottom:10px; margin-bottom:5px;">قنوات STARZPLAY</div>
+    <?php for($i = 10; $i <= 11; $i++): ?>
+    <div class="card" id="ch-row-<?php echo $i; ?>">
+        <div class="c-head">
+            <div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div>
             <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
