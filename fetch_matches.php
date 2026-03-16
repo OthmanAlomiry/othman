@@ -1,4 +1,8 @@
 <?php
+// منع التخزين المؤقت لضمان تحديث الأهداف فوراً
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+
 $apiKey = '273aaeb61360452588653ffea820cc19';
 $url = 'https://api.football-data.org/v4/matches';
 
@@ -35,6 +39,16 @@ if (isset($match_data['matches'])):
         if (isset($leagues_map[$code])): 
             $is_live = ($m['status'] == 'IN_PLAY' || $m['status'] == 'PAUSED');
             $is_fin = ($m['status'] == 'FINISHED');
+            
+            // حساب وقت الشوط (الدقيقة التقريبية)
+            $minute_display = "";
+            if ($m['status'] == 'IN_PLAY') {
+                $start = strtotime($m['lastUpdated']); // توقيت آخر تحديث للحالة
+                $now = time();
+                $diff = floor(($now - $start) / 60);
+                // الـ API المجاني لا يعطي الدقيقة بدقة، نكتفي بعرض الشوط
+                $minute_display = ($m['stage'] == 'HALF_TIME') ? "استراحة" : "شوط " . ($m['score']['duration'] == 'REGULAR' ? '1' : '2');
+            }
 ?>
         <div class="match-card">
             <div class="league-title-box">
@@ -48,7 +62,10 @@ if (isset($match_data['matches'])):
                 <div class="m-status" style="flex:0.6; text-align:center;">
                     <?php if ($is_live || $is_fin): ?>
                         <div class="m-score"><?php echo $m['score']['fullTime']['home'].'-'.$m['score']['fullTime']['away']; ?></div>
-                        <?php if($is_live): ?><span style="color:#ff4d4d; font-size:8px; font-weight:900;">LIVE</span><?php endif; ?>
+                        <?php if($is_live): ?>
+                            <span style="color:#ff4d4d; font-size:9px; font-weight:900; display:block;">● مباشر</span>
+                            <span style="color:#22c55e; font-size:8px;"><?php echo $minute_display; ?></span>
+                        <?php endif; ?>
                     <?php else: ?>
                         <div style="font-size:11px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
                     <?php endif; ?>
