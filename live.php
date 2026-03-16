@@ -51,51 +51,49 @@ date_default_timezone_set('Asia/Riyadh');
         }
         
         html { scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; overflow-x: hidden; color: #e2e8f0; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
         /* --- شاشة الدخول VFX --- */
         #pro-cinematic-intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            z-index: 1000000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1);
+            z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1);
         }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
         .intro-icon { font-size: 90px; color: #fff; filter: drop-shadow(0 0 30px var(--main)); animation: pulseLogo 2s infinite ease-in-out; }
         .intro-loading-box { width: 200px; height: 2px; background: rgba(255,255,255,0.1); margin-top: 30px; border-radius: 10px; overflow: hidden; }
         .intro-loading-bar { width: 0%; height: 100%; background: var(--main); box-shadow: 0 0 15px var(--main); animation: loadProgress 3s forwards; }
         @keyframes loadProgress { to { width: 100%; } }
-        @keyframes pulseLogo { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
 
         /* --- الخلفية --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* --- الهيدر الزجاجي المنسق والواضح --- */
+        /* --- الهيدر الزجاجي (تصغير الخط وتوسيط كامل) --- */
         .header-fixed-container { 
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
             background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
-            border-bottom: 1px solid var(--glass-border); padding: 20px 15px;
+            border-bottom: 1px solid var(--glass-border); padding: 15px 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
         }
         .promo-text { 
-            font-size: 13px; font-weight: 700; color: #fff; text-align: center; 
-            margin-bottom: 15px; line-height: 1.7; max-width: 650px; 
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            font-size: 11px; /* تم تصغير الخط هنا */
+            font-weight: 700; color: #fff; 
+            margin-bottom: 10px; line-height: 1.6; 
+            width: 90%; max-width: 600px; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5); margin-inline: auto;
         }
-        .social-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .social-btn { padding: 8px 18px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 11px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
-        .social-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); filter: brightness(1.1); }
+        .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; width: 95%; margin-inline: auto; }
+        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
+        .social-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
 
-        /* --- جدول المباريات --- */
+        /* --- جدول المباريات والقنوات --- */
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-scroll::-webkit-scrollbar { display: none; }
-        .match-card { 
-            min-width: 270px; background: var(--glass); border-radius: 20px; padding: 15px; 
-            border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
+        .match-card { min-width: 270px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); }
         .m-league { font-size: 9px; color: #00ff87; font-weight: 800; text-align: center; margin-bottom: 10px; }
         .match-main { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .team img { width: 38px; height: 38px; object-fit: contain; }
@@ -103,42 +101,26 @@ date_default_timezone_set('Asia/Riyadh');
         .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; }
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
-        /* --- القنوات --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
-        
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.2; } }
 
-        /* --- زر التشغيل الزجاجي المتوهج --- */
-        .play-btn-premium { 
-            width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; 
-            background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); 
-            padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer;
-            backdrop-filter: blur(5px); transition: 0.4s;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
-            animation: glassGlow 3s infinite;
-        }
-        .play-btn-premium:hover { background: rgba(255, 255, 255, 0.15); border-color: #fff; transform: translateY(-2px); }
-        @keyframes glassGlow {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); }
-            50% { box-shadow: 0 0 25px rgba(255, 255, 255, 0.15); border-color: rgba(255,255,255,0.4); }
-        }
+        .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; backdrop-filter: blur(5px); animation: glassGlow 3s infinite; }
+        @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); } 50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); } }
 
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
-        footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; letter-spacing: 1px; }
+        footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
     </style>
 </head>
 <body>
 
 <div id="pro-cinematic-intro">
     <div class="intro-icon"><i class="fas fa-play-circle"></i></div>
-    <h1 style="color:#fff; font-weight:900; font-size:28px; margin-top:15px; letter-spacing:1px;">الخدمة الرقمية</h1>
+    <h1 style="color:#fff; font-weight:900; font-size:28px; margin-top:15px;">الخدمة الرقمية</h1>
     <div class="intro-loading-box"><div class="intro-loading-bar"></div></div>
 </div>
 
@@ -221,7 +203,7 @@ window.addEventListener('load', function() {
 
 function goToChannel(num) {
     const el = document.getElementById('ch-row-' + num);
-    if(el) { window.scrollTo({ top: el.offsetTop - 200, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); }
+    if(el) { window.scrollTo({ top: el.offsetTop - 190, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); }
 }
 
 function robustPlay(videoId, primary, backup, btn) {
