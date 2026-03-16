@@ -70,7 +70,7 @@ date_default_timezone_set('Asia/Riyadh');
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* --- الهيدر الزجاجي (تصغير الخط وتوسيط كامل) --- */
+        /* --- الهيدر الزجاجي --- */
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
             background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
@@ -79,28 +79,28 @@ date_default_timezone_set('Asia/Riyadh');
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
         .promo-text { 
-            font-size: 11px; /* تم تصغير الخط هنا */
-            font-weight: 700; color: #fff; 
+            font-size: 11px; font-weight: 700; color: #fff; 
             margin-bottom: 10px; line-height: 1.6; 
             width: 90%; max-width: 600px; 
             text-shadow: 0 2px 10px rgba(0,0,0,0.5); margin-inline: auto;
         }
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; width: 95%; margin-inline: auto; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
-        .social-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
 
-        /* --- جدول المباريات والقنوات --- */
+        /* --- جدول المباريات (إصلاح التوسيط) --- */
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-scroll::-webkit-scrollbar { display: none; }
-        .match-card { min-width: 270px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); }
+        .match-card { min-width: 270px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); text-align: center; }
         .m-league { font-size: 9px; color: #00ff87; font-weight: 800; text-align: center; margin-bottom: 10px; }
-        .match-main { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .team img { width: 38px; height: 38px; object-fit: contain; }
-        .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; display: block; }
-        .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; }
+        .match-main { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+        .team { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .team img { width: 38px; height: 38px; object-fit: contain; display: block; margin: 0 auto; }
+        .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; display: block; text-align: center; }
+        .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; flex: 0.6; text-align: center; }
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
+        /* --- القنوات --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
@@ -156,7 +156,7 @@ date_default_timezone_set('Asia/Riyadh');
                             <img src="<?php echo $m['homeTeam']['crest']; ?>" onerror="this.src='https://via.placeholder.com/40'">
                             <span class="team-name"><?php echo translate_name($m['homeTeam']['name']); ?></span>
                         </div>
-                        <div style="text-align:center; flex:0.6;">
+                        <div class="m-status" style="flex:0.6; text-align:center;">
                             <?php if ($is_live || $is_fin): ?>
                                 <div class="m-score"><?php echo $m['score']['fullTime']['home'].'-'.$m['score']['fullTime']['away']; ?></div>
                                 <?php if($is_live): ?><span style="color:#ff4d4d; font-size:8px; font-weight:900;">LIVE</span><?php endif; ?>
