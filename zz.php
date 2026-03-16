@@ -51,9 +51,9 @@ date_default_timezone_set('Asia/Riyadh');
         }
         
         html { scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 10px; overflow-x: hidden; color: #e2e8f0; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 160px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* --- شاشة الدخول الاحترافية (VFX) --- */
+        /* --- شاشة الدخول VFX --- */
         #pro-cinematic-intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
@@ -71,14 +71,20 @@ date_default_timezone_set('Asia/Riyadh');
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* --- الهيدر --- */
-        .header-container { padding: 20px; text-align: center; background: rgba(5, 12, 20, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border); }
-        .promo-text { font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 15px; max-width: 90%; margin-inline: auto; line-height: 1.6; }
-        .social-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .social-btn { padding: 7px 18px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+        /* --- الهيدر الزجاجي الثابت --- */
+        .header-fixed-container { 
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background: rgba(5, 12, 20, 0.85); backdrop-filter: blur(20px); 
+            border-bottom: 1px solid var(--glass-border); padding: 15px 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .promo-text { font-size: 11px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 12px; line-height: 1.5; max-width: 800px; margin-inline: auto; }
+        .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .social-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
 
         /* --- جدول المباريات --- */
-        .matches-section { padding: 15px; }
+        .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-scroll::-webkit-scrollbar { display: none; }
         .match-card { 
@@ -92,12 +98,11 @@ date_default_timezone_set('Asia/Riyadh');
         .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; }
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
-        /* --- القنوات والمستطيلات المتدرجة --- */
+        /* --- القنوات --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         
-        /* المستطيل المتدرج الملون */
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         
@@ -134,7 +139,7 @@ date_default_timezone_set('Asia/Riyadh');
 
 <div class="bg-pattern-animated"></div>
 
-<div class="header-container">
+<div class="header-fixed-container">
     <div class="promo-text">هذه الصفحة مقدمة من متجر الخدمة الرقمية مجانا وبدون إعلانات للاشتراك في الباقة كاملة على جميع الأجهزة والشاشات تواصل معنا</div>
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
@@ -145,7 +150,7 @@ date_default_timezone_set('Asia/Riyadh');
 </div>
 
 <div class="matches-section">
-    <div style="font-size:16px; font-weight:900; margin-bottom:12px; display:flex; align-items:center; gap:8px;"><i class="fas fa-calendar-alt" style="color:#f1c40f"></i> مباريات ونتائج اليوم</div>
+    <div style="font-size:15px; font-weight:900; margin-bottom:12px; display:flex; align-items:center; gap:8px;"><i class="fas fa-calendar-alt" style="color:#f1c40f"></i> مباريات ونتائج اليوم</div>
     <div class="match-scroll">
         <?php if (isset($match_data['matches'])):
             foreach ($match_data['matches'] as $m): 
@@ -176,7 +181,7 @@ date_default_timezone_set('Asia/Riyadh');
                     </div>
                     <div class="m-footer">
                         <span style="opacity:0.7;">📺 <?php echo $leagues_map[$code]['channel']; ?></span>
-                        <span style="color:#00ff87; font-weight:900;" onclick="goToChannel('<?php echo $leagues_map[$code]['ch_num']; ?>')">شاهد الآن ▶</span>
+                        <span style="color:#00ff87; font-weight:900; cursor:pointer;" onclick="goToChannel('<?php echo $leagues_map[$code]['ch_num']; ?>')">شاهد الآن ▶</span>
                     </div>
                 </div>
         <?php endif; endforeach; endif; ?>
@@ -222,7 +227,7 @@ window.addEventListener('load', function() {
 
 function goToChannel(num) {
     const el = document.getElementById('ch-row-' + num);
-    if(el) { window.scrollTo({ top: el.offsetTop - 100, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); }
+    if(el) { window.scrollTo({ top: el.offsetTop - 170, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); }
 }
 
 function robustPlay(videoId, primary, backup, btn) {
