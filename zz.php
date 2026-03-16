@@ -51,7 +51,7 @@ date_default_timezone_set('Asia/Riyadh');
         }
         
         html { scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; overflow-x: hidden; color: #e2e8f0; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
         /* --- شاشة الدخول VFX --- */
         #pro-cinematic-intro {
@@ -70,7 +70,7 @@ date_default_timezone_set('Asia/Riyadh');
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* --- الهيدر الزجاجي (الإصلاح النهائي للتوسيط والقص) --- */
+        /* --- الهيدر الزجاجي (تصغير الخط وتوسيط كامل) --- */
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
             background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
@@ -79,13 +79,14 @@ date_default_timezone_set('Asia/Riyadh');
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
         .promo-text { 
-            font-size: 12.5px; font-weight: 700; color: #fff; 
-            margin-bottom: 12px; line-height: 1.6; 
-            width: 92%; max-width: 600px; 
+            font-size: 11px; /* تم تصغير الخط هنا */
+            font-weight: 700; color: #fff; 
+            margin-bottom: 10px; line-height: 1.6; 
+            width: 90%; max-width: 600px; 
             text-shadow: 0 2px 10px rgba(0,0,0,0.5); margin-inline: auto;
         }
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; width: 95%; margin-inline: auto; }
-        .social-btn { padding: 8px 16px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 11px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
+        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
         .social-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
 
         /* --- جدول المباريات والقنوات --- */
