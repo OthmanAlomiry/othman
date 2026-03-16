@@ -1,5 +1,4 @@
 <?php
-// منع التخزين المؤقت لضمان تحديث الأهداف فوراً
 header("Cache-Control: no-cache, must-revalidate");
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
@@ -40,14 +39,24 @@ if (isset($match_data['matches'])):
             $is_live = ($m['status'] == 'IN_PLAY' || $m['status'] == 'PAUSED');
             $is_fin = ($m['status'] == 'FINISHED');
             
-            // تحديد وقت الشوط أو الحالة
-            $status_text = "";
-            if ($is_live) {
-                if ($m['status'] == 'PAUSED') {
-                    $status_text = "استراحة";
+            // --- نظام حساب الدقيقة المطور ---
+            $minute_display = "";
+            if ($m['status'] == 'IN_PLAY') {
+                $startTime = strtotime($m['utcDate']);
+                $now = time();
+                $diffInMinutes = floor(($now - $startTime) / 60);
+
+                if ($diffInMinutes < 45) {
+                    $minute_display = $diffInMinutes . "'"; // الشوط الأول
+                } elseif ($diffInMinutes >= 45 && $diffInMinutes <= 60) {
+                    $minute_display = "45+"; // نهاية الشوط الأول أو بدل ضائع
+                } elseif ($diffInMinutes > 60 && $diffInMinutes < 105) {
+                    $minute_display = ($diffInMinutes - 15) . "'"; // الشوط الثاني (خصم 15 دقيقة استراحة)
                 } else {
-                    $status_text = ($m['score']['duration'] == 'REGULAR') ? "الشوط 1" : "الشوط 2";
+                    $minute_display = "90+";
                 }
+            } elseif ($m['status'] == 'PAUSED') {
+                $minute_display = "بين الشوطين";
             }
 ?>
         <div class="match-card">
@@ -61,10 +70,10 @@ if (isset($match_data['matches'])):
                 </div>
                 <div class="m-status" style="flex:0.6; text-align:center;">
                     <?php if ($is_live || $is_fin): ?>
-                        <div class="m-score"><?php echo $m['score']['fullTime']['home'].'-'.$m['score']['fullTime']['away']; ?></div>
+                        <div class="m-score" style="color:#fff;"><?php echo $m['score']['fullTime']['home'].'-'.$m['score']['fullTime']['away']; ?></div>
                         <?php if($is_live): ?>
                             <span style="color:#ff4d4d; font-size:9px; font-weight:900; display:block; margin-top:2px;">● مباشر</span>
-                            <span style="color:#22c55e; font-size:8px; font-weight:bold;"><?php echo $status_text; ?></span>
+                            <span style="color:#22c55e; font-size:10px; font-weight:bold;"><?php echo $minute_display; ?></span>
                         <?php else: ?>
                             <span style="color:#64748b; font-size:8px; font-weight:900;">انتهت</span>
                         <?php endif; ?>
@@ -84,5 +93,5 @@ if (isset($match_data['matches'])):
         </div>
 <?php endif; endforeach; 
 else:
-    echo '<div style="padding:20px; opacity:0.5; font-size:12px;">لا توجد مباريات جارية حالياً</div>';
+    echo '<div style="padding:20px; opacity:0.5; font-size:12px;">لا توجد مباريات كبرى جارية حالياً</div>';
 endif; ?>
