@@ -83,18 +83,35 @@ date_default_timezone_set('Asia/Riyadh');
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; width: 95%; margin-inline: auto; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
 
-        /* --- جدول المباريات --- */
+        /* --- جدول المباريات (التعديل الجديد) --- */
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-scroll::-webkit-scrollbar { display: none; }
+        
         .match-card { 
-            min-width: 270px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); 
+            min-width: 270px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px; /* تم تعديل البادنج العلوي */
+            border: 1px solid var(--glass-border); 
             transition: all var(--anim-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden; /* لضمان بقاء المستطيل داخل الكرت */
         }
         .match-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
+
+        /* مستطيل الدوري المميز */
+        .league-title-box {
+            background: rgba(255, 255, 255, 0.03); /* شفاف جداً */
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 8px 15px; margin: 0 -15px 15px -15px; /* تمديد المستطيل للحواف */
+            text-align: center;
+        }
+        .m-league { font-size: 10px; color: #00ff87; font-weight: 800; text-shadow: 0 0 5px rgba(0,255,135,0.5); }
+
+        /* توسيط شعارات الفرق */
         .match-main { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+        .team { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .team img { width: 38px; height: 38px; object-fit: contain; }
-        .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; display: block; text-align: center; }
+        .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; display: block; }
+        
         .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; flex: 0.6; text-align: center; }
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
@@ -104,7 +121,6 @@ date_default_timezone_set('Asia/Riyadh');
         .card:hover { transform: scale(1.01); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         
-        /* المستطيلات المتدرجة الملونة */
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         
@@ -153,7 +169,10 @@ date_default_timezone_set('Asia/Riyadh');
                     $is_fin = ($m['status'] == 'FINISHED');
         ?>
                 <div class="match-card">
-                    <div class="m-league"><?php echo $leagues_map[$code]['name']; ?></div>
+                    <div class="league-title-box">
+                        <div class="m-league"><?php echo $leagues_map[$code]['name']; ?></div>
+                    </div>
+
                     <div class="match-main">
                         <div class="team">
                             <img src="<?php echo $m['homeTeam']['crest']; ?>" onerror="this.src='https://via.placeholder.com/40'">
