@@ -52,19 +52,32 @@ date_default_timezone_set('Asia/Riyadh');
         }
         
         html { scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 195px; overflow-x: hidden; color: #e2e8f0; transition: background 0.8s ease; }
+
+        /* ميزة الوضع السينمائي */
+        body.theater-mode { background-color: #000 !important; }
+        body.theater-mode .header-fixed-container, body.theater-mode .matches-section { opacity: 0.1; pointer-events: none; }
 
         /* --- شاشة الدخول VFX --- */
         #pro-cinematic-intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1);
+            z-index: 9999; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1);
         }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
         .intro-icon { font-size: 90px; color: #fff; filter: drop-shadow(0 0 30px var(--main)); animation: pulseLogo 2s infinite ease-in-out; }
         .intro-loading-box { width: 200px; height: 2px; background: rgba(255,255,255,0.1); margin-top: 30px; border-radius: 10px; overflow: hidden; }
         .intro-loading-bar { width: 0%; height: 100%; background: var(--main); box-shadow: 0 0 15px var(--main); animation: loadProgress 3s forwards; }
         @keyframes loadProgress { to { width: 100%; } }
+        @keyframes pulseLogo { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+
+        /* --- شريط الأهداف المتحرك --- */
+        .news-ticker {
+            width: 100%; background: rgba(225, 29, 72, 0.1); border-bottom: 1px solid var(--glass-border);
+            padding: 5px 0; overflow: hidden; white-space: nowrap; font-size: 11px; font-weight: bold;
+        }
+        .ticker-content { display: inline-block; animation: ticker 30s linear infinite; color: #fff; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
         /* --- الخلفية --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
@@ -75,38 +88,31 @@ date_default_timezone_set('Asia/Riyadh');
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
             background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
-            border-bottom: 1px solid var(--glass-border); padding: 15px 0;
+            border-bottom: 1px solid var(--glass-border); padding: 10px 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
+            transition: opacity 0.5s ease;
         }
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); margin-inline: auto; }
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; width: 95%; margin-inline: auto; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
 
-        /* --- جدول المباريات (التعديل الجديد) --- */
-        .matches-section { padding: 10px 15px; }
+        /* --- جدول المباريات --- */
+        .matches-section { padding: 10px 15px; transition: opacity 0.5s ease; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-scroll::-webkit-scrollbar { display: none; }
         
         .match-card { 
-            min-width: 270px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px; /* تم تعديل البادنج العلوي */
+            min-width: 270px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px;
             border: 1px solid var(--glass-border); 
             transition: all var(--anim-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden; /* لضمان بقاء المستطيل داخل الكرت */
+            overflow: hidden;
         }
         .match-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
 
-        /* مستطيل الدوري المميز */
-        .league-title-box {
-            background: rgba(255, 255, 255, 0.03); /* شفاف جداً */
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 8px 15px; margin: 0 -15px 15px -15px; /* تمديد المستطيل للحواف */
-            text-align: center;
-        }
+        .league-title-box { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(5px); border-bottom: 1px solid var(--glass-border); padding: 8px 15px; margin: 0 -15px 15px -15px; text-align: center; }
         .m-league { font-size: 10px; color: #00ff87; font-weight: 800; text-shadow: 0 0 5px rgba(0,255,135,0.5); }
 
-        /* توسيط شعارات الفرق */
         .match-main { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
         .team { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .team img { width: 38px; height: 38px; object-fit: contain; }
@@ -117,8 +123,8 @@ date_default_timezone_set('Asia/Riyadh');
 
         /* --- القنوات --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
-        .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s ease; }
-        .card:hover { transform: scale(1.01); }
+        .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s ease; position: relative; z-index: 5; }
+        .card.active-focus { transform: scale(1.05); z-index: 1001; box-shadow: 0 0 50px rgba(225, 29, 72, 0.3); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
@@ -146,6 +152,17 @@ date_default_timezone_set('Asia/Riyadh');
 <div class="bg-pattern-animated"></div>
 
 <div class="header-fixed-container">
+    <div class="news-ticker">
+        <div class="ticker-content">
+            <?php 
+            if (isset($match_data['matches'])) {
+                foreach (array_slice($match_data['matches'], 0, 5) as $m) {
+                    echo " ⚽ " . translate_name($m['homeTeam']['name']) . " (" . $m['score']['fullTime']['home'] . ") VS (" . $m['score']['fullTime']['away'] . ") " . translate_name($m['awayTeam']['name']) . " • ";
+                }
+            }
+            ?>
+        </div>
+    </div>
     <div class="promo-text">
         هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات<br>
         للاشتراك في الباقة كاملة على جميع الأجهزة والشاشات تواصل معنا
@@ -169,10 +186,7 @@ date_default_timezone_set('Asia/Riyadh');
                     $is_fin = ($m['status'] == 'FINISHED');
         ?>
                 <div class="match-card">
-                    <div class="league-title-box">
-                        <div class="m-league"><?php echo $leagues_map[$code]['name']; ?></div>
-                    </div>
-
+                    <div class="league-title-box"><div class="m-league"><?php echo $leagues_map[$code]['name']; ?></div></div>
                     <div class="match-main">
                         <div class="team">
                             <img src="<?php echo $m['homeTeam']['crest']; ?>" onerror="this.src='https://via.placeholder.com/40'">
@@ -208,7 +222,7 @@ date_default_timezone_set('Asia/Riyadh');
             <div class="name-box-purple">beIN Sport <?php echo $i; ?></div>
             <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
         </div>
-        <video id="vid<?php echo $i; ?>" playsinline controls></video>
+        <video id="vid<?php echo $i; ?>" playsinline controls onplay="enableTheater(this)" onpause="disableTheater()"></video>
         <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
             <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
         </button>
@@ -222,7 +236,7 @@ date_default_timezone_set('Asia/Riyadh');
             <div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div>
             <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
         </div>
-        <video id="vid<?php echo $i; ?>" playsinline controls></video>
+        <video id="vid<?php echo $i; ?>" playsinline controls onplay="enableTheater(this)" onpause="disableTheater()"></video>
         <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
             <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
         </button>
@@ -236,6 +250,16 @@ date_default_timezone_set('Asia/Riyadh');
 window.addEventListener('load', function() {
     setTimeout(() => { document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'); }, 2500); 
 });
+
+function enableTheater(video) {
+    document.body.classList.add('theater-mode');
+    video.closest('.card').classList.add('active-focus');
+}
+
+function disableTheater() {
+    document.body.classList.remove('theater-mode');
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active-focus'));
+}
 
 function goToChannel(num) {
     const el = document.getElementById('ch-row-' + num);
