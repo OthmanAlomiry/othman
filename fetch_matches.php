@@ -40,14 +40,14 @@ if (isset($match_data['matches'])):
             $is_live = ($m['status'] == 'IN_PLAY' || $m['status'] == 'PAUSED');
             $is_fin = ($m['status'] == 'FINISHED');
             
-            // حساب وقت الشوط (الدقيقة التقريبية)
-            $minute_display = "";
-            if ($m['status'] == 'IN_PLAY') {
-                $start = strtotime($m['lastUpdated']); // توقيت آخر تحديث للحالة
-                $now = time();
-                $diff = floor(($now - $start) / 60);
-                // الـ API المجاني لا يعطي الدقيقة بدقة، نكتفي بعرض الشوط
-                $minute_display = ($m['stage'] == 'HALF_TIME') ? "استراحة" : "شوط " . ($m['score']['duration'] == 'REGULAR' ? '1' : '2');
+            // تحديد وقت الشوط أو الحالة
+            $status_text = "";
+            if ($is_live) {
+                if ($m['status'] == 'PAUSED') {
+                    $status_text = "استراحة";
+                } else {
+                    $status_text = ($m['score']['duration'] == 'REGULAR') ? "الشوط 1" : "الشوط 2";
+                }
             }
 ?>
         <div class="match-card">
@@ -63,8 +63,10 @@ if (isset($match_data['matches'])):
                     <?php if ($is_live || $is_fin): ?>
                         <div class="m-score"><?php echo $m['score']['fullTime']['home'].'-'.$m['score']['fullTime']['away']; ?></div>
                         <?php if($is_live): ?>
-                            <span style="color:#ff4d4d; font-size:9px; font-weight:900; display:block;">● مباشر</span>
-                            <span style="color:#22c55e; font-size:8px;"><?php echo $minute_display; ?></span>
+                            <span style="color:#ff4d4d; font-size:9px; font-weight:900; display:block; margin-top:2px;">● مباشر</span>
+                            <span style="color:#22c55e; font-size:8px; font-weight:bold;"><?php echo $status_text; ?></span>
+                        <?php else: ?>
+                            <span style="color:#64748b; font-size:8px; font-weight:900;">انتهت</span>
                         <?php endif; ?>
                     <?php else: ?>
                         <div style="font-size:11px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
@@ -76,8 +78,11 @@ if (isset($match_data['matches'])):
                 </div>
             </div>
             <div class="m-footer">
-                <span>📺 <?php echo $leagues_map[$code]['channel']; ?></span>
+                <span style="opacity:0.7;">📺 <?php echo $leagues_map[$code]['channel']; ?></span>
                 <span style="color:#00ff87; font-weight:900; cursor:pointer;" onclick="goToChannel('<?php echo $leagues_map[$code]['ch_num']; ?>')">شاهد الآن ▶</span>
             </div>
         </div>
-<?php endif; endforeach; endif; ?>
+<?php endif; endforeach; 
+else:
+    echo '<div style="padding:20px; opacity:0.5; font-size:12px;">لا توجد مباريات جارية حالياً</div>';
+endif; ?>
