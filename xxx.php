@@ -3,7 +3,7 @@
 $apiKey = '273aaeb61360452588653ffea820cc19';
 $url = 'https://api.football-data.org/v4/matches';
 
-// مصفوفة معلومات الدوريات والقنوات
+// مصفوفة الدوريات والقنوات
 $leagues_map = [
     'PL'  => ['name' => 'الدوري الإنجليزي الممتاز', 'channel' => 'beIN Sports 1 HD'],
     'PD'  => ['name' => 'الدوري الإسباني', 'channel' => 'beIN Sports 3 HD'],
@@ -11,12 +11,15 @@ $leagues_map = [
     'BL1' => ['name' => 'الدوري الألماني', 'channel' => 'beIN Sports 5 HD'],
 ];
 
-// دالة للترجمة الفورية عبر جوجل
+// دالة الترجمة التلقائية
 function translate_to_arabic($text) {
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
-    $response = file_get_contents($url);
-    $result = json_decode($response, true);
-    return $result[0][0][0] ?? $text;
+    $response = @file_get_contents($url);
+    if($response) {
+        $result = json_decode($response, true);
+        return $result[0][0][0] ?? $text;
+    }
+    return $text;
 }
 
 $ch = curl_init();
@@ -34,25 +37,26 @@ date_default_timezone_set('Asia/Riyadh');
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مباريات اليوم بالعربي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مباريات اليوم مع الشعارات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #0f0f0f; color: #fff; padding: 20px; }
-        .container { max-width: 800px; margin: auto; }
+        body { font-family: 'Cairo', sans-serif; background-color: #0b0e11; color: #fff; padding: 10px; }
+        .container { max-width: 700px; margin: auto; }
+        h1 { text-align: center; color: #00ff87; font-size: 1.8em; margin-bottom: 25px; }
         .match-card { 
-            background: linear-gradient(145deg, #1a1a1a, #222); 
-            border-radius: 15px; padding: 20px; margin-bottom: 15px; 
-            display: flex; align-items: center; border: 1px solid #333;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            background: #1c2127; border-radius: 12px; padding: 15px; margin-bottom: 12px; 
+            border: 1px solid #2d3436; position: relative;
         }
-        .league-title { color: #00ff87; font-size: 0.85em; margin-bottom: 8px; font-weight: 800; }
-        .team-section { flex: 3; display: flex; justify-content: space-around; align-items: center; text-align: center; }
-        .team-name { width: 40%; font-size: 1.1em; font-weight: 600; }
-        .vs { background: #333; padding: 5px 10px; border-radius: 5px; font-size: 0.7em; color: #aaa; }
-        .meta-section { flex: 1; text-align: left; border-right: 2px solid #00ff87; padding-right: 15px; margin-right: 10px; }
-        .time { font-size: 1.2em; color: #f1c40f; display: block; }
-        .channel { font-size: 0.8em; color: #3498db; margin-top: 5px; display: block; }
-        h1 { text-align: center; font-size: 2em; color: #00ff87; text-shadow: 0 2px 10px rgba(0,255,135,0.3); }
+        .league-header { font-size: 0.75em; color: #00ff87; text-align: center; margin-bottom: 10px; opacity: 0.8; }
+        .main-row { display: flex; align-items: center; justify-content: space-between; }
+        .team { flex: 1; text-align: center; }
+        .team img { width: 45px; height: 45px; object-fit: contain; margin-bottom: 8px; }
+        .team-name { font-size: 0.95em; display: block; font-weight: 600; }
+        .vs-box { flex: 0.5; text-align: center; }
+        .time { font-size: 1.1em; color: #f1c40f; font-weight: bold; display: block; }
+        .vs-text { font-size: 0.7em; color: #636e72; text-transform: uppercase; }
+        .footer-info { border-top: 1px solid #2d3436; margin-top: 10px; padding-top: 8px; display: flex; justify-content: space-between; font-size: 0.8em; color: #3498db; }
     </style>
 </head>
 <body>
@@ -68,23 +72,34 @@ date_default_timezone_set('Asia/Riyadh');
             if (isset($leagues_map[$league_code])): 
                 $match_count++;
                 
-                // ترجمة أسماء الفرق فوراً
-                $homeTeam = translate_to_arabic($match['homeTeam']['name']);
-                $awayTeam = translate_to_arabic($match['awayTeam']['name']);
+                $homeTeamName = translate_to_arabic($match['homeTeam']['name']);
+                $awayTeamName = translate_to_arabic($match['awayTeam']['name']);
+                $homeLogo = $match['homeTeam']['crest']; // رابط الشعار من الـ API
+                $awayLogo = $match['awayTeam']['crest']; // رابط الشعار من الـ API
     ?>
             <div class="match-card">
-                <div class="meta-section">
-                    <span class="time"><?php echo date('h:i A', strtotime($match['utcDate'])); ?></span>
-                    <span class="channel">📺 <?php echo $leagues_map[$league_code]['channel']; ?></span>
+                <div class="league-header"><?php echo $leagues_map[$league_code]['name']; ?></div>
+                
+                <div class="main-row">
+                    <div class="team">
+                        <img src="<?php echo $homeLogo; ?>" alt="logo">
+                        <span class="team-name"><?php echo $homeTeamName; ?></span>
+                    </div>
+
+                    <div class="vs-box">
+                        <span class="time"><?php echo date('h:i A', strtotime($match['utcDate'])); ?></span>
+                        <span class="vs-text">ضد</span>
+                    </div>
+
+                    <div class="team">
+                        <img src="<?php echo $awayLogo; ?>" alt="logo">
+                        <span class="team-name"><?php echo $awayTeamName; ?></span>
+                    </div>
                 </div>
 
-                <div class="team-section">
-                    <div class="league-title" style="position: absolute; margin-top: -65px;">
-                        <?php echo $leagues_map[$league_code]['name']; ?>
-                    </div>
-                    <div class="team-name"><?php echo $homeTeam; ?></div>
-                    <div class="vs">ضد</div>
-                    <div class="team-name"><?php echo $awayTeam; ?></div>
+                <div class="footer-info">
+                    <span>📺 <?php echo $leagues_map[$league_code]['channel']; ?></span>
+                    <span style="color: #636e72;">دوري محلي</span>
                 </div>
             </div>
     <?php 
@@ -92,8 +107,9 @@ date_default_timezone_set('Asia/Riyadh');
         endforeach; 
     endif;
 
-    if ($match_count == 0) echo "<div style='text-align:center; padding:50px;'>لا توجد مباريات جارية حالياً لهذه الدوريات.</div>";
-    ?>
+    if ($match_count == 0): ?>
+        <div style="text-align:center; margin-top: 50px; color: #636e72;">لا توجد مباريات كبرى اليوم.</div>
+    <?php endif; ?>
 </div>
 
 </body>
