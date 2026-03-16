@@ -96,13 +96,7 @@ date_default_timezone_set('Asia/Riyadh');
         }
         .match-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
 
-        .league-title-box {
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 8px 15px; margin: 0 -15px 15px -15px;
-            text-align: center;
-        }
+        .league-title-box { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(5px); border-bottom: 1px solid var(--glass-border); padding: 8px 15px; margin: 0 -15px 15px -15px; text-align: center; }
         .m-league { font-size: 10px; color: #00ff87; font-weight: 800; text-shadow: 0 0 5px rgba(0,255,135,0.5); }
 
         .match-main { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
@@ -110,9 +104,8 @@ date_default_timezone_set('Asia/Riyadh');
         .team img { width: 38px; height: 38px; object-fit: contain; }
         .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; display: block; }
         
-        /* إصلاح عرض النتيجة لمنع الانعكاس */
-        .m-score-container { flex: 0.6; text-align: center; direction: ltr; display: flex; flex-direction: column; align-items: center; }
-        .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; color: #fff; }
+        .m-score-container { flex: 0.6; text-align: center; }
+        .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; color: #fff; display: inline-block; direction: ltr; }
         
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
@@ -130,7 +123,7 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes blink { 50% { opacity: 0.2; } }
 
         .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; backdrop-filter: blur(5px); animation: glassGlow 3s infinite; }
-        @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); } 50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); } }
+        @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); } 50% { box-shadow: 0 0 25px rgba(255, 255, 255, 0.15); } }
 
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
@@ -168,9 +161,11 @@ date_default_timezone_set('Asia/Riyadh');
                 if (isset($leagues_map[$code])): 
                     $is_live = ($m['status'] == 'IN_PLAY' || $m['status'] == 'PAUSED');
                     $is_fin = ($m['status'] == 'FINISHED');
-                    // جلب الأهداف بوضوح لمنع اللبس
-                    $homeScore = $m['score']['fullTime']['home'] ?? 0;
-                    $awayScore = $m['score']['fullTime']['away'] ?? 0;
+                    
+                    // إصلاح ترتيب النتائج للغة العربية
+                    // صاحب الأرض (اليمين في التصميم العربي) والضيف (اليسار)
+                    $homeScore = $m['score']['fullTime']['home'];
+                    $awayScore = $m['score']['fullTime']['away'];
         ?>
                 <div class="match-card">
                     <div class="league-title-box">
@@ -185,8 +180,8 @@ date_default_timezone_set('Asia/Riyadh');
                         
                         <div class="m-score-container">
                             <?php if ($is_live || $is_fin): ?>
-                                <div class="m-score" style="direction: ltr;"><?php echo $homeScore . ' - ' . $awayScore; ?></div>
-                                <?php if($is_live): ?><span style="color:#ff4d4d; font-size:8px; font-weight:900; margin-top:5px;">LIVE</span><?php endif; ?>
+                                <div class="m-score"><?php echo $awayScore . ' - ' . $homeScore; ?></div>
+                                <?php if($is_live): ?><span style="color:#ff4d4d; font-size:8px; font-weight:900; display:block; margin-top:5px;">LIVE</span><?php endif; ?>
                             <?php else: ?>
                                 <div style="font-size:11px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
                             <?php endif; ?>
