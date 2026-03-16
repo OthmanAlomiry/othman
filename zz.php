@@ -46,6 +46,8 @@ date_default_timezone_set('Asia/Riyadh');
             --main: #e11d48; --bg-deep: #050c14; --whatsapp: #25d366; 
             --glass: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.15);
+            --purple-grad: linear-gradient(45deg, #7c3aed, #fff); 
+            --green-grad: linear-gradient(45deg, #16a34a, #fff);
         }
         
         html { scroll-behavior: smooth; }
@@ -90,15 +92,20 @@ date_default_timezone_set('Asia/Riyadh');
         .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; }
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
-        /* --- القنوات --- */
+        /* --- القنوات والمستطيلات المتدرجة --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+        
+        /* المستطيل المتدرج الملون */
+        .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
+        .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
+        
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.2; } }
 
-        /* --- زر التشغيل الزجاجي المتوهج (Glow Glass) --- */
+        /* --- زر التشغيل الزجاجي المتوهج --- */
         .play-btn-premium { 
             width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; 
             background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); 
@@ -181,7 +188,21 @@ date_default_timezone_set('Asia/Riyadh');
     <?php for($i = 1; $i <= 9; $i++): ?>
     <div class="card" id="ch-row-<?php echo $i; ?>">
         <div class="c-head">
-            <div style="background:rgba(255,255,255,0.1); padding:5px 12px; border-radius:8px; font-weight:900; font-size:11px;">beIN Sport <?php echo $i; ?></div>
+            <div class="name-box-purple">beIN Sport <?php echo $i; ?></div>
+            <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
+        </div>
+        <video id="vid<?php echo $i; ?>" playsinline controls></video>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
+            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
+        </button>
+    </div>
+    <?php endfor; ?>
+    
+    <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-top:20px; padding-bottom:10px; margin-bottom:5px;">قنوات STARZPLAY</div>
+    <?php for($i = 10; $i <= 11; $i++): ?>
+    <div class="card" id="ch-row-<?php echo $i; ?>">
+        <div class="c-head">
+            <div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div>
             <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
