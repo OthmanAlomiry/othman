@@ -51,7 +51,7 @@ date_default_timezone_set('Asia/Riyadh');
         }
         
         html { scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 160px; overflow-x: hidden; color: #e2e8f0; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; overflow-x: hidden; color: #e2e8f0; }
 
         /* --- شاشة الدخول VFX --- */
         #pro-cinematic-intro {
@@ -71,17 +71,22 @@ date_default_timezone_set('Asia/Riyadh');
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* --- الهيدر الزجاجي الثابت --- */
+        /* --- الهيدر الزجاجي المنسق والواضح --- */
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-            background: rgba(5, 12, 20, 0.85); backdrop-filter: blur(20px); 
-            border-bottom: 1px solid var(--glass-border); padding: 15px 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
+            border-bottom: 1px solid var(--glass-border); padding: 20px 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .promo-text { font-size: 11px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 12px; line-height: 1.5; max-width: 800px; margin-inline: auto; }
-        .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
-        .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-        .social-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .promo-text { 
+            font-size: 13px; font-weight: 700; color: #fff; text-align: center; 
+            margin-bottom: 15px; line-height: 1.7; max-width: 650px; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .social-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .social-btn { padding: 8px 18px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 11px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
+        .social-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); filter: brightness(1.1); }
 
         /* --- جدول المباريات --- */
         .matches-section { padding: 10px 15px; }
@@ -140,7 +145,10 @@ date_default_timezone_set('Asia/Riyadh');
 <div class="bg-pattern-animated"></div>
 
 <div class="header-fixed-container">
-    <div class="promo-text">هذه الصفحة مقدمة من متجر الخدمة الرقمية مجانا وبدون إعلانات للاشتراك في الباقة كاملة على جميع الأجهزة والشاشات تواصل معنا</div>
+    <div class="promo-text">
+        هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات<br>
+        للاشتراك في الباقة كاملة على جميع الأجهزة والشاشات تواصل معنا
+    </div>
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
         <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
@@ -202,20 +210,6 @@ date_default_timezone_set('Asia/Riyadh');
         </button>
     </div>
     <?php endfor; ?>
-    
-    <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-top:20px; padding-bottom:10px; margin-bottom:5px;">قنوات STARZPLAY</div>
-    <?php for($i = 10; $i <= 11; $i++): ?>
-    <div class="card" id="ch-row-<?php echo $i; ?>">
-        <div class="c-head">
-            <div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div>
-            <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
-        </div>
-        <video id="vid<?php echo $i; ?>" playsinline controls></video>
-        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
-            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
-        </button>
-    </div>
-    <?php endfor; ?>
 </div>
 
 <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية</footer>
@@ -227,7 +221,7 @@ window.addEventListener('load', function() {
 
 function goToChannel(num) {
     const el = document.getElementById('ch-row-' + num);
-    if(el) { window.scrollTo({ top: el.offsetTop - 170, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); }
+    if(el) { window.scrollTo({ top: el.offsetTop - 200, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); }
 }
 
 function robustPlay(videoId, primary, backup, btn) {
