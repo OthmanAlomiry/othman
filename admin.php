@@ -66,7 +66,7 @@ $match_data = json_decode($response, true);
 <body>
     <div style="display:flex; justify-content:space-between; align-items:center;">
         <h2>تحديد القنوات لمباريات اليوم</h2>
-        <a href="live.php" style="color:#aaa; text-decoration:none;">◀ العودة للموقع</a>
+        <a href="indix.php" style="color:#aaa; text-decoration:none;">◀ العودة للموقع</a>
     </div>
     <hr style="opacity:0.1;">
 
