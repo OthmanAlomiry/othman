@@ -3,12 +3,30 @@
 $apiKey = '273aaeb61360452588653ffea820cc19';
 $url = 'https://api.football-data.org/v4/matches';
 
+// خريطة الدوريات الشاملة (beIN Sports Global)
 $leagues_map = [
-    'PL'  => ['name' => 'الدوري الإنجليزي', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
-    'PD'  => ['name' => 'الدوري الإسباني', 'channel' => 'beIN Sport 3', 'ch_num' => '3'],
-    'SA'  => ['name' => 'الدوري الإيطالي', 'channel' => 'STARZPLAY 1', 'ch_num' => '10'],
-    'BL1' => ['name' => 'الدوري الألماني', 'channel' => 'beIN Sport 5', 'ch_num' => '5'],
-    'CL'  => ['name' => 'دوري أبطال أوروبا', 'channel' => 'beIN Sport 2', 'ch_num' => '2'],
+    // القارة الأوروبية
+    'PL'   => ['name' => 'الدوري الإنجليزي', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
+    'PD'   => ['name' => 'الدوري الإسباني', 'channel' => 'beIN Sport 3', 'ch_num' => '3'],
+    'BL1'  => ['name' => 'الدوري الألماني', 'channel' => 'beIN Sport 5', 'ch_num' => '5'],
+    'SA'   => ['name' => 'الدوري الإيطالي', 'channel' => 'STARZPLAY 1', 'ch_num' => '10'],
+    'FL1'  => ['name' => 'الدوري الفرنسي', 'channel' => 'beIN Sport 4', 'ch_num' => '4'],
+    'CL'   => ['name' => 'دوري أبطال أوروبا', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
+    'EL'   => ['name' => 'الدوري الأوروبي', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
+    'EC'   => ['name' => 'دوري المؤتمر الأوروبي', 'channel' => 'beIN Sport 8', 'ch_num' => '8'],
+    
+    // القارة الآسيوية (beIN AFC)
+    'ACL'  => ['name' => 'دوري أبطال آسيا للنخبة', 'channel' => 'beIN AFC', 'ch_num' => '7'],
+    'ASL'  => ['name' => 'دوري أبطال آسيا 2', 'channel' => 'beIN AFC 2', 'ch_num' => '7'],
+    
+    // القارة الأفريقية
+    'CAF'  => ['name' => 'دوري أبطال أفريقيا', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
+    'CCF'  => ['name' => 'كأس الكونفيدرالية', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
+    
+    // البطولات الدولية والمنتخبات
+    'WC'   => ['name' => 'تصفيات كأس العالم', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
+    'EURO' => ['name' => 'كأس أمم أوروبا', 'channel' => 'beIN MAX', 'ch_num' => '1'],
+    'AFCON'=> ['name' => 'كأس أمم أفريقيا', 'channel' => 'beIN MAX', 'ch_num' => '1'],
 ];
 
 function translate_name($text) {
@@ -54,7 +72,6 @@ date_default_timezone_set('Asia/Riyadh');
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* --- شاشة الدخول --- */
         #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
         .intro-icon { font-size: 90px; color: #fff; filter: drop-shadow(0 0 30px var(--main)); animation: pulseLogo 2s infinite ease-in-out; }
@@ -69,7 +86,6 @@ date_default_timezone_set('Asia/Riyadh');
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; }
 
-        /* --- جدول المباريات (إصلاح جذري للنتيجة) --- */
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-scroll::-webkit-scrollbar { display: none; }
@@ -82,19 +98,17 @@ date_default_timezone_set('Asia/Riyadh');
         .team img { width: 35px; height: 35px; object-fit: contain; }
         .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; }
 
-        /* حاوية النتيجة المنفصلة */
+        /* حاوية النتيجة المضمونة ضد القلب */
         .m-score-container { flex: 0.8; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: sans-serif; }
         .s-box { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 1.4em; font-weight: 900; color: #fff; min-width: 30px; text-align: center; }
         .s-divider { opacity: 0.5; font-weight: bold; }
 
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
-        /* --- القنوات --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.2; } }
@@ -164,7 +178,8 @@ date_default_timezone_set('Asia/Riyadh');
                         <span style="color:#00ff87; font-weight:900; cursor:pointer;" onclick="goToChannel('<?php echo $leagues_map[$code]['ch_num']; ?>')">شاهد الآن ▶</span>
                     </div>
                 </div>
-        <?php endif; endforeach; endif; ?>
+        <?php endif; endforeach; 
+        else: echo "لا توجد مباريات كبرى اليوم."; endif; ?>
     </div>
 </div>
 
