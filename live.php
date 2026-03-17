@@ -61,7 +61,7 @@ date_default_timezone_set('Asia/Riyadh');
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* --- شاشة الدخول VFX --- */
+        /* --- شاشة الدخول --- */
         #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
         .intro-icon { font-size: 90px; color: #fff; filter: drop-shadow(0 0 30px var(--main)); animation: pulseLogo 2s infinite ease-in-out; }
@@ -70,12 +70,12 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes loadProgress { to { width: 100%; } }
         @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        /* --- الخلفية الأنيقة المتحركة --- */
+        /* --- الخلفية الأنيقة --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* --- الهيدر الزجاجي --- */
+        /* --- الهيدر --- */
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
             background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
@@ -94,16 +94,13 @@ date_default_timezone_set('Asia/Riyadh');
         .match-card { min-width: 280px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px; border: 1px solid var(--glass-border); transition: all 0.3s ease; overflow: hidden; }
         .league-title-box { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 8px 15px; margin: 0 -15px 15px -15px; text-align: center; }
         .m-league { font-size: 10px; color: #00ff87; font-weight: 800; }
-        
         .match-main { display: flex; align-items: center; justify-content: space-between; gap: 5px; margin-bottom: 12px; }
         .team { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 80px; }
         .team img { width: 35px; height: 35px; object-fit: contain; }
         .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; }
-
         .m-score-container { flex: 0.8; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: sans-serif; }
         .s-box { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 1.4em; font-weight: 900; color: #fff; min-width: 30px; text-align: center; }
         .s-divider { opacity: 0.5; font-weight: bold; }
-
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
         /* --- القنوات وأزرار التشغيل الزجاجية المتوهجة --- */
@@ -112,12 +109,10 @@ date_default_timezone_set('Asia/Riyadh');
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.2; } }
 
-        /* تعديل الزر ليكون زجاجي متوهج */
         .play-btn-premium { 
             width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; 
             background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); 
@@ -125,12 +120,7 @@ date_default_timezone_set('Asia/Riyadh');
             backdrop-filter: blur(5px); transition: all 0.3s ease; 
             animation: glassGlow 3s infinite;
         }
-        .play-btn-premium:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.02); }
-        
-        @keyframes glassGlow {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); }
-            50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); }
-        }
+        @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); } 50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); } }
 
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
@@ -232,15 +222,36 @@ date_default_timezone_set('Asia/Riyadh');
 
 <script>
 window.addEventListener('load', () => { setTimeout(() => document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'), 2500); });
-function goToChannel(num) { const el = document.getElementById('ch-row-' + num); if(el) { window.scrollTo({ top: el.offsetTop - 190, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); } }
-function robustPlay(id, p, b, btn) {
-    const v = document.getElementById(id);
-    if (v.hls) { v.hls.destroy(); }
+
+function goToChannel(num) {
+    const el = document.getElementById('ch-row-' + num);
+    if(el) { window.scrollTo({ top: el.offsetTop - 190, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); }
+}
+
+function robustPlay(videoId, primary, backup, btn) {
+    const video = document.getElementById(videoId);
+    const btnText = btn.querySelector('span');
+    
+    // تغيير النص فور الضغط
+    btnText.innerText = "جاري تشغيل القناة...";
+    
+    if (video.hls) { video.hls.destroy(); }
+    
     if (Hls.isSupported()) {
-        const hls = new Hls(); hls.loadSource(p); hls.attachMedia(v);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => v.play());
-        v.hls = hls;
-    } else { v.src = p; v.play(); }
+        const hls = new Hls();
+        hls.loadSource(primary);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            video.play();
+            // تغيير النص عند التشغيل بنجاح
+            btnText.innerText = "تم تشغيل البث بنجاح";
+        });
+        video.hls = hls;
+    } else {
+        video.src = primary;
+        video.play();
+        btnText.innerText = "تم تشغيل البث بنجاح";
+    }
 }
 </script>
 </body>
