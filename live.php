@@ -3,9 +3,8 @@
 $apiKey = '273aaeb61360452588653ffea820cc19';
 $url = 'https://api.football-data.org/v4/matches';
 
-// خريطة الدوريات الشاملة (beIN Sports Global)
+// خريطة الدوريات الشاملة (أوروبا، آسيا، أفريقيا)
 $leagues_map = [
-    // القارة الأوروبية
     'PL'   => ['name' => 'الدوري الإنجليزي', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
     'PD'   => ['name' => 'الدوري الإسباني', 'channel' => 'beIN Sport 3', 'ch_num' => '3'],
     'BL1'  => ['name' => 'الدوري الألماني', 'channel' => 'beIN Sport 5', 'ch_num' => '5'],
@@ -13,20 +12,10 @@ $leagues_map = [
     'FL1'  => ['name' => 'الدوري الفرنسي', 'channel' => 'beIN Sport 4', 'ch_num' => '4'],
     'CL'   => ['name' => 'دوري أبطال أوروبا', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
     'EL'   => ['name' => 'الدوري الأوروبي', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
-    'EC'   => ['name' => 'دوري المؤتمر الأوروبي', 'channel' => 'beIN Sport 8', 'ch_num' => '8'],
-    
-    // القارة الآسيوية (beIN AFC)
-    'ACL'  => ['name' => 'دوري أبطال آسيا للنخبة', 'channel' => 'beIN AFC', 'ch_num' => '7'],
-    'ASL'  => ['name' => 'دوري أبطال آسيا 2', 'channel' => 'beIN AFC 2', 'ch_num' => '7'],
-    
-    // القارة الأفريقية
+    'ACL'  => ['name' => 'دوري أبطال آسيا', 'channel' => 'beIN AFC', 'ch_num' => '7'],
     'CAF'  => ['name' => 'دوري أبطال أفريقيا', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
-    'CCF'  => ['name' => 'كأس الكونفيدرالية', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
-    
-    // البطولات الدولية والمنتخبات
     'WC'   => ['name' => 'تصفيات كأس العالم', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
-    'EURO' => ['name' => 'كأس أمم أوروبا', 'channel' => 'beIN MAX', 'ch_num' => '1'],
-    'AFCON'=> ['name' => 'كأس أمم أفريقيا', 'channel' => 'beIN MAX', 'ch_num' => '1'],
+    'EC'   => ['name' => 'كأس أمم أوروبا', 'channel' => 'beIN MAX', 'ch_num' => '1'],
 ];
 
 function translate_name($text) {
@@ -72,6 +61,7 @@ date_default_timezone_set('Asia/Riyadh');
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
+        /* --- شاشة الدخول VFX --- */
         #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
         .intro-icon { font-size: 90px; color: #fff; filter: drop-shadow(0 0 30px var(--main)); animation: pulseLogo 2s infinite ease-in-out; }
@@ -86,6 +76,7 @@ date_default_timezone_set('Asia/Riyadh');
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; }
 
+        /* --- جدول المباريات --- */
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-scroll::-webkit-scrollbar { display: none; }
@@ -98,7 +89,6 @@ date_default_timezone_set('Asia/Riyadh');
         .team img { width: 35px; height: 35px; object-fit: contain; }
         .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; }
 
-        /* حاوية النتيجة المضمونة ضد القلب */
         .m-score-container { flex: 0.8; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: sans-serif; }
         .s-box { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 1.4em; font-weight: 900; color: #fff; min-width: 30px; text-align: center; }
         .s-divider { opacity: 0.5; font-weight: bold; }
@@ -109,6 +99,8 @@ date_default_timezone_set('Asia/Riyadh');
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
+        .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
+        
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.2; } }
@@ -145,7 +137,6 @@ date_default_timezone_set('Asia/Riyadh');
                 $code = $m['competition']['code'];
                 if (isset($leagues_map[$code])): 
                     $is_live = ($m['status'] == 'IN_PLAY' || $m['status'] == 'PAUSED');
-                    $is_fin = ($m['status'] == 'FINISHED');
                     $homeScore = $m['score']['fullTime']['home'];
                     $awayScore = $m['score']['fullTime']['away'];
         ?>
@@ -156,9 +147,8 @@ date_default_timezone_set('Asia/Riyadh');
                             <img src="<?php echo $m['homeTeam']['crest']; ?>" onerror="this.src='https://via.placeholder.com/40'">
                             <span class="team-name"><?php echo translate_name($m['homeTeam']['name']); ?></span>
                         </div>
-                        
                         <div class="m-score-container">
-                            <?php if ($is_live || $is_fin): ?>
+                            <?php if ($is_live || $m['status'] == 'FINISHED'): ?>
                                 <div class="s-box"><?php echo $homeScore; ?></div>
                                 <div class="s-divider">-</div>
                                 <div class="s-box"><?php echo $awayScore; ?></div>
@@ -166,7 +156,6 @@ date_default_timezone_set('Asia/Riyadh');
                                 <div style="font-size:11px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
                             <?php endif; ?>
                         </div>
-
                         <div class="team">
                             <img src="<?php echo $m['awayTeam']['crest']; ?>" onerror="this.src='https://via.placeholder.com/40'">
                             <span class="team-name"><?php echo translate_name($m['awayTeam']['name']); ?></span>
@@ -178,8 +167,7 @@ date_default_timezone_set('Asia/Riyadh');
                         <span style="color:#00ff87; font-weight:900; cursor:pointer;" onclick="goToChannel('<?php echo $leagues_map[$code]['ch_num']; ?>')">شاهد الآن ▶</span>
                     </div>
                 </div>
-        <?php endif; endforeach; 
-        else: echo "لا توجد مباريات كبرى اليوم."; endif; ?>
+        <?php endif; endforeach; endif; ?>
     </div>
 </div>
 
@@ -192,9 +180,19 @@ date_default_timezone_set('Asia/Riyadh');
             <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
-        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
-            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
-        </button>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)">بدء البث المباشر</button>
+    </div>
+    <?php endfor; ?>
+
+    <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-top:20px; padding-bottom:10px; margin-bottom:5px;">قنوات STARZPLAY</div>
+    <?php for($i = 10; $i <= 11; $i++): ?>
+    <div class="card" id="ch-row-<?php echo $i; ?>">
+        <div class="c-head">
+            <div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div>
+            <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
+        </div>
+        <video id="vid<?php echo $i; ?>" playsinline controls></video>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)">بدء البث المباشر</button>
     </div>
     <?php endfor; ?>
 </div>
@@ -202,29 +200,16 @@ date_default_timezone_set('Asia/Riyadh');
 <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية</footer>
 
 <script>
-window.addEventListener('load', function() {
-    setTimeout(() => { document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'); }, 2500); 
-});
-
-function goToChannel(num) {
-    const el = document.getElementById('ch-row-' + num);
-    if(el) { window.scrollTo({ top: el.offsetTop - 190, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); }
-}
-
-function robustPlay(videoId, primary, backup, btn) {
-    const video = document.getElementById(videoId);
-    const btnText = btn.querySelector('span');
-    btnText.innerText = "جاري الاتصال...";
-    function run(url, isB = false) {
-        if (video.hls) { video.hls.destroy(); }
-        if (Hls.isSupported()) {
-            const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btnText.innerText = "تم التشغيل بنجاح"; });
-            video.hls = hls;
-        } else { video.src = url; video.play(); }
-    }
-    run(primary);
-    setTimeout(() => { if (video.paused) run(backup, true); }, 7000);
+window.addEventListener('load', () => { setTimeout(() => document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'), 2500); });
+function goToChannel(num) { const el = document.getElementById('ch-row-' + num); if(el) { window.scrollTo({ top: el.offsetTop - 190, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); } }
+function robustPlay(id, p, b, btn) {
+    const v = document.getElementById(id);
+    if (v.hls) { v.hls.destroy(); }
+    if (Hls.isSupported()) {
+        const hls = new Hls(); hls.loadSource(p); hls.attachMedia(v);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => v.play());
+        v.hls = hls;
+    } else { v.src = p; v.play(); }
 }
 </script>
 </body>
