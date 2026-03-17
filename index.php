@@ -1,5 +1,5 @@
 <?php
-// --- نظام عداد المتواجدين الحقيقي المدمج ---
+// --- 1. نظام عداد المتواجدين الحقيقي المدمج ---
 session_start();
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
@@ -16,7 +16,11 @@ if (isset($_GET['fetch_visitors'])) {
 }
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
 
-// --- إعدادات API المباريات ---
+// --- 2. جلب إعدادات القنوات من لوحة التحكم (Admin) ---
+$manual_file = 'manual_channels.json';
+$manual_channels = file_exists($manual_file) ? json_decode(file_get_contents($manual_file), true) : [];
+
+// --- 3. إعدادات API المباريات والدوريات ---
 $apiKey = '273aaeb61360452588653ffea820cc19';
 $url = 'https://api.football-data.org/v4/matches';
 
@@ -79,7 +83,7 @@ date_default_timezone_set('Asia/Riyadh');
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
             background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
-            border-bottom: 1px solid var(--glass-border); padding: 10px 0;
+            border-bottom: 1px solid var(--glass-border); padding: 15px 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
@@ -108,7 +112,7 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         @keyframes blink { 50% { opacity: 0.2; } }
 
-        /* --- الخلفية --- */
+        /* --- الخلفية المتحركة --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
@@ -118,11 +122,9 @@ date_default_timezone_set('Asia/Riyadh');
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s; }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         
-        /* صناديق أسماء القنوات المتدرجة */
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         
-        /* مستطيل المباشر LIVE */
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
 
@@ -132,7 +134,7 @@ date_default_timezone_set('Asia/Riyadh');
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .match-card { min-width: 280px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px; border: 1px solid var(--glass-border); overflow: hidden; }
+        .match-card { min-width: 280px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px; border: 1px solid var(--glass-border); transition: all 0.3s ease; overflow: hidden; }
         .league-title-box { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 8px 15px; margin: 0 -15px 15px -15px; text-align: center; color: #00ff87; font-size: 10px; font-weight: 800; }
         .s-box { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 1.4em; font-weight: 900; }
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
@@ -172,6 +174,19 @@ date_default_timezone_set('Asia/Riyadh');
             foreach ($match_data['matches'] as $m): 
                 $code = $m['competition']['code'];
                 if (isset($leagues_map[$code])): 
+                    $hName = $m['homeTeam']['name'];
+                    $aName = $m['awayTeam']['name'];
+                    
+                    // منطق القناة اليدوية (من لوحة التحكم)
+                    $match_key = $hName . ' vs ' . $aName;
+                    if (isset($manual_channels[$match_key])) {
+                        $target_ch_num = $manual_channels[$match_key];
+                        $display_ch = "beIN Sport " . $target_ch_num;
+                    } else {
+                        $display_ch = $leagues_map[$code]['channel'];
+                        $target_ch_num = $leagues_map[$code]['ch_num'];
+                    }
+
                     $is_live = ($m['status'] == 'IN_PLAY' || $m['status'] == 'PAUSED');
                     $homeScore = $m['score']['fullTime']['home'];
                     $awayScore = $m['score']['fullTime']['away'];
@@ -181,7 +196,7 @@ date_default_timezone_set('Asia/Riyadh');
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
                         <div style="flex:1; text-align:center;">
                             <img src="<?php echo $m['homeTeam']['crest']; ?>" width="35" onerror="this.src='https://via.placeholder.com/40'">
-                            <span style="font-size:9px; font-weight:700; margin-top:5px; display:block;"><?php echo translate_name($m['homeTeam']['name']); ?></span>
+                            <span style="font-size:9px; font-weight:700; margin-top:5px; display:block;"><?php echo translate_name($hName); ?></span>
                         </div>
                         <div style="flex: 0.8; display: flex; align-items: center; justify-content: center; gap: 5px;">
                             <?php if ($is_live || $m['status'] == 'FINISHED'): ?>
@@ -194,12 +209,13 @@ date_default_timezone_set('Asia/Riyadh');
                         </div>
                         <div style="flex:1; text-align:center;">
                             <img src="<?php echo $m['awayTeam']['crest']; ?>" width="35" onerror="this.src='https://via.placeholder.com/40'">
-                            <span style="font-size:9px; font-weight:700; margin-top:5px; display:block;"><?php echo translate_name($m['awayTeam']['name']); ?></span>
+                            <span style="font-size:9px; font-weight:700; margin-top:5px; display:block;"><?php echo translate_name($aName); ?></span>
                         </div>
                     </div>
                     <div style="border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center;">
-                        <span style="opacity:0.7;">📺 <?php echo $leagues_map[$code]['channel']; ?></span>
-                        <span style="color:#00ff87; font-weight:900; cursor:pointer;" onclick="goToChannel('<?php echo $leagues_map[$code]['ch_num']; ?>')">شاهد الآن ▶</span>
+                        <span style="opacity:0.7;">📺 <?php echo $display_ch; ?></span>
+                        <?php if($is_live): ?><span style="color:#ff4d4d; font-weight:900;">● مباشر</span><?php endif; ?>
+                        <span style="color:#00ff87; font-weight:900; cursor:pointer;" onclick="goToChannel('<?php echo $target_ch_num; ?>')">شاهد الآن ▶</span>
                     </div>
                 </div>
         <?php endif; endforeach; endif; ?>
