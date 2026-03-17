@@ -12,10 +12,9 @@ if (isset($_GET['fetch_visitors'])) {
     }
     file_put_contents($visitors_file, serialize($data));
     echo count($data);
-    exit; // إنهاء التنفيذ هنا عند طلب التحديث فقط
+    exit; 
 }
 
-// جلب العدد المبدئي عند تحميل الصفحة لأول مرة
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
 
 // --- إعدادات API المباريات ---
@@ -79,8 +78,15 @@ date_default_timezone_set('Asia/Riyadh');
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
-        .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 12px; border-radius: 50px; color: #22c55e; font-size: 10px; font-weight: 900; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 6px; }
-        .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
+        /* تعديل مكان العداد ليكون يسار الشاشة */
+        .online-count-badge { 
+            position: fixed; left: 15px; bottom: 20px; z-index: 1500;
+            background: rgba(5, 12, 20, 0.8); backdrop-filter: blur(10px);
+            border: 1px solid rgba(34, 197, 94, 0.4); padding: 8px 15px; 
+            border-radius: 50px; color: #22c55e; font-size: 11px; font-weight: 900; 
+            display: flex; align-items: center; gap: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .dot-blink { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; box-shadow: 0 0 10px #22c55e; }
 
         #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
@@ -147,6 +153,11 @@ date_default_timezone_set('Asia/Riyadh');
 </head>
 <body>
 
+<div class="online-count-badge">
+    <div class="dot-blink"></div>
+    <span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span>
+</div>
+
 <div id="pro-cinematic-intro">
     <div class="intro-icon"><i class="fas fa-play-circle"></i></div>
     <h1 style="color:#fff; font-weight:900; font-size:28px; margin-top:15px;">الخدمة الرقمية</h1>
@@ -156,11 +167,6 @@ date_default_timezone_set('Asia/Riyadh');
 <div class="bg-pattern-animated"></div>
 
 <div class="header-fixed-container">
-    <div class="online-count-badge">
-        <div class="dot-blink"></div>
-        <span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span>
-    </div>
-
     <div class="promo-text">هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات<br>للاشتراك في الباقة كاملة على جميع الأجهزة والشاشات تواصل معنا</div>
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
@@ -213,6 +219,7 @@ date_default_timezone_set('Asia/Riyadh');
 </div>
 
 <div class="grid">
+    <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:5px;">قنوات beIN Sports</div>
     <?php for($i = 1; $i <= 9; $i++): ?>
     <div class="card" id="ch-row-<?php echo $i; ?>">
         <div class="c-head">
@@ -221,7 +228,21 @@ date_default_timezone_set('Asia/Riyadh');
         </div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
         <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
-            <span>بدء البث المباشر</span>
+            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
+        </button>
+    </div>
+    <?php endfor; ?>
+
+    <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-top:20px; padding-bottom:10px; margin-bottom:5px;">قنوات STARZPLAY</div>
+    <?php for($i = 10; $i <= 11; $i++): ?>
+    <div class="card" id="ch-row-<?php echo $i; ?>">
+        <div class="c-head">
+            <div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div>
+            <div class="live-box"><div class="live-dot" style="width:7px; height:7px; background:#22c55e; border-radius:50%; animation:blink 1s infinite;"></div><span style="font-size:9px; color:#22c55e; font-weight:900; margin-right:5px;">LIVE</span></div>
+        </div>
+        <video id="vid<?php echo $i; ?>" playsinline controls></video>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
+            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
         </button>
     </div>
     <?php endfor; ?>
@@ -232,7 +253,6 @@ date_default_timezone_set('Asia/Riyadh');
 <script>
 window.addEventListener('load', () => { setTimeout(() => document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'), 2500); });
 
-// تحديث العداد من نفس الملف لضمان عدم حدوث خطأ 404
 function updateRealtimeVisitors() {
     fetch(window.location.pathname + '?fetch_visitors=1')
     .then(res => res.text())
@@ -258,13 +278,13 @@ function robustPlay(videoId, primary, backup, btn) {
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
             video.play();
-            btnText.innerText = "تم تشغيل البث بنجاح";
+            btnText.innerText = "تم التشغيل بنجاح";
         });
         video.hls = hls;
     } else {
         video.src = primary;
         video.play();
-        btnText.innerText = "تم تشغيل البث بنجاح";
+        btnText.innerText = "تم التشغيل بنجاح";
     }
 }
 </script>
