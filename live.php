@@ -78,16 +78,7 @@ date_default_timezone_set('Asia/Riyadh');
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* تعديل مكان العداد ليكون يسار الشاشة */
-        .online-count-badge { 
-            position: fixed; left: 15px; bottom: 20px; z-index: 1500;
-            background: rgba(5, 12, 20, 0.8); backdrop-filter: blur(10px);
-            border: 1px solid rgba(34, 197, 94, 0.4); padding: 8px 15px; 
-            border-radius: 50px; color: #22c55e; font-size: 11px; font-weight: 900; 
-            display: flex; align-items: center; gap: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-        }
-        .dot-blink { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; box-shadow: 0 0 10px #22c55e; }
-
+        /* --- شاشة الدخول VFX --- */
         #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
         .intro-icon { font-size: 90px; color: #fff; filter: drop-shadow(0 0 30px var(--main)); animation: pulseLogo 2s infinite ease-in-out; }
@@ -97,10 +88,12 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         @keyframes blink { 50% { opacity: 0.2; } }
 
+        /* --- الخلفية الأنيقة --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
+        /* --- الهيدر الزجاجي --- */
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
             background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
@@ -108,10 +101,21 @@ date_default_timezone_set('Asia/Riyadh');
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
+
+        /* تعديل عداد المتواجدين ليكون أعلى اليسار داخل الهيدر */
+        .online-count-badge { 
+            position: absolute; left: 15px; top: 15px;
+            background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); 
+            padding: 4px 10px; border-radius: 50px; color: #22c55e; 
+            font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px;
+        }
+        .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
+
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; margin-inline: auto; }
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; }
 
+        /* --- جدول المباريات --- */
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-scroll::-webkit-scrollbar { display: none; }
@@ -129,12 +133,12 @@ date_default_timezone_set('Asia/Riyadh');
         .s-divider { opacity: 0.5; font-weight: bold; }
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
+        /* --- القنوات وأزرار التشغيل المتوهجة --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
 
@@ -153,11 +157,6 @@ date_default_timezone_set('Asia/Riyadh');
 </head>
 <body>
 
-<div class="online-count-badge">
-    <div class="dot-blink"></div>
-    <span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span>
-</div>
-
 <div id="pro-cinematic-intro">
     <div class="intro-icon"><i class="fas fa-play-circle"></i></div>
     <h1 style="color:#fff; font-weight:900; font-size:28px; margin-top:15px;">الخدمة الرقمية</h1>
@@ -167,6 +166,11 @@ date_default_timezone_set('Asia/Riyadh');
 <div class="bg-pattern-animated"></div>
 
 <div class="header-fixed-container">
+    <div class="online-count-badge">
+        <div class="dot-blink"></div>
+        <span>متواجد: <span id="realtime-visitors"><?php echo $online_now; ?></span></span>
+    </div>
+
     <div class="promo-text">هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات<br>للاشتراك في الباقة كاملة على جميع الأجهزة والشاشات تواصل معنا</div>
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
@@ -219,7 +223,6 @@ date_default_timezone_set('Asia/Riyadh');
 </div>
 
 <div class="grid">
-    <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:5px;">قنوات beIN Sports</div>
     <?php for($i = 1; $i <= 9; $i++): ?>
     <div class="card" id="ch-row-<?php echo $i; ?>">
         <div class="c-head">
@@ -228,21 +231,7 @@ date_default_timezone_set('Asia/Riyadh');
         </div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
         <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
-            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
-        </button>
-    </div>
-    <?php endfor; ?>
-
-    <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-top:20px; padding-bottom:10px; margin-bottom:5px;">قنوات STARZPLAY</div>
-    <?php for($i = 10; $i <= 11; $i++): ?>
-    <div class="card" id="ch-row-<?php echo $i; ?>">
-        <div class="c-head">
-            <div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div>
-            <div class="live-box"><div class="live-dot" style="width:7px; height:7px; background:#22c55e; border-radius:50%; animation:blink 1s infinite;"></div><span style="font-size:9px; color:#22c55e; font-weight:900; margin-right:5px;">LIVE</span></div>
-        </div>
-        <video id="vid<?php echo $i; ?>" playsinline controls></video>
-        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
-            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
+            <span>بدء البث المباشر</span>
         </button>
     </div>
     <?php endfor; ?>
@@ -278,13 +267,13 @@ function robustPlay(videoId, primary, backup, btn) {
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
             video.play();
-            btnText.innerText = "تم التشغيل بنجاح";
+            btnText.innerText = "تم تشغيل البث بنجاح";
         });
         video.hls = hls;
     } else {
         video.src = primary;
         video.play();
-        btnText.innerText = "تم التشغيل بنجاح";
+        btnText.innerText = "تم تشغيل البث بنجاح";
     }
 }
 </script>
