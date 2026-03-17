@@ -87,15 +87,8 @@ date_default_timezone_set('Asia/Riyadh');
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
-
         .top-header-row { width: 95%; display: flex; justify-content: flex-start; margin-bottom: 5px; }
-
-        /* عداد المتواجدين */
-        .online-count-badge { 
-            background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); 
-            padding: 3px 10px; border-radius: 50px; color: #22c55e; 
-            font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px;
-        }
+        .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 10px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px; }
         .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
 
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; margin-inline: auto; }
@@ -112,10 +105,9 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         @keyframes blink { 50% { opacity: 0.2; } }
 
-        /* --- الخلفية المتحركة --- */
+        /* --- الخلفية --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
-        @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
         /* --- الكروت والشبكة --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
@@ -124,19 +116,31 @@ date_default_timezone_set('Asia/Riyadh');
         
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
 
         .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; backdrop-filter: blur(5px); animation: glassGlow 3s infinite; }
         @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); } 50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); } }
 
-        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
+        /* --- جدول المباريات --- */
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-card { min-width: 280px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px; border: 1px solid var(--glass-border); transition: all 0.3s ease; overflow: hidden; }
         .league-title-box { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 8px 15px; margin: 0 -15px 15px -15px; text-align: center; color: #00ff87; font-size: 10px; font-weight: 800; }
         .s-box { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 1.4em; font-weight: 900; }
+
+        /* تعديل تصميم اسم القناة في الكرت */
+        .channel-label-box {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 4px 10px; border-radius: 6px;
+            color: #fff; font-size: 9px; font-weight: 700;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.02);
+        }
+        .channel-label-box i { color: #f1c40f; font-size: 10px; }
+
+        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
     </style>
 </head>
@@ -177,7 +181,6 @@ date_default_timezone_set('Asia/Riyadh');
                     $hName = $m['homeTeam']['name'];
                     $aName = $m['awayTeam']['name'];
                     
-                    // منطق القناة اليدوية (من لوحة التحكم)
                     $match_key = $hName . ' vs ' . $aName;
                     if (isset($manual_channels[$match_key])) {
                         $target_ch_num = $manual_channels[$match_key];
@@ -213,8 +216,7 @@ date_default_timezone_set('Asia/Riyadh');
                         </div>
                     </div>
                     <div style="border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center;">
-                        <span style="opacity:0.7;">📺 <?php echo $display_ch; ?></span>
-                        <?php if($is_live): ?><span style="color:#ff4d4d; font-weight:900;">● مباشر</span><?php endif; ?>
+                        <div class="channel-label-box"><i class="fas fa-tv"></i> <?php echo $display_ch; ?></div>
                         <span style="color:#00ff87; font-weight:900; cursor:pointer;" onclick="goToChannel('<?php echo $target_ch_num; ?>')">شاهد الآن ▶</span>
                     </div>
                 </div>
@@ -262,9 +264,9 @@ function robustPlay(vId, p, b, btn) {
     if (video.hls) { video.hls.destroy(); }
     if (Hls.isSupported()) {
         const hls = new Hls(); hls.loadSource(p); hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btnText.innerText = "تم تشغيل البث بنجاح"; });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btnText.innerText = "تم التشغيل بنجاح"; });
         video.hls = hls;
-    } else { video.src = p; video.play(); btnText.innerText = "تم تشغيل البث بنجاح"; }
+    } else { video.src = p; video.play(); btnText.innerText = "تم التشغيل بنجاح"; }
 }
 </script>
 </body>
