@@ -3,7 +3,7 @@
 $apiKey = '273aaeb61360452588653ffea820cc19';
 $url = 'https://api.football-data.org/v4/matches';
 
-// خريطة الدوريات الشاملة (أوروبا، آسيا، أفريقيا)
+// خريطة الدوريات الشاملة
 $leagues_map = [
     'PL'   => ['name' => 'الدوري الإنجليزي', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
     'PD'   => ['name' => 'الدوري الإسباني', 'channel' => 'beIN Sport 3', 'ch_num' => '3'],
@@ -70,8 +70,19 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes loadProgress { to { width: 100%; } }
         @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
+        /* --- الخلفية الأنيقة المتحركة --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
-        .header-fixed-container { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
+        @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
+
+        /* --- الهيدر الزجاجي --- */
+        .header-fixed-container { 
+            position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
+            background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
+            border-bottom: 1px solid var(--glass-border); padding: 15px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; margin-inline: auto; }
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; }
@@ -95,6 +106,7 @@ date_default_timezone_set('Asia/Riyadh');
 
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
+        /* --- القنوات وأزرار التشغيل الزجاجية المتوهجة --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
@@ -104,7 +116,22 @@ date_default_timezone_set('Asia/Riyadh');
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.2; } }
-        .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; backdrop-filter: blur(5px); animation: glassGlow 3s infinite; }
+
+        /* تعديل الزر ليكون زجاجي متوهج */
+        .play-btn-premium { 
+            width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; 
+            background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); 
+            padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer;
+            backdrop-filter: blur(5px); transition: all 0.3s ease; 
+            animation: glassGlow 3s infinite;
+        }
+        .play-btn-premium:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.02); }
+        
+        @keyframes glassGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); }
+            50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); }
+        }
+
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
     </style>
@@ -120,7 +147,7 @@ date_default_timezone_set('Asia/Riyadh');
 <div class="bg-pattern-animated"></div>
 
 <div class="header-fixed-container">
-    <div class="promo-text">هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات<br>للاشتراك في الباقة كاملة تواصل معنا</div>
+    <div class="promo-text">هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات<br>للاشتراك في الباقة كاملة على جميع الأجهزة والشاشات تواصل معنا</div>
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
         <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
@@ -180,7 +207,9 @@ date_default_timezone_set('Asia/Riyadh');
             <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
-        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)">بدء البث المباشر</button>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
+            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
+        </button>
     </div>
     <?php endfor; ?>
 
@@ -192,7 +221,9 @@ date_default_timezone_set('Asia/Riyadh');
             <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
-        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)">بدء البث المباشر</button>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
+            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
+        </button>
     </div>
     <?php endfor; ?>
 </div>
