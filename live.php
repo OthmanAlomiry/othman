@@ -1,5 +1,5 @@
 <?php
-// --- نظام عداد المتواجدين الحقيقي (بدون تغيير في منطق الصفحة) ---
+// --- نظام عداد المتواجدين الحقيقي ---
 session_start();
 $visitors_file = 'online_visitors.txt';
 function update_online_count($file) {
@@ -19,7 +19,6 @@ $online_now = update_online_count($visitors_file);
 $apiKey = '273aaeb61360452588653ffea820cc19';
 $url = 'https://api.football-data.org/v4/matches';
 
-// خريطة الدوريات الشاملة
 $leagues_map = [
     'PL'   => ['name' => 'الدوري الإنجليزي', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
     'PD'   => ['name' => 'الدوري الإسباني', 'channel' => 'beIN Sport 3', 'ch_num' => '3'],
@@ -77,7 +76,7 @@ date_default_timezone_set('Asia/Riyadh');
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* ميزة المتواجدين (تصميم متناسق مع الهيدر) */
+        /* ميزة المتواجدين (تصميم متناسق) */
         .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 12px; border-radius: 50px; color: #22c55e; font-size: 10px; font-weight: 900; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 6px; }
         .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
 
@@ -253,7 +252,7 @@ window.addEventListener('load', () => {
     setTimeout(() => document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'), 2500); 
 });
 
-// ميزة تحديث العداد تلقائياً كل 20 ثانية بدون إعادة تحميل
+// ميزة تحديث العداد تلقائياً كل 3 ثوانٍ
 function updateRealtimeVisitors() {
     fetch(window.location.href)
     .then(res => res.text())
@@ -262,9 +261,10 @@ function updateRealtimeVisitors() {
         const doc = parser.parseFromString(html, 'text/html');
         const count = doc.getElementById('realtime-visitors').innerText;
         document.getElementById('realtime-visitors').innerText = count;
-    });
+    })
+    .catch(err => console.log('Update Error'));
 }
-setInterval(updateRealtimeVisitors, 20000);
+setInterval(updateRealtimeVisitors, 3000); // تحديث سريع جداً كل 3 ثوانٍ
 
 function goToChannel(num) {
     const el = document.getElementById('ch-row-' + num);
