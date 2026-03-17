@@ -146,6 +146,7 @@ date_default_timezone_set('Asia/Riyadh');
             <span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span>
         </div>
     </div>
+
     <div class="promo-text">هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات<br>للاشتراك في الباقة كاملة على جميع الأجهزة والشاشات تواصل معنا</div>
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
@@ -174,7 +175,7 @@ date_default_timezone_set('Asia/Riyadh');
                         $target_ch_num = $leagues_map[$code]['ch_num'];
                     }
 
-                    // منطق الحالة المباشرة والنتيجة
+                    // منطق الحالة المباشرة والنتيجة المطور
                     $status = $m['status'];
                     $is_live = (in_array($status, ['IN_PLAY', 'PAUSED', 'LIVE']));
                     $is_finished = ($status == 'FINISHED');
@@ -228,6 +229,18 @@ date_default_timezone_set('Asia/Riyadh');
     <div class="card" id="ch-row-<?php echo $i; ?>">
         <div class="c-head">
             <div class="name-box-purple">beIN Sport <?php echo $i; ?></div>
+            <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
+        </div>
+        <video id="vid<?php echo $i; ?>" playsinline controls></video>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"><span>بدء البث المباشر</span></button>
+    </div>
+    <?php endfor; ?>
+
+    <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-top:20px; padding-bottom:10px; margin-bottom:5px;">قنوات STARZPLAY</div>
+    <?php for($i = 10; $i <= 11; $i++): ?>
+    <div class="card" id="ch-row-<?php echo $i; ?>">
+        <div class="c-head">
+            <div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div>
             <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
