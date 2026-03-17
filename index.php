@@ -79,7 +79,6 @@ date_default_timezone_set('Asia/Riyadh');
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* --- الهيدر الزجاجي --- */
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
             background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
@@ -95,7 +94,6 @@ date_default_timezone_set('Asia/Riyadh');
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; }
 
-        /* --- شاشة الدخول VFX --- */
         #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
         .intro-icon { font-size: 90px; color: #fff; filter: drop-shadow(0 0 30px var(--main)); animation: pulseLogo 2s infinite ease-in-out; }
@@ -105,15 +103,13 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         @keyframes blink { 50% { opacity: 0.2; } }
 
-        /* --- الخلفية --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
+        @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* --- الكروت والشبكة --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s; }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
-        
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
@@ -122,25 +118,14 @@ date_default_timezone_set('Asia/Riyadh');
         .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; backdrop-filter: blur(5px); animation: glassGlow 3s infinite; }
         @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); } 50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); } }
 
-        /* --- جدول المباريات --- */
+        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-card { min-width: 280px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px; border: 1px solid var(--glass-border); transition: all 0.3s ease; overflow: hidden; }
         .league-title-box { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 8px 15px; margin: 0 -15px 15px -15px; text-align: center; color: #00ff87; font-size: 10px; font-weight: 800; }
         .s-box { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 1.4em; font-weight: 900; }
-
-        /* تعديل تصميم اسم القناة في الكرت */
-        .channel-label-box {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            padding: 4px 10px; border-radius: 6px;
-            color: #fff; font-size: 9px; font-weight: 700;
-            box-shadow: inset 0 0 10px rgba(255,255,255,0.02);
-        }
+        .channel-label-box { display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12); padding: 4px 10px; border-radius: 6px; color: #fff; font-size: 9px; font-weight: 700; }
         .channel-label-box i { color: #f1c40f; font-size: 10px; }
-
-        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
     </style>
 </head>
@@ -190,9 +175,13 @@ date_default_timezone_set('Asia/Riyadh');
                         $target_ch_num = $leagues_map[$code]['ch_num'];
                     }
 
-                    $is_live = ($m['status'] == 'IN_PLAY' || $m['status'] == 'PAUSED');
-                    $homeScore = $m['score']['fullTime']['home'];
-                    $awayScore = $m['score']['fullTime']['away'];
+                    // منطق الحالة المباشرة والنتيجة المطور
+                    $status = $m['status'];
+                    $is_live = (in_array($status, ['IN_PLAY', 'PAUSED', 'LIVE']));
+                    $is_finished = ($status == 'FINISHED');
+                    
+                    $homeScore = $m['score']['fullTime']['home'] ?? 0;
+                    $awayScore = $m['score']['fullTime']['away'] ?? 0;
         ?>
                 <div class="match-card">
                     <div class="league-title-box"><div class="m-league"><?php echo $leagues_map[$code]['name']; ?></div></div>
@@ -201,13 +190,23 @@ date_default_timezone_set('Asia/Riyadh');
                             <img src="<?php echo $m['homeTeam']['crest']; ?>" width="35" onerror="this.src='https://via.placeholder.com/40'">
                             <span style="font-size:9px; font-weight:700; margin-top:5px; display:block;"><?php echo translate_name($hName); ?></span>
                         </div>
-                        <div style="flex: 0.8; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                            <?php if ($is_live || $m['status'] == 'FINISHED'): ?>
-                                <div class="s-box"><?php echo $homeScore; ?></div>
-                                <span>-</span>
-                                <div class="s-box"><?php echo $awayScore; ?></div>
+                        <div style="flex: 1.2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;">
+                            <?php if ($is_live || $is_finished): ?>
+                                <div style="display:flex; align-items:center; gap:5px;">
+                                    <div class="s-box"><?php echo $homeScore; ?></div>
+                                    <span style="font-weight:900; opacity:0.6;">-</span>
+                                    <div class="s-box"><?php echo $awayScore; ?></div>
+                                </div>
+                                <?php if($is_live): ?>
+                                    <span style="color:#ff4d4d; font-size:8px; font-weight:900; animation: blink 1s infinite;">● مباشر</span>
+                                <?php elseif($is_finished): ?>
+                                    <span style="color:#aaa; font-size:8px; font-weight:900;">انتهت</span>
+                                <?php endif; ?>
                             <?php else: ?>
-                                <div style="font-size:11px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
+                                <div style="font-size:11px; font-weight:bold; color:#f1c40f; text-align:center;">
+                                    <?php echo date('h:i A', strtotime($m['utcDate'])); ?><br>
+                                    <span style="font-size:8px; opacity:0.6;"><?php echo ($status == 'TIMED' ? 'لم تبدأ' : $status); ?></span>
+                                </div>
                             <?php endif; ?>
                         </div>
                         <div style="flex:1; text-align:center;">
@@ -264,9 +263,9 @@ function robustPlay(vId, p, b, btn) {
     if (video.hls) { video.hls.destroy(); }
     if (Hls.isSupported()) {
         const hls = new Hls(); hls.loadSource(p); hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btnText.innerText = "تم التشغيل بنجاح"; });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btnText.innerText = "تم تشغيل البث بنجاح"; });
         video.hls = hls;
-    } else { video.src = p; video.play(); btnText.innerText = "تم التشغيل بنجاح"; }
+    } else { video.src = p; video.play(); btnText.innerText = "تم تشغيل البث بنجاح"; }
 }
 </script>
 </body>
