@@ -36,12 +36,26 @@ $leagues_map = [
     'CAF'  => ['name' => 'دوري أبطال أفريقيا', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
 ];
 
+// دالة تنظيف وترجمة الأسماء (اسم النادي فقط)
 function translate_name($text) {
+    // ترجمة النص أولاً عبر جوجل
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
     $response = @file_get_contents($url);
     if($response) {
         $result = json_decode($response, true);
-        return $result[0][0][0] ?? $text;
+        $translated = $result[0][0][0] ?? $text;
+        
+        // كلمات للتنظيف من الاسم المترجم
+        $remove_list = [
+            'نادي', 'فريق', 'كرة القدم', 'الرياضي', 'للمحترفين', 
+            'FC', 'CF', 'SC', 'AFC', 'United', 'City', 'Real'
+        ];
+        
+        foreach ($remove_list as $word) {
+            $translated = str_replace($word, '', $translated);
+        }
+        
+        return trim($translated);
     }
     return $text;
 }
@@ -175,7 +189,6 @@ date_default_timezone_set('Asia/Riyadh');
                         $target_ch_num = $leagues_map[$code]['ch_num'];
                     }
 
-                    // منطق الحالة المباشرة والنتيجة المطور
                     $status = $m['status'];
                     $is_live = (in_array($status, ['IN_PLAY', 'PAUSED', 'LIVE']));
                     $is_finished = ($status == 'FINISHED');
@@ -205,7 +218,7 @@ date_default_timezone_set('Asia/Riyadh');
                             <?php else: ?>
                                 <div style="font-size:11px; font-weight:bold; color:#f1c40f; text-align:center;">
                                     <?php echo date('h:i A', strtotime($m['utcDate'])); ?><br>
-                                    <span style="font-size:8px; opacity:0.6;"><?php echo ($status == 'TIMED' ? 'لم تبدأ' : $status); ?></span>
+                                    <span style="font-size:8px; opacity:0.6;">لم تبدأ</span>
                                 </div>
                             <?php endif; ?>
                         </div>
