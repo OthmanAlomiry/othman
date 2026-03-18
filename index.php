@@ -36,45 +36,60 @@ $leagues_map = [
     'CAF'  => ['name' => 'دوري أبطال أفريقيا', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
 ];
 
-// --- دالة ترجمة وتنظيف الأسماء الذكية ---
+// --- دالة ترجمة الأسماء الذكية (نسخة مطورة للأندية العالمية والتركية) ---
 function translate_name($text) {
     $names_map = [
+        // تركيا
+        'Galatasaray SK' => 'غلطة سراي',
+        'Fenerbahçe SK' => 'فنربخشة',
+        'Beşiktaş JK' => 'بشكتاش',
+        'Trabzonspor' => 'طرابزون سبور',
         // إنجلترا
-        'Tottenham Hotspur FC' => 'توتنهام', 'Arsenal FC' => 'أرسنال', 'Chelsea FC' => 'تشيلسي', 'Liverpool FC' => 'ليفربول',
-        'Manchester City FC' => 'مانشستر سيتي', 'Manchester United FC' => 'مانشستر يونايتد', 'Aston Villa FC' => 'أستون فيلا',
-        'Newcastle United FC' => 'نيوكاسل', 'West Ham United FC' => 'وست هام', 'Everton FC' => 'إيفرتون',
+        'Tottenham Hotspur FC' => 'توتنهام',
+        'Arsenal FC' => 'أرسنال',
+        'Chelsea FC' => 'تشيلسي',
+        'Liverpool FC' => 'ليفربول',
+        'Manchester City FC' => 'مانشستر سيتي',
+        'Manchester United FC' => 'مانشستر يونايتد',
         // إسبانيا
-        'Real Madrid CF' => 'ريال مدريد', 'FC Barcelona' => 'برشلونة', 'Atlético Madrid' => 'أتلتيكو مدريد',
-        'Girona FC' => 'جيرونا', 'Athletic Club' => 'أتلتيك بلباو', 'Real Sociedad' => 'سوسيداد', 'Sevilla FC' => 'إشبيلية',
+        'Real Madrid CF' => 'ريال مدريد',
+        'FC Barcelona' => 'برشلونة',
+        'Atlético Madrid' => 'أتلتيكو مدريد',
         // إيطاليا
-        'Atalanta BC' => 'أتالانتا', 'Inter Milan' => 'إنتر ميلان', 'AC Milan' => 'ميلان', 'Juventus FC' => 'يوفنتوس',
-        'AS Roma' => 'روما', 'SS Lazio' => 'لاتسيو', 'SSC Napoli' => 'نابولي', 'Bologna FC 1909' => 'بولونيا',
+        'Atalanta BC' => 'أتالانتا',
+        'Inter Milan' => 'إنتر ميلان',
+        'AC Milan' => 'ميلان',
+        'Juventus FC' => 'يوفنتوس',
         // ألمانيا
-        'Bayer 04 Leverkusen' => 'ليفركوزن', 'FC Bayern München' => 'بايرن ميونخ', 'Borussia Dortmund' => 'دورتموند',
-        'RB Leipzig' => 'لايبزيج', 'VfB Stuttgart' => 'شتوتجارت',
+        'FC Bayern München' => 'بايرن ميونخ',
+        'Borussia Dortmund' => 'دورتموند',
+        'Bayer 04 Leverkusen' => 'ليفركوزن',
         // فرنسا
-        'Paris Saint-Germain FC' => 'باريس سان جيرمان', 'Olympique de Marseille' => 'مارسيليا', 'AS Monaco FC' => 'موناكو',
-        'Lille OSC' => 'ليل', 'Olympique Lyonnais' => 'ليون',
-        // البرتغال وهولندا
-        'Sporting CP' => 'سبورتينج لشبونة', 'SL Benfica' => 'بنفيكا', 'FC Porto' => 'بورتو', 'PSV Eindhoven' => 'أيندهوفن', 'Ajax' => 'أياكس',
-        // أفريقيا
-        'Al Ahly SC' => 'الأهلي', 'Zamalek SC' => 'الزمالك', 'Wydad AC' => 'الوداد', 'Raja Casablanca' => 'الرجاء',
-        'Espérance de Tunis' => 'الترجي', 'Mamelodi Sundowns FC' => 'صن داونز', 'TP Mazembe' => 'مازيمبي',
-        // آسيا (السعودية والخليج)
-        'Al Hilal SFC' => 'الهلال', 'Al Nassr FC' => 'النصر', 'Al Ittihad' => 'الاتحاد', 'Al Ahli SFC' => 'الأهلي',
-        'Al Shabab' => 'الشباب', 'Al Ain FC' => 'العين', 'Al Sadd SC' => 'السد', 'Urawa Red Diamonds' => 'أوراوا'
+        'Paris Saint-Germain FC' => 'باريس سان جيرمان',
+        // آسيا وأفريقيا
+        'Al Hilal SFC' => 'الهلال',
+        'Al Nassr FC' => 'النصر',
+        'Al Ahly SC' => 'الأهلي',
+        'Zamalek SC' => 'الزمالك'
     ];
 
-    if (isset($names_map[$text])) return $names_map[$text];
+    if (isset($names_map[$text])) {
+        return $names_map[$text];
+    }
 
-    // إذا لم يوجد في القائمة، نقوم بترجمة آلية وتنظيف الكلمات الزائدة
+    // إذا لم يوجد في القائمة، نقوم بترجمة آلية وتنظيف شامل
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
     $response = @file_get_contents($url);
     if($response) {
         $result = json_decode($response, true);
         $translated = $result[0][0][0] ?? $text;
-        // حذف الكلمات الشائعة التي لا نريدها
-        $translated = str_replace(['نادي', 'فريق', 'كرة القدم', 'الرياضي', 'قبل الميلاد', 'إف سي', 'سي اف', 'بي سي', 'يونايتد', 'سيتي'], '', $translated);
+        
+        // تنظيف الكلمات التركية واللاتينية الزائدة من الترجمة العربية
+        $unwanted = [
+            'إس كيه', 'جي كيه', 'إف سي', 'سي اف', 'بي سي', 'نادي', 'فريق', 'كرة القدم', 
+            'الرياضي', 'قبل الميلاد', 'يونايتد', 'سيتي', 'هوتسبير', 'إس كي', 'إف كي'
+        ];
+        $translated = str_replace($unwanted, '', $translated);
         return trim($translated);
     }
     return $text;
@@ -95,20 +110,39 @@ date_default_timezone_set('Asia/Riyadh');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>بوابة الرياضة - متجر الخدمة الرقمية</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
     <style>
-        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --purple-grad: linear-gradient(45deg, #7c3aed, #fff); --green-grad: linear-gradient(45deg, #16a34a, #fff); --anim-speed: 0.4s; }
+        :root { 
+            --main: #e11d48; --bg-deep: #050c14; --whatsapp: #25d366; 
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --purple-grad: linear-gradient(45deg, #7c3aed, #fff); 
+            --green-grad: linear-gradient(45deg, #16a34a, #fff);
+            --anim-speed: 0.4s;
+        }
+        
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
-        .header-fixed-container { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+
+        .header-fixed-container { 
+            position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
+            background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
+            border-bottom: 1px solid var(--glass-border); padding: 15px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
         .top-header-row { width: 95%; display: flex; justify-content: flex-start; margin-bottom: 5px; }
         .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 10px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px; }
         .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
+
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; margin-inline: auto; }
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; }
+
         #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
         .intro-icon { font-size: 90px; color: #fff; filter: drop-shadow(0 0 30px var(--main)); animation: pulseLogo 2s infinite ease-in-out; }
@@ -117,9 +151,11 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes loadProgress { to { width: 100%; } }
         @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         @keyframes blink { 50% { opacity: 0.2; } }
+
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s; }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
@@ -127,8 +163,10 @@ date_default_timezone_set('Asia/Riyadh');
         .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
+
         .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; backdrop-filter: blur(5px); animation: glassGlow 3s infinite; }
         @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); } 50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); } }
+
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         .matches-section { padding: 10px 15px; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
@@ -156,6 +194,7 @@ date_default_timezone_set('Asia/Riyadh');
                     $match_key = $hName . ' vs ' . $aName;
                     if (isset($manual_channels[$match_key])) { $target_ch_num = $manual_channels[$match_key]; $display_ch = "beIN Sport " . $target_ch_num;
                     } else { $display_ch = $leagues_map[$code]['channel']; $target_ch_num = $leagues_map[$code]['ch_num']; }
+                    
                     $status = $m['status'];
                     $is_live = (in_array($status, ['IN_PLAY', 'PAUSED', 'LIVE']));
                     $is_finished = ($status == 'FINISHED');
@@ -189,7 +228,7 @@ date_default_timezone_set('Asia/Riyadh');
     <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:5px;">قنوات beIN Sports</div>
     <?php for($i = 1; $i <= 9; $i++): ?>
     <div class="card" id="ch-row-<?php echo $i; ?>">
-        <div class="c-head"><div class="name-box-purple">beIN Sport <?php echo $i; ?></div><div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div></div>
+        <div class="c-head"><div class="name-box-purple">beIN Sport <?php echo $i; ?></div><div class="live-box"><div class="live-dot" style="width:7px; height:7px; background:#22c55e; border-radius:50%; animation:blink 1s infinite;"></div><span style="font-size:9px; color:#22c55e; font-weight:900; margin-right:5px;">LIVE</span></div></div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
         <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"><span>بدء البث المباشر</span></button>
     </div>
@@ -197,7 +236,7 @@ date_default_timezone_set('Asia/Riyadh');
     <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-top:20px; padding-bottom:10px; margin-bottom:5px;">قنوات STARZPLAY</div>
     <?php for($i = 10; $i <= 11; $i++): ?>
     <div class="card" id="ch-row-<?php echo $i; ?>">
-        <div class="c-head"><div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div><div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div></div>
+        <div class="c-head"><div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div><div class="live-box"><div class="live-dot" style="width:7px; height:7px; background:#22c55e; border-radius:50%; animation:blink 1s infinite;"></div><span style="font-size:9px; color:#22c55e; font-weight:900; margin-right:5px;">LIVE</span></div></div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
         <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"><span>بدء البث المباشر</span></button>
     </div>
