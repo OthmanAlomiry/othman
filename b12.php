@@ -35,7 +35,7 @@ $lines = explode("\n",$m3u8);
 
 foreach($lines as &$line){
 if(strpos($line,'.ts') !== false){
-$line = "bs4.php?ts=".$line;
+$line = "b12.php?ts=".$line;
 }
 }
 
