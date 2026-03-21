@@ -38,8 +38,7 @@ if (!isset($_SESSION['admin'])) {
     <body>
         <form method="POST">
             <h2 style="margin-top:0;">الخدمة الرقمية</h2>
-            <p style="font-size:12px; opacity:0.6;">الرجاء إدخال كلمة المرور للمتابعة</p>
-            <input type="password" name="pass" placeholder="••••••••" required> 
+            <input type="password" name="pass" placeholder="كلمة المرور" required> 
             <button name="login">دخول الإدارة</button>
         </form>
     </body>
@@ -48,21 +47,17 @@ if (!isset($_SESSION['admin'])) {
 
 $saved_data = file_exists($manual_file) ? json_decode(file_get_contents($manual_file), true) : [];
 
-// الحفظ الجماعي المطور
 if (isset($_POST['save_all'])) {
     $new_data = [];
     if (isset($_POST['channels']) && is_array($_POST['channels'])) {
         foreach ($_POST['channels'] as $id => $val) {
-            if ($val !== "") {
-                $new_data[$id] = $val;
-            }
+            if ($val !== "") { $new_data[$id] = $val; }
         }
     }
     file_put_contents($manual_file, json_encode($new_data));
-    echo "<script>alert('تم حفظ جميع التغييرات بنجاح'); window.location='admin.php';</script>";
+    echo "<script>alert('تم الحفظ بنجاح'); window.location='admin.php';</script>";
 }
 
-// جلب مباريات اليوم
 $apiKey = '273aaeb61360452588653ffea820cc19';
 $url = 'https://api.football-data.org/v4/matches';
 $ch = curl_init();
@@ -72,6 +67,25 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $apiKey]);
 $response = curl_exec($ch);
 curl_close($ch);
 $match_data = json_decode($response, true);
+
+// مصفوفة القنوات المتاحة للقائمة المنسدلة
+$available_channels = [
+    ""   => "تلقائي (حسب الدوري)",
+    "1"  => "beIN Sport 1",
+    "2"  => "beIN Sport 2",
+    "3"  => "beIN Sport 3",
+    "4"  => "beIN Sport 4",
+    "5"  => "beIN Sport 5",
+    "6"  => "beIN Sport 6",
+    "7"  => "beIN Sport 7",
+    "8"  => "beIN Sport 8",
+    "9"  => "beIN Sport 9",
+    "10" => "STARZPLAY 1",
+    "11" => "STARZPLAY 2",
+    "12" => "MBC Action",
+    "13" => "شاهد الرياضية 1",
+    "14" => "شاهد الرياضية 2"
+];
 ?>
 
 <!DOCTYPE html>
@@ -79,7 +93,7 @@ $match_data = json_decode($response, true);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لوحة التحكم - القنوات الناقلة</title>
+    <title>لوحة التحكم - القنوات</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -89,81 +103,51 @@ $match_data = json_decode($response, true);
         .header h2 { margin: 0; font-size: 16px; font-weight: 900; color: var(--main); }
         .back-btn { text-decoration: none; color: #fff; font-size: 11px; background: rgba(255,255,255,0.1); padding: 6px 15px; border-radius: 50px; }
         .container { max-width: 600px; margin: auto; }
-        .section-title { font-size: 18px; font-weight: 900; color: #f1c40f; margin: 25px 0 15px 0; border-right: 4px solid var(--main); padding-right: 10px; }
         .match-card { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 18px; margin-bottom: 15px; }
         .league-name { font-size: 10px; color: #00ff87; font-weight: 800; margin-bottom: 8px; display: block; }
         .teams { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: #e2e8f0; }
-        .control-row { display: flex; gap: 10px; align-items: center; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 12px; }
-        .ch-input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #000; color: #00ff87; text-align: center; font-weight: bold; font-size: 18px; outline: none; }
+        .control-row { display: flex; gap: 10px; align-items: center; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; }
+        
+        /* تنسيق القائمة المنسدلة */
+        .ch-select { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #000; color: #00ff87; font-weight: bold; font-size: 15px; outline: none; appearance: none; text-align: center; }
+
         .floating-save { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: #22c55e; color: white; padding: 15px; border-radius: 50px; border: none; font-weight: 900; font-size: 16px; cursor: pointer; box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4); z-index: 1001; }
-        .active-badge { background: #7c3aed; color: #fff; padding: 2px 8px; border-radius: 50px; font-size: 10px; margin-right: 8px; vertical-align: middle; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2><i class="fas fa-edit"></i> لوحة التحكم الشاملة</h2>
-        <a href="live.php" class="back-btn">◀ رجوع للموقع</a>
+        <h2><i class="fas fa-list-ul"></i> اختيار القنوات</h2>
+        <a href="live.php" class="back-btn">◀ الموقع</a>
     </div>
 
     <div class="container">
         <form method="POST">
-            
-            <div class="section-title"><i class="fas fa-calendar-day"></i> مباريات اليوم التلقائية</div>
             <?php 
             if (isset($match_data['matches']) && is_array($match_data['matches']) && count($match_data['matches']) > 0):
                 foreach ($match_data['matches'] as $m): 
                     $match_id = $m['homeTeam']['name'] . ' vs ' . $m['awayTeam']['name'];
-                    $current_ch = $saved_data[$match_id] ?? '';
-                    $ar_league = translate_ar($m['competition']['name']);
-                    $ar_home = translate_ar($m['homeTeam']['name']);
-                    $ar_away = translate_ar($m['awayTeam']['name']);
+                    $current_val = $saved_data[$match_id] ?? '';
             ?>
                 <div class="match-card">
-                    <span class="league-name"><?php echo $ar_league; ?></span>
-                    <div class="teams">
-                        <?php echo $ar_home; ?> vs <?php echo $ar_away; ?>
-                        <?php if($current_ch) echo "<span class='active-badge'>قناة $current_ch</span>"; ?>
-                    </div>
+                    <span class="league-name"><?php echo translate_ar($m['competition']['name']); ?></span>
+                    <div class="teams"><?php echo translate_ar($m['homeTeam']['name']); ?> vs <?php echo translate_ar($m['awayTeam']['name']); ?></div>
                     <div class="control-row">
-                        <span style="font-size: 11px; opacity: 0.7;">رقم القناة:</span>
-                        <input type="number" name="channels[<?php echo $match_id; ?>]" class="ch-input" placeholder="0" value="<?php echo $current_ch; ?>">
+                        <span style="font-size: 11px; opacity: 0.7;">بث على:</span>
+                        <select name="channels[<?php echo $match_id; ?>]" class="ch-select">
+                            <?php foreach ($available_channels as $val => $label): ?>
+                                <option value="<?php echo $val; ?>" <?php echo ($current_val == $val) ? 'selected' : ''; ?>>
+                                    <?php echo $label; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
-            <?php endforeach; else: ?>
-                <p style="text-align:center; opacity:0.5;">لا توجد مباريات جارية حالياً.</p>
+            <?php endforeach; ?>
+            <button type="submit" name="save_all" class="floating-save">حفظ القنوات المحددة</button>
+            <?php else: ?>
+                <p style="text-align:center; padding-top:50px; opacity:0.5;">لا توجد مباريات حالياً</p>
             <?php endif; ?>
-
-            <div class="section-title"><i class="fas fa-tv"></i> القنوات الثابتة</div>
-            
-            <div class="match-card">
-                <span class="league-name">مجموعة MBC</span>
-                <div class="teams">MBC Action <?php if(isset($saved_data['ch12_status'])) echo "<span class='active-badge'>".$saved_data['ch12_status']."</span>"; ?></div>
-                <div class="control-row">
-                    <span style="font-size: 11px; opacity: 0.7;">الحالة/ملاحظة:</span>
-                    <input type="text" name="channels[ch12_status]" class="ch-input" placeholder="مثال: يعمل" value="<?php echo $saved_data['ch12_status'] ?? ''; ?>">
-                </div>
-            </div>
-
-            <div class="match-card">
-                <span class="league-name">مجموعة MBC</span>
-                <div class="teams">شاهد MBC الرياضية 1</div>
-                <div class="control-row">
-                    <span style="font-size: 11px; opacity: 0.7;">الحالة/ملاحظة:</span>
-                    <input type="text" name="channels[ch13_status]" class="ch-input" placeholder="مثال: مباشر" value="<?php echo $saved_data['ch13_status'] ?? ''; ?>">
-                </div>
-            </div>
-
-            <div class="match-card">
-                <span class="league-name">مجموعة MBC</span>
-                <div class="teams">شاهد MBC الرياضية 2</div>
-                <div class="control-row">
-                    <span style="font-size: 11px; opacity: 0.7;">الحالة/ملاحظة:</span>
-                    <input type="text" name="channels[ch14_status]" class="ch-input" placeholder="مثال: متوقف" value="<?php echo $saved_data['ch14_status'] ?? ''; ?>">
-                </div>
-            </div>
-
-            <button type="submit" name="save_all" class="floating-save">حفظ جميع التعديلات</button>
         </form>
     </div>
 </body>
