@@ -20,7 +20,7 @@ $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents(
 $manual_file = 'manual_channels.json';
 $manual_channels = file_exists($manual_file) ? json_decode(file_get_contents($manual_file), true) : [];
 
-// خريطة أسماء القنوات للعرض الجميل
+// خريطة أسماء القنوات للعرض الجميل في الجدول
 $channel_names_map = [
     "1"  => "beIN Sport 1", "2"  => "beIN Sport 2", "3"  => "beIN Sport 3",
     "4"  => "beIN Sport 4", "5"  => "beIN Sport 5", "6"  => "beIN Sport 6",
@@ -45,12 +45,15 @@ $leagues_map = [
     'CAF'  => ['name' => 'دوري أبطال أفريقيا', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
 ];
 
-// --- دالة ترجمة وتنظيف الأسماء الذكية ---
+// --- دالة ترجمة الأسماء الذكية ---
 function translate_name($text) {
     $names_map = [
         'Tottenham Hotspur FC' => 'توتنهام', 'Atalanta BC' => 'أتالانتا', 'Real Madrid CF' => 'ريال مدريد', 'FC Barcelona' => 'برشلونة',
         'Manchester City FC' => 'مانشستر سيتي', 'Liverpool FC' => 'ليفربول', 'Arsenal FC' => 'أرسنال', 'Chelsea FC' => 'تشيلسي',
-        'Galatasaray SK' => 'غلطة سراي', 'Fenerbahçe SK' => 'فنربخشة', 'Al Hilal SFC' => 'الهلال', 'Al Nassr FC' => 'النصر'
+        'Manchester United FC' => 'مانشستر يونايتد', 'Paris Saint-Germain FC' => 'باريس سان جيرمان', 'FC Bayern München' => 'بايرن ميونخ',
+        'Borussia Dortmund' => 'دورتموند', 'Juventus FC' => 'يوفنتوس', 'Inter Milan' => 'إنتر ميلان', 'AC Milan' => 'ميلان',
+        'Atlético Madrid' => 'أتلتيكو مدريد', 'Galatasaray SK' => 'غلطة سراي', 'Fenerbahçe SK' => 'فنربخشة', 'Al Hilal SFC' => 'الهلال',
+        'Al Nassr FC' => 'النصر', 'Al Ahly SC' => 'الأهلي', 'Zamalek SC' => 'الزمالك'
     ];
     if (isset($names_map[$text])) return $names_map[$text];
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
@@ -58,7 +61,7 @@ function translate_name($text) {
     if($response) {
         $result = json_decode($response, true);
         $translated = $result[0][0][0] ?? $text;
-        $unwanted = ['نادي', 'فريق', 'كرة القدم', 'الرياضي', 'قبل الميلاد', 'إف سي', 'سي اف', 'بي سي', 'إس كيه'];
+        $unwanted = ['إس كيه', 'جي كيه', 'إف سي', 'سي اف', 'بي سي', 'نادي', 'فريق', 'كرة القدم', 'الرياضي', 'قبل الميلاد', 'يونايتد', 'سيتي', 'هوتسبير'];
         return trim(str_replace($unwanted, '', $translated));
     }
     return $text;
@@ -81,7 +84,7 @@ date_default_timezone_set('Asia/Riyadh');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --purple-grad: linear-gradient(45deg, #7c3aed, #fff); --green-grad: linear-gradient(45deg, #16a34a, #fff); }
+        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --purple-grad: linear-gradient(45deg, #7c3aed, #fff); --green-grad: linear-gradient(45deg, #16a34a, #fff); --blue-grad: linear-gradient(45deg, #0284c7, #fff); }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; color: #e2e8f0; overflow-x: hidden; }
         .header-fixed-container { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; display: flex; flex-direction: column; align-items: center; }
         .top-header-row { width: 95%; display: flex; justify-content: flex-start; margin-bottom: 5px; }
@@ -90,7 +93,7 @@ date_default_timezone_set('Asia/Riyadh');
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; text-align: center; }
         .social-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); }
-        #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s; }
+        #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         @keyframes blink { 50% { opacity: 0.2; } }
@@ -99,6 +102,7 @@ date_default_timezone_set('Asia/Riyadh');
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
+        .name-box-blue { background: var(--blue-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
         .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; animation: glassGlow 3s infinite; }
         @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); } 50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); } }
@@ -130,7 +134,7 @@ date_default_timezone_set('Asia/Riyadh');
                     $hName = $m['homeTeam']['name']; $aName = $m['awayTeam']['name'];
                     $match_key = $hName . ' vs ' . $aName;
                     
-                    // --- الإصلاح: جلب اسم القناة الصحيح من لوحة التحكم ---
+                    // ربط القناة بأسماء لوحة التحكم
                     if (isset($manual_channels[$match_key]) && $manual_channels[$match_key] != "") {
                         $target_ch_num = $manual_channels[$match_key];
                         $display_ch = $channel_names_map[$target_ch_num] ?? "beIN Sport " . $target_ch_num;
@@ -175,15 +179,20 @@ date_default_timezone_set('Asia/Riyadh');
     <?php endfor; ?>
     <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-top:20px; padding-bottom:10px; margin-bottom:5px;">قنوات STARZPLAY</div>
     <?php for($i = 10; $i <= 11; $i++): ?>
-    <div class="card" id="ch-row-<?php echo $i; ?>"><div class="c-head"><div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div><div class="live-box"><div class="dot-blink"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div></div><video id="vid<?php echo $i; ?>" playsinline controls></video><button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"><span>بدء البث المباشر</span></button></div>
+    <div class="card" id="ch-row-<?php echo $i; ?>">
+        <div class="c-head"><div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div><div class="live-box"><div class="dot-blink"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div></div>
+        <video id="vid<?php echo $i; ?>" playsinline controls></video>
+        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"><span>بدء البث المباشر</span></button>
+    </div>
     <?php endfor; ?>
+    
     <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-top:20px; padding-bottom:10px; margin-bottom:5px;">قنوات MBC ومنوعة</div>
-    <div class="card" id="ch-row-12"><div class="c-head"><div class="name-box-purple" style="background:linear-gradient(45deg, #f39c12, #fff)">MBC Action</div><div class="live-box"><div class="dot-blink"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div></div><video id="vid12" playsinline controls></video><button class="play-btn-premium" onclick="robustPlay('vid12', 'b12.php', 'bs12.php', this)"><span>بدء البث المباشر</span></button></div>
-    <div class="card" id="ch-row-13"><div class="c-head"><div class="name-box-purple" style="background:linear-gradient(45deg, #3498db, #fff)">شاهد MBC الرياضية 1</div><div class="live-box"><div class="dot-blink"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div></div><video id="vid13" playsinline controls></video><button class="play-btn-premium" onclick="robustPlay('vid13', 'b13.php', 'bs13.php', this)"><span>بدء البث المباشر</span></button></div>
-    <div class="card" id="ch-row-14"><div class="c-head"><div class="name-box-purple" style="background:linear-gradient(45deg, #3498db, #fff)">شاهد MBC الرياضية 2</div><div class="live-box"><div class="dot-blink"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div></div><video id="vid14" playsinline controls></video><button class="play-btn-premium" onclick="robustPlay('vid14', 'b14.php', 'bs14.php', this)"><span>بدء البث المباشر</span></button></div>
+    <div class="card" id="ch-row-12"><div class="c-head"><div class="name-box-blue">MBC Action</div><div class="live-box"><div class="dot-blink"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div></div><video id="vid12" playsinline controls></video><button class="play-btn-premium" onclick="robustPlay('vid12', 'b12.php', 'bs12.php', this)"><span>بدء البث المباشر</span></button></div>
+    <div class="card" id="ch-row-13"><div class="c-head"><div class="name-box-blue">شاهد MBC الرياضية 1</div><div class="live-box"><div class="dot-blink"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div></div><video id="vid13" playsinline controls></video><button class="play-btn-premium" onclick="robustPlay('vid13', 'b13.php', 'bs13.php', this)"><span>بدء البث المباشر</span></button></div>
+    <div class="card" id="ch-row-14"><div class="c-head"><div class="name-box-blue">شاهد MBC الرياضية 2</div><div class="live-box"><div class="dot-blink"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div></div><video id="vid14" playsinline controls></video><button class="play-btn-premium" onclick="robustPlay('vid14', 'b14.php', 'bs14.php', this)"><span>بدء البث المباشر</span></button></div>
 </div>
 
-<footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية</footer>
+<footer style="text-align:center; padding:40px; font-size:11px; opacity:0.5;">جميع الحقوق محفوظة لمتجر الخدمة الرقمية</footer>
 
 <script>
 window.addEventListener('load', () => { setTimeout(() => document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'), 2500); });
