@@ -66,31 +66,19 @@ date_default_timezone_set('Asia/Riyadh');
             slidedown: {
               enabled: true,
               autoPrompt: true,
-              timeDelay: 2, 
+              timeDelay: 3,
               pageViews: 1
-            }
-          },
-          notifyButton: {
-            enable: true, 
-            displayPredicate: function() { return true; }, 
-            position: 'bottom-right',
-            size: 'medium',
-            theme: 'default',
-            colors: {
-                'circle.background': '#e11d48',
-                'badge.background': '#e11d48',
-                'pulse.color': 'white'
-            },
-            text: {
-                'tip.state.unsubscribed': 'اشتراك في تنبيهات المباريات',
-                'tip.state.subscribed': 'أنت مشترك بالفعل',
-                'message.prenotify': 'اضغط لتفعيل التنبيهات المباشرة',
-                'dialog.main.title': 'تنبيهات الخدمة الرقمية',
-                'dialog.main.button.subscribe': 'اشتراك الآن',
             }
           }
         });
       });
+
+      // دالة تفعيل الاشتراك اليدوي
+      function subscribeNow() {
+        OneSignal.push(function() {
+          OneSignal.showNativePrompt();
+        });
+      }
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
@@ -98,31 +86,31 @@ date_default_timezone_set('Asia/Riyadh');
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root { --main: #e11d48; --bg: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg); padding-top: 175px; color: #e2e8f0; overflow-x: hidden; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg); padding-top: 210px; color: #e2e8f0; overflow-x: hidden; }
         .header-fixed-container { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
-        .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 10px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px; }
-        .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; }
-        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); }
+        .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 10px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
+        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); display: inline-flex; align-items: center; gap: 5px; }
+        .sub-btn { background: var(--main); color: white; border: none; padding: 10px 20px; border-radius: 50px; font-family: 'Tajawal'; font-weight: 900; font-size: 11px; cursor: pointer; margin-top: 12px; box-shadow: 0 4px 15px rgba(225,29,72,0.4); animation: pulse-red 2s infinite; }
+        @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 15px; scrollbar-width: none; }
         .match-card { min-width: 280px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
-        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s; }
+        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); margin-bottom: 10px; }
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
-        .play-btn-premium { width: 90%; margin: 15px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 50px; font-weight: 900; cursor: pointer; }
-        footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
-        @keyframes blink { 50% { opacity: 0.2; } }
-        .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
+        .play-btn { width: 90%; margin: 15px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 50px; font-weight: 900; cursor: pointer; }
+        footer { text-align: center; padding: 30px; font-size: 10px; opacity: 0.6; }
     </style>
 </head>
 <body>
 
 <div class="header-fixed-container">
-    <div class="online-count-badge"><div class="dot-blink"></div><span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span></div>
-    <div class="promo-text">متجر الخدمة الرقمية - اشتراكات IPTV وبث مباشر مجاني</div>
+    <div class="online-count-badge"><span>● متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span></div>
+    <div style="font-size:11px; font-weight:700; margin-bottom:10px;">متجر الخدمة الرقمية - بث مباشر مجاني</div>
     <div class="social-links">
-        <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
+        <a href="https://wa.me/966505571164" class="social-btn" style="background:#22c55e"><i class="fab fa-whatsapp"></i> واتساب</a>
         <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
     </div>
+    <button class="sub-btn" onclick="subscribeNow()"><i class="fas fa-bell"></i> تفعيل تنبيهات المباريات المباشرة</button>
 </div>
 
 <div class="match-scroll">
@@ -130,34 +118,13 @@ date_default_timezone_set('Asia/Riyadh');
         <div class="match-card">
             <div style="text-align:center; color:#00ff87; font-size:10px; margin-bottom:10px; font-weight:900;"><?php echo $cm['league']; ?></div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="text-align:center;"><img src="<?php echo $cm['home_logo'] ?: 'https://via.placeholder.com/40'; ?>" width="35" height="35" style="border-radius:50%;"><br><span style="font-size:9px; font-weight:700;"><?php echo $cm['home']; ?></span></div>
+                <div style="text-align:center;"><img src="<?php echo $cm['home_logo'] ?: 'https://via.placeholder.com/40'; ?>" width="35" style="border-radius:50%;"><br><span style="font-size:9px; font-weight:700;"><?php echo $cm['home']; ?></span></div>
                 <div style="text-align:center; font-size:12px; font-weight:bold; color:#f1c40f;"><?php echo ($cm['ch']=='postponed'?'مؤجلة':$cm['time']); ?></div>
-                <div style="text-align:center;"><img src="<?php echo $cm['away_logo'] ?: 'https://via.placeholder.com/40'; ?>" width="35" height="35" style="border-radius:50%;"><br><span style="font-size:9px; font-weight:700;"><?php echo $cm['away']; ?></span></div>
+                <div style="text-align:center;"><img src="<?php echo $cm['away_logo'] ?: 'https://via.placeholder.com/40'; ?>" width="35" style="border-radius:50%;"><br><span style="font-size:9px; font-weight:700;"><?php echo $cm['away']; ?></span></div>
             </div>
-            <div style="border-top: 1px solid var(--glass-border); margin-top:10px; padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:9px; color:#aaa;"><i class="fas fa-tv"></i> <?php echo ($cm['ch']=='postponed'?'غير متاح':$channel_names_map[$cm['ch']]??"قناة ".$cm['ch']); ?></span>
-                <?php if($cm['ch']!='postponed'): ?><span style="font-size:9px; color:#00ff87; font-weight:bold; cursor:pointer;" onclick="goToChannel('<?php echo $cm['ch']; ?>')">شاهد الآن ▶</span><?php endif; ?>
-            </div>
-        </div>
-    <?php endforeach; ?>
-
-    <?php if (isset($match_data['matches'])) foreach ($match_data['matches'] as $m): 
-        $hName = $m['homeTeam']['name']; $aName = $m['awayTeam']['name'];
-        $is_live = (in_array($m['status'], ['IN_PLAY', 'PAUSED', 'LIVE']));
-    ?>
-        <div class="match-card">
-            <div style="text-align:center; color:#00ff87; font-size:10px; margin-bottom:10px; font-weight:900;"><?php echo translate_name($m['competition']['name']); ?></div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="text-align:center;"><img src="<?php echo $m['homeTeam']['crest']; ?>" width="35" height="35" onerror="this.src='https://via.placeholder.com/40'"><br><span style="font-size:9px; font-weight:700;"><?php echo translate_name($hName); ?></span></div>
-                <div style="text-align:center;">
-                    <?php if($is_live): ?>
-                        <div style="font-size:14px; font-weight:900;"><?php echo ($m['score']['fullTime']['home']??'0').'-'.($m['score']['fullTime']['away']??'0'); ?></div>
-                        <span style="color:#ff4d4d; font-size:8px; font-weight:900;">● مباشر</span>
-                    <?php else: ?>
-                        <div style="font-size:12px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
-                    <?php endif; ?>
-                </div>
-                <div style="text-align:center;"><img src="<?php echo $m['awayTeam']['crest']; ?>" width="35" height="35" onerror="this.src='https://via.placeholder.com/40'"><br><span style="font-size:9px; font-weight:700;"><?php echo translate_name($aName); ?></span></div>
+            <div style="border-top: 1px solid var(--glass-border); margin-top:10px; padding-top:10px; display:flex; justify-content:space-between; align-items:center; font-size:9px;">
+                <span><i class="fas fa-tv"></i> <?php echo ($cm['ch']=='postponed'?'مؤجلة':$channel_names_map[$cm['ch']]??"قناة ".$cm['ch']); ?></span>
+                <?php if($cm['ch']!='postponed'): ?><span style="color:#00ff87; font-weight:bold; cursor:pointer;" onclick="goToChannel('<?php echo $cm['ch']; ?>')">مشاهدة ▶</span><?php endif; ?>
             </div>
         </div>
     <?php endforeach; ?>
@@ -166,12 +133,12 @@ date_default_timezone_set('Asia/Riyadh');
 <div class="grid">
     <?php for($i = 1; $i <= 14; $i++): ?>
     <div class="card" id="ch-row-<?php echo $i; ?>">
-        <div style="padding:10px; background:rgba(0,0,0,0.3); font-size:11px; font-weight:bold; display:flex; justify-content:space-between;">
+        <div style="padding:10px; background:rgba(0,0,0,0.3); font-size:11px; font-weight:900; display:flex; justify-content:space-between; align-items:center;">
             <span><?php echo $channel_names_map[$i] ?? "قناة $i"; ?></span>
-            <span style="color:#22c55e;">● LIVE</span>
+            <span style="color:#22c55e; font-size:9px;">● LIVE</span>
         </div>
         <video id="vid<?php echo $i; ?>" playsinline controls></video>
-        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', this)">بدء البث المباشر</button>
+        <button class="play-btn" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', this)">بدء البث المباشر</button>
     </div>
     <?php endfor; ?>
 </div>
@@ -181,7 +148,7 @@ date_default_timezone_set('Asia/Riyadh');
 <script>
 function updateRealtimeVisitors() { fetch('index.php?fetch_visitors=1').then(res => res.text()).then(count => { if(count && !isNaN(count)) document.getElementById('realtime-visitors').innerText = count; }); }
 setInterval(updateRealtimeVisitors, 3000);
-function goToChannel(num) { const el = document.getElementById('ch-row-' + num); if(el) window.scrollTo({ top: el.offsetTop - 190, behavior: 'smooth' }); }
+function goToChannel(num) { const el = document.getElementById('ch-row-' + num); if(el) window.scrollTo({ top: el.offsetTop - 220, behavior: 'smooth' }); }
 function robustPlay(vId, p, btn) {
     const video = document.getElementById(vId); btn.innerText = "جاري التحميل...";
     if (Hls.isSupported()) {
