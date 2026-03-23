@@ -16,7 +16,7 @@ if (isset($_GET['fetch_visitors'])) {
 }
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
 
-// --- 2. جلب إعدادات القنوات والمباريات اليدوية ---
+// --- 2. جلب إعدادات القنوات ---
 $manual_file = 'manual_channels.json';
 $manual_channels = file_exists($manual_file) ? json_decode(file_get_contents($manual_file), true) : ['custom_matches' => []];
 
@@ -46,16 +46,30 @@ $channel_names_map = [
         });
       });
 
-      // دالة الاستدعاء المباشر - بدون نوافذ وسيطة
-      function forceSubscribe() {
-        OneSignal.push(function() {
-            // استدعاء نافذة النظام (Allow/Don't Allow) فوراً
-            OneSignal.showNativePrompt().then(function() {
-                console.log("تم طلب الإذن بنجاح");
-            }).catch(function(err) {
-                // إذا فشل، نطلب تسجيل المستخدم يدوياً
-                OneSignal.registerForPushNotifications();
-            });
+      // دالة التفعيل مع رسالة تأكيد للفحص
+      async function forceSubscribe() {
+        console.log("محاولة طلب الإشعارات...");
+        
+        OneSignal.push(async function() {
+            // التحقق إذا كان المستخدم مشتركاً بالفعل
+            let isSubscribed = await OneSignal.isPushNotificationsEnabled();
+            
+            if (isSubscribed) {
+                alert("أنت مشترك بالفعل في التنبيهات! ستصلك إشعارات المباريات فور بدئها.");
+            } else {
+                // طلب الإذن مباشرة
+                OneSignal.showNativePrompt().then(() => {
+                    console.log("تم إرسال الطلب للنظام");
+                }).catch((err) => {
+                    // إذا فشل الطلب المباشر، نستخدم الطريقة البديلة
+                    OneSignal.registerForPushNotifications();
+                });
+                
+                // رسالة مساعدة تظهر فقط إذا تأخر النظام في الاستجابة
+                setTimeout(() => {
+                    alert("إذا لم تظهر نافذة 'سماح' الآن، يرجى التأكد من أنك تفتح الموقع من أيقونة الشاشة الرئيسية.");
+                }, 2000);
+            }
         });
       }
     </script>
@@ -70,10 +84,8 @@ $channel_names_map = [
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 12px; border-radius: 50px; color: #22c55e; font-size: 10px; font-weight: 900; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; }
         .dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
         @keyframes blink { 50% { opacity: 0.2; } }
-        
         .subscribe-btn { background: #e11d48; color: white; padding: 12px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; width: 90%; border-radius: 10px; margin-top: 10px; animation: pulse 2s infinite; font-family: 'Tajawal'; }
-        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); } 70% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(225, 29, 72, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); } }
-
+        @keyframes pulse { 0% { transform: scale(1); } 70% { transform: scale(1.03); } 100% { transform: scale(1); } }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
@@ -87,7 +99,7 @@ $channel_names_map = [
     <div style="font-size:12px; font-weight:900;">متجر الخدمة الرقمية - بث مباشر للمباريات</div>
     
     <button class="subscribe-btn" onclick="forceSubscribe()">
-        <i class="fas fa-bell"></i> اضغط هنا لتفعيل التنبيهات 🔔
+        <i class="fas fa-bell"></i> تفعيل تنبيهات المباريات 🔔
     </button>
 
     <div style="display:flex; justify-content:center; gap:15px; margin-top:12px;">
