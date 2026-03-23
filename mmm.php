@@ -3,140 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محمد المصلحي | الصفحة الشخصية</title>
+    <title>محمد المصلحي | البروفايل الرقمي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-glow: #00d2ff;
-            --secondary-glow: #9d00ff;
-            --bg-color: #0f0c29;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
 
-        body, html {
+        * {
             margin: 0;
             padding: 0;
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: #050505;
+            height: 100vh;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #000;
+            color: #fff;
         }
 
-        /* خلفية متحركة احترافية */
-        .background {
+        /* خلفية الجزيئات */
+        #particles-js {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            z-index: -1;
+            z-index: 1;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* حاوية المحتوى */
-        .profile-card {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 50px;
-            border-radius: 20px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .profile-img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 3px solid var(--primary-glow);
-            box-shadow: 0 0 20px var(--primary-glow);
-            margin-bottom: 20px;
-            transition: 0.5s;
-        }
-
-        .profile-img:hover {
-            transform: scale(1.05) rotate(5deg);
-            box-shadow: 0 0 30px var(--secondary-glow);
-            border-color: var(--secondary-glow);
-        }
-
-        h1 {
-            color: white;
-            margin: 10px 0;
-            letter-spacing: 2px;
-            font-size: 2rem;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
-        }
-
-        p {
-            color: #ccc;
-            margin-bottom: 30px;
-        }
-
-        /* أيقونات التواصل الاجتماعي المتوهجة */
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .social-links a {
+        /* الكارت الرئيسي */
+        .glass-card {
             position: relative;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            color: white;
-            font-size: 24px;
-            text-decoration: none;
-            transition: 0.5s;
-            border: 1px solid rgba(255,255,255,0.1);
-            overflow: hidden;
+            z-index: 10;
+            width: 400px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            text-align: center;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            transition: 0.4s ease-in-out;
         }
 
-        .social-links a:hover {
-            color: #fff;
+        .glass-card:hover {
+            border: 1px solid rgba(0, 243, 255, 0.4);
             transform: translateY(-10px);
         }
 
-        /* تأثير التوهج اللوني لكل أيقونة */
-        .social-links a.facebook:hover { background: #1877F2; box-shadow: 0 0 20px #1877F2; }
-        .social-links a.twitter:hover { background: #1DA1F2; box-shadow: 0 0 20px #1DA1F2; }
-        .social-links a.linkedin:hover { background: #0077B5; box-shadow: 0 0 20px #0077B5; }
-        .social-links a.instagram:hover { background: #E4405F; box-shadow: 0 0 20px #E4405F; }
+        /* صورة البروفايل المتوهجة */
+        .img-box {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 25px;
+        }
 
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #00f3ff;
+            padding: 5px;
+        }
+
+        .img-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%;
+            background: #00f3ff;
+            filter: blur(20px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(to right, #fff, #00f3ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .title {
+            font-size: 14px;
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        /* أيقونات تواصل اجتماعي فائقة التوهج */
+        .social-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 15px;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 22px;
+            text-decoration: none;
+            border: 1px solid #222;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        /* تأثير التوهج الملون */
+        .social-btn:hover {
+            color: #fff;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--clr);
+            border-color: var(--clr);
+            text-shadow: 0 0 10px var(--clr);
+        }
+
+        .facebook { --clr: #1877f2; }
+        .twitter { --clr: #1da1f2; }
+        .instagram { --clr: #e4405f; }
+        .snapchat { --clr: #fffc00; }
+
+        /* زر الإتصال السريع */
+        .btn-contact {
+            margin-top: 35px;
+            display: inline-block;
+            padding: 12px 35px;
+            background: #00f3ff;
+            color: #000;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.3);
+            transition: 0.3s;
+        }
+
+        .btn-contact:hover {
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
 
-    <div class="background"></div>
+    <div id="particles-js"></div>
 
-    <div class="profile-card">
-        <img src="https://via.placeholder.com/150" alt="محمد المصلحي" class="profile-img">
-        
-        <h1><?php echo "محمد المصلحي"; ?></h1>
-        <p>مطور برمجيات | رائد أعمال | مصمم حلول رقمية</p>
-
-        <div class="social-links">
-            <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="linkedin"><i class="fab fa-linkedin-in"></i></a>
-            <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
+    <div class="glass-card">
+        <div class="img-box">
+            <img src="https://ui-avatars.com/api/?name=M+M&background=00f3ff&color=000&size=200" alt="محمد المصلحي">
         </div>
+
+        <h1><?php echo "محمد المصلحي"; ?></h1>
+        <p class="title">Creative Developer & Digital Architect</p>
+
+        <div class="social-container">
+            <a href="#" class="social-btn facebook" style="--clr: #1877f2;"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-btn twitter" style="--clr: #00f3ff;"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" class="social-btn instagram" style="--clr: #e4405f;"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-btn snapchat" style="--clr: #fffc00;"><i class="fab fa-snapchat-ghost"></i></a>
+        </div>
+
+        <a href="mailto:info@example.com" class="btn-contact">تواصل معي الآن</a>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 80 },
+                "color": { "value": "#00f3ff" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5 },
+                "size": { "value": 3 },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#00f3ff",
+                    "opacity": 0.2,
+                    "width": 1
+                },
+                "move": { "enable": true, "speed": 2 }
+            },
+            "interactivity": {
+                "events": { "onhover": { "enable": true, "mode": "repulse" } }
+            }
+        });
+    </script>
 </body>
 </html>
