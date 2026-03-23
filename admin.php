@@ -3,7 +3,6 @@ session_start();
 $password = "admin123"; 
 $manual_file = 'manual_channels.json';
 
-// تسجيل الدخول
 if (isset($_POST['login'])) { if ($_POST['pass'] == $password) { $_SESSION['admin'] = true; } }
 if (!isset($_SESSION['admin'])) { die('<form method="POST" style="text-align:center;padding:100px;background:#050c14;color:#fff;height:100vh;"><h2>الخدمة الرقمية</h2><input type="password" name="pass" placeholder="Password" style="padding:10px;border-radius:5px;"><button name="login" style="padding:10px;background:#e11d48;color:#fff;border:none;margin-left:5px;">Enter</button></form>'); }
 
@@ -61,38 +60,24 @@ if (isset($_GET['del_match'])) {
     </div>
 
     <div class="card">
-        <h3><i class="fas fa-bell"></i> إرسال إشعار فوري لجميع المشتركين</h3>
+        <h3><i class="fas fa-bell"></i> إرسال إشعار للنظام</h3>
         <form method="POST">
             <input type="text" name="push_title" placeholder="عنوان الإشعار (مثال: ريال مدريد يسجل!)" required>
-            <textarea name="push_body" placeholder="نص الرسالة (مثال: شاهد الآن البث المباشر للشوط الثاني)" rows="2" required></textarea>
+            <textarea name="push_body" placeholder="نص الرسالة" rows="2" required></textarea>
             <button name="send_push" class="btn" style="background:#0ea5e9">إرسال الإشعار الآن</button>
         </form>
     </div>
 
     <div class="card">
-        <h3><i class="fas fa-plus"></i> إضافة مباراة يدوية للجدول</h3>
+        <h3>إضافة مباراة للجدول</h3>
         <form method="POST">
-            <input type="text" name="m_league" placeholder="اسم البطولة">
-            <input type="text" name="m_home" placeholder="الفريق الأول">
-            <input type="text" name="m_home_logo" placeholder="رابط شعار الفريق الأول">
-            <input type="text" name="m_away" placeholder="الفريق الثاني">
-            <input type="text" name="m_away_logo" placeholder="رابط شعار الفريق الثاني">
-            <input type="text" name="m_time" placeholder="الوقت (مثال: 10:00 PM)">
+            <input type="text" name="m_league" placeholder="البطولة"><input type="text" name="m_home" placeholder="الفريق 1"><input type="text" name="m_home_logo" placeholder="رابط شعار 1"><input type="text" name="m_away" placeholder="الفريق 2"><input type="text" name="m_away_logo" placeholder="رابط شعار 2"><input type="text" name="m_time" placeholder="الوقت">
             <select name="m_ch">
-                <option value="postponed">⚠️ مباراة مؤجلة</option>
+                <option value="postponed">⚠️ مؤجلة</option>
                 <?php for($i=1;$i<=14;$i++) echo "<option value='$i'>قناة $i</option>"; ?>
             </select>
-            <button name="add_custom" class="btn" style="background:#22c55e">إضافة المباراة للموقع</button>
+            <button name="add_custom" class="btn" style="background:#22c55e">إضافة للموقع</button>
         </form>
     </div>
-
-    <h3>المباريات اليدوية الحالية</h3>
-    <?php foreach($saved_data['custom_matches'] as $cm): ?>
-        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-            <div><b><?php echo $cm['home']; ?> vs <?php echo $cm['away']; ?></b> (<?php echo $cm['league']; ?>)</div>
-            <a href="?del_match=<?php echo $cm['id']; ?>" style="color:#e11d48; text-decoration:none;">حذف 🗑️</a>
-        </div>
-    <?php endforeach; ?>
-
 </body>
 </html>
