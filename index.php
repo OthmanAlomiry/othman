@@ -60,8 +60,28 @@ date_default_timezone_set('Asia/Riyadh');
       OneSignal.push(function() {
         OneSignal.init({
           appId: "6e41fb93-1b65-4596-86f4-ad8589b38ad7",
-          notifyButton: { enable: true },
           allowLocalhostAsSecureOrigin: true,
+          serviceWorkerPath: "OneSignalSDKWorker.js",
+          promptOptions: {
+            slidedown: {
+              enabled: true,
+              autoPrompt: true,
+              timeDelay: 5,
+              pageViews: 1
+            }
+          },
+          notifyButton: {
+            enable: true,
+            position: 'bottom-right', 
+            theme: 'default',
+            text: {
+                'tip.state.unsubscribed': 'اشترك في التنبيهات الرياضية',
+                'tip.state.subscribed': 'أنت مشترك بالفعل',
+                'message.prenotify': 'اضغط هنا لتفعيل تنبيهات المباريات',
+                'dialog.main.title': 'تنبيهات الخدمة الرقمية',
+                'dialog.main.button.subscribe': 'اشتراك الآن',
+            }
+          }
         });
       });
     </script>
@@ -123,6 +143,8 @@ date_default_timezone_set('Asia/Riyadh');
     </div>
     <?php endfor; ?>
 </div>
+
+<footer style="text-align:center; padding:40px; font-size:11px; opacity:0.5;">جميع الحقوق محفوظة لمتجر الخدمة الرقمية</footer>
 
 <script>
 function updateRealtimeVisitors() { fetch('index.php?fetch_visitors=1').then(res => res.text()).then(count => { document.getElementById('realtime-visitors').innerText = count; }); }
