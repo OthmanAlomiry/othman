@@ -161,7 +161,7 @@ date_default_timezone_set('Asia/Riyadh');
 
     <div class="category-tabs">
         <div class="cat-item active" onclick="switchSection('bein', this)"><img src="mg/bein.png"><span>beIN Sport</span></div>
-        <div class="cat-item" onclick="switchSection('shahad', this)"><img src="mg/shahad.png"><span>شاهد</span></div>
+        <div class="cat-item" onclick="switchSection('shahad', this)"><img src="mg/shahd.png"><span>شاهد</span></div>
         <div class="cat-item" onclick="switchSection('mbc', this)"><img src="mg/mbc.png"><span>MBC</span></div>
         <div class="cat-item" onclick="switchSection('star', this)"><img src="mg/star.png"><span>Starzplay</span></div>
         <div class="cat-item" onclick="switchSection('alkas', this)"><img src="mg/alkas.png"><span>الكاس</span></div>
