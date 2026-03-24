@@ -66,6 +66,23 @@ date_default_timezone_set('Asia/Riyadh');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignal.js" async=""></script>
+    <script>
+      window.OneSignal = window.OneSignal || [];
+      OneSignal.push(function() {
+        OneSignal.init({
+          appId: "6e41fb93-1b65-4596-86f4-ad8589b38ad7",
+          allowLocalhostAsSecureOrigin: true,
+          serviceWorkerPath: "OneSignalSDKWorker.js"
+        });
+      });
+      function forceSubscribe() {
+        OneSignal.push(function() {
+            OneSignal.showNativePrompt().catch(() => OneSignal.registerForPushNotifications());
+        });
+      }
+    </script>
+
     <style>
         :root { 
             --main: #e11d48; --bg-deep: #050c14; --whatsapp: #25d366; 
@@ -77,64 +94,64 @@ date_default_timezone_set('Asia/Riyadh');
         }
         
         html { scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 255px; overflow-x: hidden; color: #e2e8f0; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 270px; overflow-x: hidden; color: #e2e8f0; }
 
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
-            background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
-            border-bottom: 1px solid var(--glass-border); padding: 15px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); 
+            border-bottom: 1px solid var(--glass-border); padding: 10px 0;
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
         .top-header-row { width: 95%; display: flex; justify-content: flex-start; margin-bottom: 5px; }
         .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 10px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px; }
         .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
 
-        .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; margin-inline: auto; }
-        .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; }
+        .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+        .social-btn { padding: 6px 12px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* شريط الأيقونات المطور */
+        /* شريط الأيقونات المطور مع صور ثابتة - عثمان */
         .category-tabs { 
-            display: flex; justify-content: center; gap: 12px; width: 95%; overflow-x: auto; 
-            scrollbar-width: none; padding: 5px 0; 
+            display: flex; justify-content: center; gap: 10px; width: 95%; overflow-x: auto; 
+            scrollbar-width: none; padding: 10px 0;
         }
         .cat-item { 
-            min-width: 70px; background: var(--glass); border: 1px solid var(--glass-border); 
-            padding: 10px; border-radius: 15px; cursor: pointer; transition: 0.3s;
+            min-width: 80px; background: var(--glass); border: 1px solid var(--glass-border); 
+            padding: 10px 5px; border-radius: 15px; cursor: pointer; transition: 0.3s;
             display: flex; flex-direction: column; align-items: center; gap: 5px;
         }
-        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: translateY(-3px); }
-        .cat-item img { height: 25px; width: auto; object-fit: contain; }
-        .cat-item span { font-size: 9px; font-weight: 900; color: #fff; }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(225, 29, 72, 0.2); }
+        .cat-item img { height: 30px; width: 100%; object-fit: contain; }
+        .cat-item span { font-size: 8px; font-weight: 900; color: #fff; }
 
-        #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
+        #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s; }
         .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
-        .intro-icon { font-size: 90px; color: #fff; filter: drop-shadow(0 0 30px var(--main)); animation: pulseLogo 2s infinite ease-in-out; }
-        .intro-loading-box { width: 200px; height: 2px; background: rgba(255,255,255,0.1); margin-top: 30px; border-radius: 10px; overflow: hidden; }
-        .intro-loading-bar { width: 0%; height: 100%; background: var(--main); box-shadow: 0 0 15px var(--main); animation: loadProgress 3s forwards; }
-        
+        .intro-icon { font-size: 70px; color: #fff; animation: pulseLogo 2s infinite ease-in-out; }
+        @keyframes loadProgress { to { width: 100%; } }
+        @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        @keyframes blink { 50% { opacity: 0.2; } }
+
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; min-height: 400px; }
         
-        /* إخفاء الأقسام افتراضياً */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; min-height: 300px; }
+        
+        /* إخفاء القنوات افتراضياً عثمان */
         .channel-section { display: none; grid-column: 1/-1; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
-        .channel-section.active { display: grid; animation: fadeIn 0.5s ease-out; }
+        .channel-section.active { display: grid; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s; }
-        .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
-        .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        .name-box-blue { background: var(--blue-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
+        .c-head { padding: 10px 15px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+        .name-box-purple { background: var(--purple-grad); padding: 4px 12px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 10px; }
+        .name-box-green { background: var(--green-grad); padding: 4px 12px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 10px; }
+        .name-box-blue { background: var(--blue-grad); padding: 4px 12px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 10px; }
         
-        .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; backdrop-filter: blur(5px); }
+        .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 50px; font-weight: 900; font-size: 12px; cursor: pointer; }
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; }
-        .match-card { min-width: 280px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px; border: 1px solid var(--glass-border); transition: all 0.3s ease; }
-        .league-title-box { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 8px 15px; margin: 0 -15px 15px -15px; text-align: center; color: #00ff87; font-size: 10px; font-weight: 800; }
-        .s-box { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 1.4em; font-weight: 900; }
+        .match-card { min-width: 260px; background: var(--glass); border-radius: 20px; padding: 10px 15px; border: 1px solid var(--glass-border); }
+        .league-title-box { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 5px 15px; margin: 0 -15px 10px -15px; text-align: center; color: #00ff87; font-size: 9px; font-weight: 800; }
+        .s-box { background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 6px; font-size: 1.2em; font-weight: 900; }
         
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
     </style>
@@ -143,8 +160,8 @@ date_default_timezone_set('Asia/Riyadh');
 
 <div id="pro-cinematic-intro">
     <div class="intro-icon"><i class="fas fa-play-circle"></i></div>
-    <h1 style="color:#fff; font-weight:900; font-size:28px; margin-top:15px;">الخدمة الرقمية</h1>
-    <div class="intro-loading-box"><div class="intro-loading-bar"></div></div>
+    <h1 style="color:#fff; font-weight:900; font-size:24px; margin-top:15px;">الخدمة الرقمية</h1>
+    <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); margin-top:20px; overflow:hidden; border-radius:10px;"><div style="width:0%; height:100%; background:var(--main); animation: loadProgress 2.5s forwards;"></div></div>
 </div>
 
 <div class="bg-pattern-animated"></div>
@@ -153,28 +170,28 @@ date_default_timezone_set('Asia/Riyadh');
     <div class="top-header-row">
         <div class="online-count-badge"><div class="dot-blink"></div><span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span></div>
     </div>
-    <div class="promo-text">هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات<br>للاشتراك في الباقة كاملة تواصل معنا</div>
+    
     <div class="social-links">
-        <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
-        <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
-        <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000"><i class="fab fa-snapchat"></i> سناب</a>
+        <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366">واتساب</a>
+        <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc">تليجرام</a>
+        <button onclick="forceSubscribe()" class="social-btn" style="background:var(--main); border:none; cursor:pointer;">تفعيل الإشعارات 🔔</button>
     </div>
 
     <div class="category-tabs">
         <div class="cat-item" onclick="switchSection('bein', this)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/BeIN_Sports_logo.svg/2560px-BeIN_Sports_logo.svg.png" alt="beIN">
+            <img src="https://i.ibb.co/LhYhWnN/bein-sports.png" alt="beIN">
             <span>beIN Sports</span>
         </div>
         <div class="cat-item" onclick="switchSection('shahid', this)">
-            <img src="https://upload.wikimedia.org/wikipedia/ar/thumb/a/a2/Shahid_logo.svg/1200px-Shahid_logo.svg.png" alt="Shahid">
+            <img src="https://i.ibb.co/mS6Yp5X/shahid-logo.png" alt="Shahid">
             <span>SHAHID</span>
         </div>
         <div class="cat-item" onclick="switchSection('mbc', this)">
-            <img src="https://upload.wikimedia.org/wikipedia/ar/0/03/MBC_Group_Logo.png" alt="MBC">
+            <img src="https://i.ibb.co/vYm6D6X/mbc-logo.png" alt="MBC">
             <span>MBC TV</span>
         </div>
         <div class="cat-item" onclick="switchSection('starz', this)">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/STARZPLAY_Logo.svg/1200px-STARZPLAY_Logo.svg.png" alt="Starzplay">
+            <img src="https://i.ibb.co/v4G2Bnd/starzplay.png" alt="Starzplay">
             <span>STARZPLAY</span>
         </div>
     </div>
@@ -186,31 +203,31 @@ date_default_timezone_set('Asia/Riyadh');
             foreach ($match_data['matches'] as $m): 
                 $code = $m['competition']['code'];
                 if (isset($leagues_map[$code])): 
-                    $hName = $m['homeTeam']['name'];
-                    $aName = $m['awayTeam']['name'];
+                    $hName = translate_name($m['homeTeam']['name']);
+                    $aName = translate_name($m['awayTeam']['name']);
                     $status = $m['status'];
                     $is_live = (in_array($status, ['IN_PLAY', 'PAUSED', 'LIVE']));
                     $homeScore = $m['score']['fullTime']['home'] ?? 0;
                     $awayScore = $m['score']['fullTime']['away'] ?? 0;
         ?>
                 <div class="match-card">
-                    <div class="league-title-box"><div class="m-league"><?php echo $leagues_map[$code]['name']; ?></div></div>
-                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <div class="league-title-box"><div><?php echo $leagues_map[$code]['name']; ?></div></div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
                         <div style="flex:1; text-align:center;">
-                            <img src="<?php echo $m['homeTeam']['crest']; ?>" width="35" onerror="this.src='https://via.placeholder.com/40'">
-                            <span style="font-size:9px; font-weight:700; margin-top:5px; display:block;"><?php echo translate_name($hName); ?></span>
+                            <img src="<?php echo $m['homeTeam']['crest']; ?>" width="30" onerror="this.src='https://via.placeholder.com/40'">
+                            <span style="font-size:8px; font-weight:700; margin-top:5px; display:block;"><?php echo $hName; ?></span>
                         </div>
-                        <div style="flex: 1.2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;">
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
                             <?php if ($is_live): ?>
-                                <div style="display:flex; align-items:center; gap:5px;"><div class="s-box"><?php echo $homeScore; ?></div><span style="opacity:0.6;">-</span><div class="s-box"><?php echo $awayScore; ?></div></div>
-                                <span style="color:#ff4d4d; font-size:8px; font-weight:900; animation: blink 1s infinite;">● مباشر</span>
+                                <div style="display:flex; align-items:center; gap:5px;"><div class="s-box"><?php echo $homeScore; ?></div><span>-</span><div class="s-box"><?php echo $awayScore; ?></div></div>
+                                <span style="color:#ff4d4d; font-size:7px; font-weight:900; animation: blink 1s infinite;">● مباشر</span>
                             <?php else: ?>
-                                <div style="font-size:11px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
+                                <div style="font-size:10px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
                             <?php endif; ?>
                         </div>
                         <div style="flex:1; text-align:center;">
-                            <img src="<?php echo $m['awayTeam']['crest']; ?>" width="35" onerror="this.src='https://via.placeholder.com/40'">
-                            <span style="font-size:9px; font-weight:700; margin-top:5px; display:block;"><?php echo translate_name($aName); ?></span>
+                            <img src="<?php echo $m['awayTeam']['crest']; ?>" width="30" onerror="this.src='https://via.placeholder.com/40'">
+                            <span style="font-size:8px; font-weight:700; margin-top:5px; display:block;"><?php echo $aName; ?></span>
                         </div>
                     </div>
                 </div>
@@ -220,94 +237,83 @@ date_default_timezone_set('Asia/Riyadh');
 
 <div class="grid">
     <div id="section-bein" class="channel-section">
-        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:5px;">قنوات beIN Sports</div>
+        <div style="grid-column: 1/-1; font-size:16px; font-weight:900; color:#fff; padding:10px; border-right:3px solid var(--main);">باقة beIN Sports</div>
         <?php for($i = 1; $i <= 9; $i++): ?>
-        <div class="card" id="ch-row-<?php echo $i; ?>">
+        <div class="card">
             <div class="c-head">
                 <div class="name-box-purple">beIN Sport <?php echo $i; ?></div>
-                <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
+                <div class="live-box"><div class="live-dot"></div><span style="font-size:8px; color:#22c55e;">LIVE</span></div>
             </div>
             <video id="vid<?php echo $i; ?>" playsinline controls></video>
-            <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"><span>بدء البث المباشر</span></button>
+            <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', this)"><span>تشغيل البث</span></button>
         </div>
         <?php endfor; ?>
     </div>
 
     <div id="section-shahid" class="channel-section">
-        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:5px;">قنوات SHAHID الرياضية</div>
+        <div style="grid-column: 1/-1; font-size:16px; font-weight:900; color:#fff; padding:10px; border-right:3px solid var(--main);">باقة SHAHID الرياضية</div>
         <?php for($i = 13; $i <= 14; $i++): ?>
-        <div class="card" id="ch-row-<?php echo $i; ?>">
+        <div class="card">
             <div class="c-head">
                 <div class="name-box-blue">SSC Sport <?php echo ($i-12); ?></div>
-                <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
+                <div class="live-box"><div class="live-dot"></div><span style="font-size:8px; color:#22c55e;">LIVE</span></div>
             </div>
             <video id="vid<?php echo $i; ?>" playsinline controls></video>
-            <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"><span>بدء البث المباشر</span></button>
+            <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', this)"><span>تشغيل البث</span></button>
         </div>
         <?php endfor; ?>
     </div>
 
     <div id="section-mbc" class="channel-section">
-        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:5px;">قنوات MBC</div>
-        <div class="card" id="ch-row-12">
-            <div class="c-head">
-                <div class="name-box-blue">MBC Action</div>
-                <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
-            </div>
+        <div style="grid-column: 1/-1; font-size:16px; font-weight:900; color:#fff; padding:10px; border-right:3px solid var(--main);">قناة MBC Action</div>
+        <div class="card">
+            <div class="c-head"><div class="name-box-blue">MBC Action</div><div class="live-box"><div class="live-dot"></div><span style="font-size:8px; color:#22c55e;">LIVE</span></div></div>
             <video id="vid12" playsinline controls></video>
-            <button class="play-btn-premium" onclick="robustPlay('vid12', 'b12.php', 'bs12.php', this)"><span>بدء البث المباشر</span></button>
+            <button class="play-btn-premium" onclick="robustPlay('vid12', 'b12.php', this)"><span>تشغيل البث</span></button>
         </div>
     </div>
 
     <div id="section-starz" class="channel-section">
-        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:5px;">قنوات STARZPLAY</div>
+        <div style="grid-column: 1/-1; font-size:16px; font-weight:900; color:#fff; padding:10px; border-right:3px solid var(--main);">باقة STARZPLAY</div>
         <?php for($i = 10; $i <= 11; $i++): ?>
-        <div class="card" id="ch-row-<?php echo $i; ?>">
+        <div class="card">
             <div class="c-head">
                 <div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div>
-                <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
+                <div class="live-box"><div class="live-dot"></div><span style="font-size:8px; color:#22c55e;">LIVE</span></div>
             </div>
             <video id="vid<?php echo $i; ?>" playsinline controls></video>
-            <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"><span>بدء البث المباشر</span></button>
+            <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', this)"><span>تشغيل البث</span></button>
         </div>
         <?php endfor; ?>
     </div>
 </div>
 
-<footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية</footer>
+<footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية 2026</footer>
 
 <script>
-window.addEventListener('load', () => { setTimeout(() => document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'), 2500); });
+window.addEventListener('load', () => { setTimeout(() => document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'), 2000); });
 
 function updateRealtimeVisitors() { fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(count => { if(count && !isNaN(count)) document.getElementById('realtime-visitors').innerText = count; }); }
-setInterval(updateRealtimeVisitors, 3000);
+setInterval(updateRealtimeVisitors, 4000);
 
-// وظيفة التبديل بين الأقسام عثمان
 function switchSection(sectionId, element) {
-    // إخفاء كل الأقسام
     document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
-    // إزالة اللون النشط من كل التبويبات
     document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
-    
-    // إظهار القسم المطلوب
     document.getElementById('section-' + sectionId).classList.add('active');
-    // إضافة لون النشط للتبويب المختار
     element.classList.add('active');
-    
-    // التمرير التلقائي للشبكة لراحة المستخدم
-    window.scrollTo({ top: document.querySelector('.grid').offsetTop - 260, behavior: 'smooth' });
+    window.scrollTo({ top: document.querySelector('.grid').offsetTop - 270, behavior: 'smooth' });
 }
 
-function robustPlay(vId, p, b, btn) {
+function robustPlay(vId, p, btn) {
     const video = document.getElementById(vId);
     const btnText = btn.querySelector('span');
-    btnText.innerText = "جاري تشغيل القناة...";
+    btnText.innerText = "جاري التحميل...";
     if (video.hls) { video.hls.destroy(); }
     if (Hls.isSupported()) {
         const hls = new Hls(); hls.loadSource(p); hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btnText.innerText = "تم تشغيل البث بنجاح"; });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btnText.innerText = "تم التشغيل"; });
         video.hls = hls;
-    } else { video.src = p; video.play(); btnText.innerText = "تم تشغيل البث بنجاح"; }
+    } else { video.src = p; video.play(); btnText.innerText = "تم التشغيل"; }
 }
 </script>
 </body>
