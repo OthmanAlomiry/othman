@@ -94,7 +94,7 @@ date_default_timezone_set('Asia/Riyadh');
         .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
 
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; margin-inline: auto; }
-        .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; }
 
         #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
@@ -130,6 +130,9 @@ date_default_timezone_set('Asia/Riyadh');
         .channel-label-box { display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12); padding: 4px 10px; border-radius: 6px; color: #fff; font-size: 9px; font-weight: 700; }
         .channel-label-box i { color: #f1c40f; font-size: 10px; }
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
+
+        /* تنسيق حاوية الإعلان */
+        .ad-container { width: 100%; max-width: 728px; margin: 5px auto; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -151,11 +154,17 @@ date_default_timezone_set('Asia/Riyadh');
     </div>
 
     <div class="promo-text">هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات<br>للاشتراك في الباقة كاملة على جميع الأجهزة والشاشات تواصل معنا</div>
+    
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
         <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
         <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000"><i class="fab fa-snapchat"></i> سناب</a>
         <a href="https://x.com/d_service_pro" class="social-btn" style="background:#000"><i class="fab fa-x-twitter"></i> تويتر</a>
+    </div>
+
+    <div class="ad-container">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2760895204432673"
+         crossorigin="anonymous"></script>
     </div>
 </div>
 
@@ -178,7 +187,6 @@ date_default_timezone_set('Asia/Riyadh');
                         $target_ch_num = $leagues_map[$code]['ch_num'];
                     }
 
-                    // منطق الحالة المباشرة والنتيجة المطور
                     $status = $m['status'];
                     $is_live = (in_array($status, ['IN_PLAY', 'PAUSED', 'LIVE']));
                     $is_finished = ($status == 'FINISHED');
