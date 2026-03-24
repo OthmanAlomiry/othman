@@ -16,24 +16,20 @@ if (isset($_GET['fetch_visitors'])) {
 }
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
 
-// --- 2. جلب إعدادات القنوات من لوحة التحكم (Admin) ---
-$manual_file = 'manual_channels.json';
-$manual_channels = file_exists($manual_file) ? json_decode(file_get_contents($manual_file), true) : [];
-
-// --- 3. إعدادات API المباريات والدوريات ---
+// --- 2. جلب إعدادات API المباريات ---
 $apiKey = '273aaeb61360452588653ffea820cc19';
 $url = 'https://api.football-data.org/v4/matches';
 
 $leagues_map = [
-    'PL'   => ['name' => 'الدوري الإنجليزي', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
-    'PD'   => ['name' => 'الدوري الإسباني', 'channel' => 'beIN Sport 3', 'ch_num' => '3'],
-    'BL1'  => ['name' => 'الدوري الألماني', 'channel' => 'beIN Sport 5', 'ch_num' => '5'],
-    'SA'   => ['name' => 'الدوري الإيطالي', 'channel' => 'STARZPLAY 1', 'ch_num' => '10'],
-    'FL1'  => ['name' => 'الدوري الفرنسي', 'channel' => 'beIN Sport 4', 'ch_num' => '4'],
-    'CL'   => ['name' => 'دوري أبطال أوروبا', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
-    'EL'   => ['name' => 'الدوري الأوروبي', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
-    'ACL'  => ['name' => 'دوري أبطال آسيا', 'channel' => 'beIN AFC', 'ch_num' => '7'],
-    'CAF'  => ['name' => 'دوري أبطال أفريقيا', 'channel' => 'beIN Sport 6', 'ch_num' => '6'],
+    'PL'   => ['name' => 'الدوري الإنجليزي'],
+    'PD'   => ['name' => 'الدوري الإسباني'],
+    'BL1'  => ['name' => 'الدوري الألماني'],
+    'SA'   => ['name' => 'الدوري الإيطالي'],
+    'FL1'  => ['name' => 'الدوري الفرنسي'],
+    'CL'   => ['name' => 'دوري أبطال أوروبا'],
+    'EL'   => ['name' => 'الدوري الأوروبي'],
+    'ACL'  => ['name' => 'دوري أبطال آسيا'],
+    'CAF'  => ['name' => 'دوري أبطال أفريقيا'],
 ];
 
 function translate_name($text) {
@@ -71,9 +67,6 @@ date_default_timezone_set('Asia/Riyadh');
             --main: #e11d48; --bg-deep: #050c14; 
             --glass: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.15);
-            --purple-grad: linear-gradient(45deg, #7c3aed, #fff); 
-            --green-grad: linear-gradient(45deg, #16a34a, #fff);
-            --blue-grad: linear-gradient(45deg, #0ea5e9, #fff);
         }
         
         html { scroll-behavior: smooth; }
@@ -85,53 +78,45 @@ date_default_timezone_set('Asia/Riyadh');
             border-bottom: 1px solid var(--glass-border); padding: 10px 0;
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
-        .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 10px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px; margin-bottom: 8px; align-self: flex-end; margin-left: 15px; }
+        .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 10px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px; margin-bottom: 8px; }
         .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
 
         .social-links { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; }
         .social-btn { padding: 8px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 11px; color: #fff; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
 
-        /* شريط الأيقونات البرمجية - مستحيل تختفي */
+        /* شريط الشعارات الحقيقية المطور */
         .category-tabs { 
             display: flex; justify-content: center; gap: 10px; width: 95%; overflow-x: auto; 
             scrollbar-width: none; padding: 10px 0;
         }
         .cat-item { 
-            min-width: 80px; background: var(--glass); border: 1px solid var(--glass-border); 
-            padding: 12px 5px; border-radius: 15px; cursor: pointer; transition: 0.3s;
+            min-width: 85px; background: var(--glass); border: 1px solid var(--glass-border); 
+            padding: 10px 5px; border-radius: 15px; cursor: pointer; transition: 0.3s;
             display: flex; flex-direction: column; align-items: center; gap: 8px;
         }
-        .cat-item.active { background: rgba(225, 29, 72, 0.25); border-color: var(--main); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(225, 29, 72, 0.3); }
-        .cat-item svg { height: 30px; width: auto; fill: currentColor; }
-        .cat-item span { font-size: 9px; font-weight: 900; color: #fff; }
+        .cat-item:hover { background: rgba(255,255,255,0.1); }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(225, 29, 72, 0.2); }
+        .cat-item img { height: 35px; width: 100%; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .cat-item span { font-size: 8px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1.2s; }
-        .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
-        .intro-icon { font-size: 70px; color: #fff; animation: pulseLogo 2s infinite ease-in-out; }
-        @keyframes loadProgress { to { width: 100%; } }
-        @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        @keyframes blink { 50% { opacity: 0.2; } }
-
-        .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; min-height: 300px; }
+        #pro-cinematic-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 1s; }
+        .intro-finish-vfx { transform: scale(1.2); opacity: 0; visibility: hidden; }
         
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; min-height: 300px; }
         .channel-section { display: none; grid-column: 1/-1; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         .channel-section.active { display: grid; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s; }
+        .card { background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 10px 15px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
-        .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        .name-box-blue { background: var(--blue-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
+        .name-box { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 8px; color: #fff; font-weight: 900; font-size: 11px; border-right: 3px solid var(--main); }
         
         .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 50px; font-weight: 900; font-size: 12px; cursor: pointer; }
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; }
         .match-card { min-width: 260px; background: var(--glass); border-radius: 20px; padding: 10px 15px; border: 1px solid var(--glass-border); }
-        .league-title-box { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 5px 15px; margin: 0 -15px 10px -15px; text-align: center; color: #00ff87; font-size: 9px; font-weight: 800; }
-        .s-box { background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 6px; font-size: 1.2em; font-weight: 900; }
+        .league-title { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 5px 15px; margin: 0 -15px 10px -15px; text-align: center; color: #00ff87; font-size: 9px; font-weight: 800; }
         
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
     </style>
@@ -139,12 +124,9 @@ date_default_timezone_set('Asia/Riyadh');
 <body>
 
 <div id="pro-cinematic-intro">
-    <div class="intro-icon"><i class="fas fa-play-circle"></i></div>
+    <div style="font-size:70px; color:#fff;"><i class="fas fa-play-circle"></i></div>
     <h1 style="color:#fff; font-weight:900; font-size:24px; margin-top:15px;">الخدمة الرقمية</h1>
-    <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); margin-top:20px; overflow:hidden; border-radius:10px;"><div style="width:0%; height:100%; background:var(--main); animation: loadProgress 2s forwards;"></div></div>
 </div>
-
-<div class="bg-pattern-animated"></div>
 
 <div class="header-fixed-container">
     <div class="online-badge"><div class="dot-blink"></div><span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span></div>
@@ -156,19 +138,19 @@ date_default_timezone_set('Asia/Riyadh');
 
     <div class="category-tabs">
         <div class="cat-item" onclick="switchSection('bein', this)">
-            <svg viewBox="0 0 24 24" style="color:#7c3aed"><path d="M21 16.5C21 16.88 20.88 17.21 20.67 17.46L14.71 23.41C14.46 23.67 14.12 23.83 13.75 23.83H10.25C9.88 23.83 9.54 23.67 9.29 23.41L3.33 17.46C3.12 17.21 3 16.88 3 16.5V7.5C3 7.12 3.12 6.79 3.33 6.54L9.29 0.59C9.54 0.33 9.88 0.17 10.25 0.17H13.75C14.12 0.17 14.46 0.33 14.71 0.59L20.67 6.54C20.88 6.79 21 7.12 21 7.5V16.5Z" /></svg>
+            <img src="[attachment_3](attachment)" alt="beIN">
             <span>beIN Sports</span>
         </div>
         <div class="cat-item" onclick="switchSection('shahid', this)">
-            <svg viewBox="0 0 24 24" style="color:#00ff87"><path d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M10,16.5L16,12L10,7.5V16.5Z" /></svg>
+            <img src="[attachment_1](attachment)" alt="Shahid">
             <span>SHAHID</span>
         </div>
         <div class="cat-item" onclick="switchSection('mbc', this)">
-            <svg viewBox="0 0 24 24" style="color:#0ea5e9"><path d="M21,17H3V5H21M21,3H3A2,2 0 0,0 1,5V17A2,2 0 0,0 3,19H8V21H16V19H21A2,2 0 0,0 23,17V5A2,2 0 0,0 21,3Z" /></svg>
+            <img src="[attachment_2](attachment)" alt="MBC">
             <span>MBC TV</span>
         </div>
         <div class="cat-item" onclick="switchSection('starz', this)">
-            <svg viewBox="0 0 24 24" style="color:#f1c40f"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" /></svg>
+            <img src="[attachment_0](attachment)" alt="Starzplay">
             <span>STARZPLAY</span>
         </div>
     </div>
@@ -182,22 +164,17 @@ date_default_timezone_set('Asia/Riyadh');
                 if (isset($leagues_map[$code])): 
                     $hName = translate_name($m['homeTeam']['name']);
                     $aName = translate_name($m['awayTeam']['name']);
-                    $status = $m['status'];
-                    $is_live = (in_array($status, ['IN_PLAY', 'PAUSED', 'LIVE']));
-                    $homeScore = $m['score']['fullTime']['home'] ?? 0;
-                    $awayScore = $m['score']['fullTime']['away'] ?? 0;
         ?>
                 <div class="match-card">
-                    <div class="league-title-box"><div><?php echo $leagues_map[$code]['name']; ?></div></div>
+                    <div class="league-title"><div><?php echo $leagues_map[$code]['name']; ?></div></div>
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
                         <div style="flex:1; text-align:center;">
                             <img src="<?php echo $m['homeTeam']['crest']; ?>" width="30" onerror="this.src='https://via.placeholder.com/40'">
                             <span style="font-size:8px; font-weight:700; margin-top:5px; display:block;"><?php echo $hName; ?></span>
                         </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                            <?php if ($is_live): ?>
-                                <div style="display:flex; align-items:center; gap:5px;"><div class="s-box"><?php echo $homeScore; ?></div><span>-</span><div class="s-box"><?php echo $awayScore; ?></div></div>
-                                <span style="color:#ff4d4d; font-size:7px; font-weight:900; animation: blink 1s infinite;">● مباشر</span>
+                        <div style="flex: 1; text-align: center;">
+                            <?php if (in_array($m['status'], ['IN_PLAY', 'PAUSED', 'LIVE'])): ?>
+                                <span style="color:#ff4d4d; font-size:8px; font-weight:900;">● مباشر</span>
                             <?php else: ?>
                                 <div style="font-size:10px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
                             <?php endif; ?>
@@ -213,70 +190,31 @@ date_default_timezone_set('Asia/Riyadh');
 </div>
 
 <div class="grid">
-    <div id="section-bein" class="channel-section">
-        <div style="grid-column: 1/-1; font-size:16px; font-weight:900; color:#fff; padding:10px; border-right:3px solid var(--main);">باقة beIN Sports</div>
+    <div id="section-bein" class="channel-section active">
+        <div style="grid-column: 1/-1; font-size:16px; font-weight:900; color:#fff; padding:10px;">باقة beIN Sports</div>
         <?php for($i = 1; $i <= 9; $i++): ?>
         <div class="card">
-            <div class="c-head">
-                <div class="name-box-purple">beIN Sport <?php echo $i; ?></div>
-                <div class="live-box"><div class="live-dot" style="width:7px; height:7px; background:#22c55e; border-radius:50%; animation:blink 1s infinite;"></div><span style="font-size:8px; color:#22c55e;">LIVE</span></div>
-            </div>
+            <div class="c-head"><div class="name-box">beIN Sport <?php echo $i; ?></div><div style="display:flex; align-items:center; gap:5px;"><div class="dot-blink"></div><span style="font-size:8px; color:#22c55e;">LIVE</span></div></div>
             <video id="vid<?php echo $i; ?>" playsinline controls></video>
             <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', this)"><span>تشغيل البث</span></button>
         </div>
         <?php endfor; ?>
     </div>
 
-    <div id="section-shahid" class="channel-section">
-        <div style="grid-column: 1/-1; font-size:16px; font-weight:900; color:#fff; padding:10px; border-right:3px solid var(--main);">باقة SHAHID الرياضية</div>
-        <?php for($i = 13; $i <= 14; $i++): ?>
-        <div class="card">
-            <div class="c-head">
-                <div class="name-box-blue">SSC Sport <?php echo ($i-12); ?></div>
-                <div class="live-box"><div class="live-dot" style="width:7px; height:7px; background:#22c55e; border-radius:50%; animation:blink 1s infinite;"></div><span style="font-size:8px; color:#22c55e;">LIVE</span></div>
-            </div>
-            <video id="vid<?php echo $i; ?>" playsinline controls></video>
-            <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', this)"><span>تشغيل البث</span></button>
-        </div>
-        <?php endfor; ?>
     </div>
-
-    <div id="section-mbc" class="channel-section">
-        <div style="grid-column: 1/-1; font-size:16px; font-weight:900; color:#fff; padding:10px; border-right:3px solid var(--main);">قناة MBC Action</div>
-        <div class="card">
-            <div class="c-head"><div class="name-box-blue">MBC Action</div><div class="live-box"><div class="live-dot" style="width:7px; height:7px; background:#22c55e; border-radius:50%; animation:blink 1s infinite;"></div><span style="font-size:8px; color:#22c55e;">LIVE</span></div></div>
-            <video id="vid12" playsinline controls></video>
-            <button class="play-btn-premium" onclick="robustPlay('vid12', 'b12.php', this)"><span>تشغيل البث</span></button>
-        </div>
-    </div>
-
-    <div id="section-starz" class="channel-section">
-        <div style="grid-column: 1/-1; font-size:16px; font-weight:900; color:#fff; padding:10px; border-right:3px solid var(--main);">باقة STARZPLAY</div>
-        <?php for($i = 10; $i <= 11; $i++): ?>
-        <div class="card">
-            <div class="c-head">
-                <div class="name-box-green">STARZPLAY <?php echo ($i-9); ?></div>
-                <div class="live-box"><div class="live-dot" style="width:7px; height:7px; background:#22c55e; border-radius:50%; animation:blink 1s infinite;"></div><span style="font-size:8px; color:#22c55e;">LIVE</span></div>
-            </div>
-            <video id="vid<?php echo $i; ?>" playsinline controls></video>
-            <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', this)"><span>تشغيل البث</span></button>
-        </div>
-        <?php endfor; ?>
-    </div>
-</div>
 
 <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية 2026</footer>
 
 <script>
-window.addEventListener('load', () => { setTimeout(() => document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'), 2000); });
-
+window.addEventListener('load', () => { setTimeout(() => document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'), 1000); });
 function updateRealtimeVisitors() { fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(count => { if(count && !isNaN(count)) document.getElementById('realtime-visitors').innerText = count; }); }
 setInterval(updateRealtimeVisitors, 4000);
 
 function switchSection(sectionId, element) {
     document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
-    document.getElementById('section-' + sectionId).classList.add('active');
+    const target = document.getElementById('section-' + sectionId);
+    if(target) target.classList.add('active');
     element.classList.add('active');
     window.scrollTo({ top: document.querySelector('.grid').offsetTop - 250, behavior: 'smooth' });
 }
