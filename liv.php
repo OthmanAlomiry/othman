@@ -3,40 +3,15 @@
 session_start();
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
-    $session_id = session_id();
-    $time = time();
+    $session_id = session_id(); $time = time();
     $data = file_exists($visitors_file) ? unserialize(file_get_contents($visitors_file)) : [];
     $data[$session_id] = $time;
-    foreach ($data as $id => $last_time) {
-        if ($time - $last_time > 120) unset($data[$id]);
-    }
+    foreach ($data as $id => $last_time) { if ($time - $last_time > 120) unset($data[$id]); }
     file_put_contents($visitors_file, serialize($data));
-    echo count($data);
-    exit; 
+    echo count($data); exit; 
 }
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
 
-// --- 2. إعدادات API المباريات ---
-$apiKey = '273aaeb61360452588653ffea820cc19';
-$url = 'https://api.football-data.org/v4/matches';
-
-function translate_name($text) {
-    $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
-    $response = @file_get_contents($url);
-    if($response) {
-        $result = json_decode($response, true);
-        return $result[0][0][0] ?? $text;
-    }
-    return $text;
-}
-
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $apiKey]);
-$response = curl_exec($ch);
-curl_close($ch);
-$match_data = json_decode($response, true);
 date_default_timezone_set('Asia/Riyadh');
 ?>
 <!DOCTYPE html>
@@ -66,7 +41,7 @@ date_default_timezone_set('Asia/Riyadh');
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
             background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); 
-            border-bottom: 1px solid var(--glass-border); padding: 15px 0;
+            border-bottom: 1px solid var(--glass-border); padding: 10px 0;
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
 
@@ -163,6 +138,16 @@ date_default_timezone_set('Asia/Riyadh');
         <?php endforeach; ?>
     </div>
 
+    <div id="section-shahad" class="channel-section">
+        <div class="card"><div class="c-head"><div class="name-box-blue">شاهد الرياضية 1</div></div><div class="video-container" id="cont-sh1"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-sh1', 'b13.php', this)"><span>تشغيل</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-blue">شاهد الرياضية 2</div></div><div class="video-container" id="cont-sh2"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-sh2', 'b14.php', this)"><span>تشغيل</span></button></div>
+    </div>
+
+    <div id="section-star" class="channel-section">
+        <div class="card"><div class="c-head"><div class="name-box-green">STARZPLAY 1</div></div><div class="video-container" id="cont-st1"><video playsinline controls></video></div><button class="play-btn-premium" onclick="robustPlay('vidst1', 'b10.php', this)"><span>تشغيل</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-green">STARZPLAY 2</div></div><div class="video-container" id="cont-st2"><video playsinline controls></video></div><button class="play-btn-premium" onclick="robustPlay('vidst2', 'b11.php', this)"><span>تشغيل</span></button></div>
+    </div>
+
     <div id="section-alkas" class="channel-section">
         <?php 
         $kas_channels = [['n'=>'SHOOF 1','f'=>'sh1.php'], ['n'=>'SHOOF 2','f'=>'sh2.php'],['n'=>'الكاس 1','f'=>'k1.php'],['n'=>'الكاس 4','f'=>'k4.php'],['n'=>'الكاس 5','f'=>'k5.php'],['n'=>'الكاس 6','f'=>'k6.php'],['n'=>'الكاس 7','f'=>'k7.php']];
@@ -171,6 +156,18 @@ date_default_timezone_set('Asia/Riyadh');
             <div class="c-head"><div class="name-box-purple"><?php echo $ch['n']; ?></div><div class="dot-blink"></div></div>
             <div class="video-container" id="cont-kas<?php echo $idx; ?>"><video playsinline controls></video></div>
             <button class="play-btn-premium" onclick="forceIframePlay('cont-kas<?php echo $idx; ?>', '<?php echo $ch['f']; ?>', this)"><span>تشغيل البث</span></button>
+        </div>
+        <?php endforeach; ?>
+    </div>
+
+    <div id="section-kuwait" class="channel-section">
+        <?php 
+        $ku_channels = [['n'=>'KTV Sport','f'=>'ku1.php'], ['n'=>'KTV Sport Plus','f'=>'ku2.php']];
+        foreach($ku_channels as $idx => $ch): ?>
+        <div class="card">
+            <div class="c-head"><div class="name-box-blue"><?php echo $ch['n']; ?></div><div class="dot-blink"></div></div>
+            <div class="video-container" id="cont-ku<?php echo $idx; ?>"><video playsinline controls></video></div>
+            <button class="play-btn-premium" onclick="forceIframePlay('cont-ku<?php echo $idx; ?>', '<?php echo $ch['f']; ?>', this)"><span>تشغيل البث</span></button>
         </div>
         <?php endforeach; ?>
     </div>
@@ -187,16 +184,9 @@ date_default_timezone_set('Asia/Riyadh');
         <?php endforeach; ?>
     </div>
 
-    <div id="section-kuwait" class="channel-section">
-        <?php 
-        $ku_channels = [['n'=>'KTV Sport','f'=>'ku1.php'], ['n'=>'KTV Sport Plus','f'=>'ku2.php']];
-        foreach($ku_channels as $idx => $ch): ?>
-        <div class="card">
-            <div class="c-head"><div class="name-box-blue"><?php echo $ch['n']; ?></div><div class="dot-blink"></div></div>
-            <div class="video-container" id="cont-ku<?php echo $idx; ?>"><video playsinline controls></video></div>
-            <button class="play-btn-premium" onclick="forceIframePlay('cont-ku<?php echo $idx; ?>', '<?php echo $ch['f']; ?>', this)"><span>تشغيل البث</span></button>
-        </div>
-        <?php endforeach; ?>
+    <div id="section-dubai" class="channel-section">
+        <div class="card"><div class="c-head"><div class="name-box-green">دبي الرياضية 1</div></div><div class="video-container" id="cont-du1"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-du1', 'd1.php', this)"><span>تشغيل</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-green">دبي الرياضية 2</div></div><div class="video-container" id="cont-du2"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-du2', 'd2.php', this)"><span>تشغيل</span></button></div>
     </div>
 </div>
 
@@ -222,14 +212,15 @@ function forceIframePlay(contId, file, btn) {
 
 function robustPlay(vId, p, btn) {
     const video = document.getElementById(vId);
-    btn.innerText = "جاري التحميل...";
+    const btnText = btn.querySelector('span') || btn;
+    btnText.innerText = "جاري التحميل...";
     if (video.hls) { video.hls.destroy(); }
     if (Hls.isSupported()) {
         const hls = new Hls({ xhrSetup: function (xhr) { xhr.withCredentials = false; } });
         hls.loadSource(p); hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btn.innerText = "تم التشغيل"; });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btnText.innerText = "تم التشغيل"; });
         video.hls = hls;
-    } else { video.src = p; video.play(); btn.innerText = "تم التشغيل"; }
+    } else { video.src = p; video.play(); btnText.innerText = "تم التشغيل"; }
 }
 </script>
 </body>
