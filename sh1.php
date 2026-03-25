@@ -1,44 +1,26 @@
 <?php
+// ملف تشغيل قناة SHOOF - الخدمة الرقمية
+$url = "https://liveeu-gcp.alkassdigital.net/shooflive/main.m3u8";
 
-$base = "http://liveeu-gcp.alkassdigital.net/shooflive/";
-$file = "main.m3u8";
+// إعداد الطلب ليبدو كأنه من متصفح رسمي لتجاوز الحماية
+$options = [
+    "http" => [
+        "method" => "GET",
+        "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36\r\n" .
+                    "Referer: https://www.alkass.net/\r\n" .
+                    "Origin: https://www.alkass.net\r\n"
+    ]
+];
 
-function stream($url){
+$context = stream_context_create($options);
+$content = @file_get_contents($url, false, $context);
 
-$ch = curl_init($url);
-
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-curl_setopt($ch, CURLOPT_BUFFERSIZE, 8192);
-curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
-curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch,$data){
-echo $data;
-flush();
-return strlen($data);
-});
-
-curl_exec($ch);
-curl_close($ch);
-
+if ($content === false) {
+    // إذا فشل السيرفر في الجلب المباشر، نقوم بعمل تحويل مباشر كحل أخير
+    header("Location: $url");
+} else {
+    // جلب البث وتمريره للمشغل في موقعك
+    header("Content-Type: application/vnd.apple.mpegurl");
+    echo $content;
 }
-
-if(isset($_GET['ts'])){
-header("Content-Type: video/mp2t");
-stream($base.$_GET['ts']);
-exit;
-}
-
-header("Content-Type: application/vnd.apple.mpegurl");
-
-$m3u8 = file_get_contents($base.$file);
-$lines = explode("\n",$m3u8);
-
-foreach($lines as &$line){
-if(strpos($line,'.ts') !== false){
-$line = "sh1.php?ts=".$line;
-}
-}
-
-echo implode("\n",$lines);
-
 ?>
