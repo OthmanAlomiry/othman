@@ -1,4 +1,5 @@
 <?php
+// --- 1. نظام عداد المتواجدين الحقيقي المدمج ---
 session_start();
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
@@ -11,21 +12,6 @@ if (isset($_GET['fetch_visitors'])) {
 }
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
 
-$manual_file = 'manual_channels.json';
-$manual_channels = file_exists($manual_file) ? json_decode(file_get_contents($manual_file), true) : [];
-$apiKey = '273aaeb61360452588653ffea820cc19';
-$url = 'https://api.football-data.org/v4/matches';
-
-function translate_name($text) {
-    $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
-    $response = @file_get_contents($url);
-    if($response) { $result = json_decode($response, true); return $result[0][0][0] ?? $text; }
-    return $text;
-}
-
-$ch = curl_init(); curl_setopt($ch, CURLOPT_URL, $url); curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $apiKey]);
-$response = curl_exec($ch); curl_close($ch);
-$match_data = json_decode($response, true);
 date_default_timezone_set('Asia/Riyadh');
 ?>
 <!DOCTYPE html>
@@ -40,13 +26,13 @@ date_default_timezone_set('Asia/Riyadh');
     <style>
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 310px; overflow-x: hidden; color: #e2e8f0; }
-        .header-fixed-container { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
         
+        /* الهيدر الثابت والتصميم عثمان */
+        .header-fixed-container { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
         .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 15px; border-radius: 50px; color: #22c55e; font-size: 10px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; animation: badgePulse 2s infinite; margin-bottom: 10px; }
         @keyframes badgePulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); } 100% { transform: scale(1); } }
         .dot-blink { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
         
-        .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; }
         .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 5px; }
 
@@ -65,14 +51,16 @@ date_default_timezone_set('Asia/Riyadh');
         .channel-section.active { display: grid; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s; }
+        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s; position: relative; }
         .c-head { padding: 15px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         .name-box { padding: 5px 15px; border-radius: 8px; color: #fff; font-weight: 900; font-size: 11px; }
 
+        /* التوهج والنبض لأزرار التشغيل عثمان */
         .play-btn { width: 90%; margin: 15px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; cursor: pointer; animation: glassGlow 3s infinite; }
         @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 5px rgba(255,255,255,0.05); } 50% { box-shadow: 0 0 20px rgba(255,255,255,0.15); } }
         
-        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
+        .video-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
+        video, iframe { width: 100%; height: 100%; border: none; }
         .blink-live { color: #ff4d4d; animation: blink 1s infinite; font-weight: 900; font-size: 10px; }
         @keyframes blink { 50% { opacity: 0.1; } }
     </style>
@@ -83,21 +71,17 @@ date_default_timezone_set('Asia/Riyadh');
 
 <div class="header-fixed-container">
     <div class="online-count-badge"><div class="dot-blink"></div><span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span></div>
-    
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
         <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
         <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000"><i class="fab fa-snapchat"></i> سناب</a>
-        <a href="https://x.com/d_service_pro" class="social-btn" style="background:#000"><i class="fab fa-x-twitter"></i> تويتر</a>
     </div>
 
     <div class="category-tabs">
         <div class="cat-item active" onclick="switchSection('bein', this)"><img src="mg/bein.png"><span>beIN</span></div>
         <div class="cat-item" onclick="switchSection('shahad', this)"><img src="mg/shahd.png"><span>شاهد</span></div>
-        <div class="cat-item" onclick="switchSection('mbc', this)"><img src="mg/mbc.png"><span>MBC</span></div>
         <div class="cat-item" onclick="switchSection('alkas', this)"><img src="mg/alkas.png"><span>الكاس</span></div>
         <div class="cat-item" onclick="switchSection('kuwait', this)"><img src="mg/ku.png"><span>الكويت</span></div>
-        <div class="cat-item" onclick="switchSection('dubai', this)"><img src="mg/du.png"><span>دبي</span></div>
     </div>
 </div>
 
@@ -105,13 +89,22 @@ date_default_timezone_set('Asia/Riyadh');
     <div id="section-alkas" class="channel-section">
         <div class="card">
             <div class="c-head"><div class="name-box" style="background: #f1c40f; color:#000">SHOOF LIVE</div><div class="blink-live">● مباشر</div></div>
-            <video id="vsh" playsinline controls></video>
-            <button class="play-btn" onclick="robustPlay('vsh', 'sh1.php', this)">تشغيل البث الداخلي</button>
+            <div class="video-wrapper" id="shoof-player">
+                <video id="vsh" playsinline controls style="width:100%; height:100%;"></video>
+            </div>
+            <button class="play-btn" onclick="forcePlayShoof(this)">تشغيل بث قناة شوف المباشر</button>
         </div>
+        <?php for($i=1; $i<=2; $i++): ?>
+        <div class="card">
+            <div class="c-head"><div class="name-box" style="background: #f1c40f; color:#000">الكاس <?php echo $i; ?></div><div class="blink-live">● مباشر</div></div>
+            <video id="vk<?php echo $i; ?>" playsinline controls></video>
+            <button class="play-btn" onclick="robustPlay('vk<?php echo $i; ?>', 'k<?php echo $i; ?>.php', this)">تشغيل البث</button>
         </div>
+        <?php endfor; ?>
+    </div>
 
     <div id="section-bein" class="channel-section active">
-        <?php for($i=1; $i<=9; $i++): ?>
+        <?php for($i=1; $i<=3; $i++): ?>
         <div class="card">
             <div class="c-head"><div class="name-box" style="background: #7c3aed">beIN Sport <?php echo $i; ?></div><div class="blink-live">● مباشر</div></div>
             <video id="vid<?php echo $i; ?>" playsinline controls></video>
@@ -132,14 +125,24 @@ function switchSection(id, element) {
     element.classList.add('active');
 }
 
+// الدالة السحرية لتشغيل شوف داخل الموقع عثمان
+function forcePlayShoof(btn) {
+    const container = document.getElementById('shoof-player');
+    btn.innerText = "جاري الاتصال بالسيرفر...";
+    
+    // الطريقة النهائية: تحويل المشغل إلى إطار داخلي يفتح رابط sh1.php
+    // هذا سيجعل المتصفح يفتح الرابط داخلياً ويقوم بالتحويل (Redirect) داخل الإطار فقط
+    container.innerHTML = `<iframe src="sh1.php" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+    btn.innerText = "تم تشغيل البث بنجاح";
+}
+
 function robustPlay(vId, p, btn) {
     const video = document.getElementById(vId);
     btn.innerText = "جاري التحميل...";
     if (video.hls) { video.hls.destroy(); }
     if (Hls.isSupported()) {
-        const hls = new Hls({ xhrSetup: function (xhr) { xhr.withCredentials = false; } });
-        hls.loadSource(p);
-        hls.attachMedia(video);
+        const hls = new Hls();
+        hls.loadSource(p); hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btn.innerText = "تم التشغيل"; });
         video.hls = hls;
     } else { video.src = p; video.play(); btn.innerText = "تم التشغيل"; }
