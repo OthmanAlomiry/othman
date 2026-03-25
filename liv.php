@@ -61,7 +61,6 @@ date_default_timezone_set('Asia/Riyadh');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>بوابة الرياضة - متجر الخدمة الرقمية</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -125,14 +124,10 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 5px rgba(255,255,255,0.05); transform: scale(1); } 50% { box-shadow: 0 0 20px rgba(255,255,255,0.15); transform: scale(1.02); } }
         
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
-        
-        .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; padding: 10px 15px; }
-        .match-card { min-width: 280px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px; border: 1px solid var(--glass-border); transition: all 0.3s ease; }
         .league-title-box { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 8px 15px; margin: 0 -15px 15px -15px; text-align: center; color: #00ff87; font-size: 10px; font-weight: 800; }
         .s-box { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 1.4em; font-weight: 900; }
         
         @keyframes blink { 50% { opacity: 0.1; } }
-
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
     </style>
 </head>
@@ -154,7 +149,7 @@ date_default_timezone_set('Asia/Riyadh');
         </div>
     </div>
 
-    <div class="promo-text">تواصل معنا للاشتراك في الباقة كاملة:</div>
+    <div class="promo-text">للاشتراك في الباقة كاملة تواصل معنا عبر:</div>
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
         <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
@@ -168,12 +163,10 @@ date_default_timezone_set('Asia/Riyadh');
         <div class="cat-item" onclick="switchSection('mbc', this)"><img src="mg/mbc.png"><span>MBC</span></div>
         <div class="cat-item" onclick="switchSection('star', this)"><img src="mg/star.png"><span>Starzplay</span></div>
         <div class="cat-item" onclick="switchSection('alkas', this)"><img src="mg/alkas.png"><span>الكاس</span></div>
-        <div class="cat-item" onclick="switchSection('ado', this)"><img src="mg/ado.png"><span>أبوظبي</span></div>
         <div class="cat-item" onclick="switchSection('on', this)"><img src="mg/on.png"><span>On Sport</span></div>
         <div class="cat-item" onclick="switchSection('dubai', this)"><img src="mg/du.png"><span>دبي الرياضية</span></div>
         <div class="cat-item" onclick="switchSection('moc', this)"><img src="mg/moc.png"><span>المغربية</span></div>
         <div class="cat-item" onclick="switchSection('kuwait', this)"><img src="mg/ku.png"><span>الكويت</span></div>
-        <div class="cat-item" onclick="switchSection('sky', this)"><img src="mg/sky.png"><span>Sky Sport</span></div>
         <div class="cat-item" onclick="switchSection('plus', this)"><img src="mg/plus.png"><span>Canal+</span></div>
         <div class="cat-item" onclick="switchSection('sporttv', this)"><img src="mg/sp.png"><span>Sport TV</span></div>
     </div>
@@ -219,6 +212,16 @@ date_default_timezone_set('Asia/Riyadh');
         <?php endfor; ?>
     </div>
 
+    <div id="section-shahad" class="channel-section">
+        <?php for($i = 1; $i <= 2; $i++): ?>
+        <div class="card">
+            <div class="c-head"><div class="name-box-blue">شاهد الرياضية <?php echo $i; ?></div><div class="dot-blink"></div></div>
+            <video id="vidsh<?php echo $i; ?>" playsinline controls></video>
+            <button class="play-btn-premium" onclick="robustPlay('vidsh<?php echo $i; ?>', 'b<?php echo ($i+12); ?>.php', this)"><span>تشغيل البث</span></button>
+        </div>
+        <?php endfor; ?>
+    </div>
+
     <div id="section-mbc" class="channel-section">
         <?php 
         $mbc_channels = [['n'=>'MBC 1','f'=>'mb1.php'], ['n'=>'MBC Action','f'=>'b12.php'], ['n'=>'MBC مصر 1','f'=>'mbe1.php'], ['n'=>'MBC مصر 2','f'=>'mbe2.php']];
@@ -231,6 +234,16 @@ date_default_timezone_set('Asia/Riyadh');
         <?php endforeach; ?>
     </div>
 
+    <div id="section-star" class="channel-section">
+        <?php for($i = 1; $i <= 2; $i++): ?>
+        <div class="card">
+            <div class="c-head"><div class="name-box-green">STARZPLAY <?php echo $i; ?></div><div class="dot-blink"></div></div>
+            <video id="vidstar<?php echo $i; ?>" playsinline controls></video>
+            <button class="play-btn-premium" onclick="robustPlay('vidstar<?php echo $i; ?>', 'b<?php echo ($i+9); ?>.php', this)"><span>تشغيل البث</span></button>
+        </div>
+        <?php endfor; ?>
+    </div>
+
     <div id="section-alkas" class="channel-section">
         <?php 
         $kas_channels = [['n'=>'الكاس 1','f'=>'k1.php'],['n'=>'الكاس 2','f'=>'k2.php'],['n'=>'الكاس 3','f'=>'k3.php'],['n'=>'الكاس 4','f'=>'k4.php'],['n'=>'الكاس 5','f'=>'k5.php'],['n'=>'الكاس 6','f'=>'k6.php'],['n'=>'الكاس 7','f'=>'k7.php'],['n'=>'SHOOF 1','f'=>'sh1.php'],['n'=>'SHOOF 2','f'=>'sh2.php']];
@@ -241,6 +254,16 @@ date_default_timezone_set('Asia/Riyadh');
             <button class="play-btn-premium" onclick="robustPlay('vidkas<?php echo $idx; ?>', '<?php echo $ch['f']; ?>', this)"><span>تشغيل البث</span></button>
         </div>
         <?php endforeach; ?>
+    </div>
+
+    <div id="section-on" class="channel-section">
+        <?php for($i = 1; $i <= 2; $i++): ?>
+        <div class="card">
+            <div class="c-head"><div class="name-box-blue">On Sport <?php echo $i; ?></div><div class="dot-blink"></div></div>
+            <video id="vidon<?php echo $i; ?>" playsinline controls></video>
+            <button class="play-btn-premium" onclick="robustPlay('vidon<?php echo $i; ?>', 'o<?php echo $i; ?>.php', this)"><span>تشغيل البث</span></button>
+        </div>
+        <?php endfor; ?>
     </div>
 
     <div id="section-kuwait" class="channel-section">
@@ -277,39 +300,19 @@ date_default_timezone_set('Asia/Riyadh');
         <?php endfor; ?>
     </div>
 
-    <div id="section-shahad" class="channel-section">
-        <?php for($i = 1; $i <= 2; $i++): ?>
-        <div class="card">
-            <div class="c-head"><div class="name-box-blue">شاهد الرياضية <?php echo $i; ?></div><div class="dot-blink"></div></div>
-            <video id="vidsh<?php echo $i; ?>" playsinline controls></video>
-            <button class="play-btn-premium" onclick="robustPlay('vidsh<?php echo $i; ?>', 'b<?php echo ($i+12); ?>.php', this)"><span>تشغيل البث</span></button>
-        </div>
-        <?php endfor; ?>
-    </div>
-
-    <div id="section-on" class="channel-section">
-        <?php for($i = 1; $i <= 2; $i++): ?>
-        <div class="card">
-            <div class="c-head"><div class="name-box-blue">On Sport <?php echo $i; ?></div><div class="dot-blink"></div></div>
-            <video id="vido<?php echo $i; ?>" playsinline controls></video>
-            <button class="play-btn-premium" onclick="robustPlay('vido<?php echo $i; ?>', 'o<?php echo $i; ?>.php', this)"><span>تشغيل البث</span></button>
-        </div>
-        <?php endfor; ?>
-    </div>
-
     <div id="section-plus" class="channel-section">
         <?php for($i = 1; $i <= 3; $i++): ?>
         <div class="card">
             <div class="c-head"><div class="name-box-purple">Canal+ Sport <?php echo $i; ?></div><div class="dot-blink"></div></div>
-            <video id="vidc<?php echo $i; ?>" playsinline controls></video>
-            <button class="play-btn-premium" onclick="robustPlay('vidc<?php echo $i; ?>', 'c<?php echo $i; ?>.php', this)"><span>تشغيل البث</span></button>
+            <video id="vidplus<?php echo $i; ?>" playsinline controls></video>
+            <button class="play-btn-premium" onclick="robustPlay('vidplus<?php echo $i; ?>', 'c<?php echo $i; ?>.php', this)"><span>تشغيل البث</span></button>
         </div>
         <?php endfor; ?>
     </div>
 
     <div id="section-sporttv" class="channel-section">
         <div class="card"><div class="c-head"><div class="name-box-blue">Sport TV 1</div><div class="dot-blink"></div></div><video id="vsp1" playsinline controls></video><button class="play-btn-premium" onclick="robustPlay('vsp1', 'sp1.php', this)"><span>تشغيل البث</span></button></div>
-        <div class="card"><div class="c-head"><div class="name-box-blue">Sport TV 4</div><div class="dot-blink"></div></div><video id="vsp4" playsinline controls></video><button class="play-btn-premium" onclick="robustPlay('vsp4', 'sp4.php', this)"><span>تشغيل البث</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-blue">Sport TV 4</div><div class="dot-blink"></div></div><video id="vsp4" playsinline controls></button></div>
     </div>
 </div>
 
