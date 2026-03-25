@@ -1,6 +1,6 @@
 <?php
 
-$base = "http://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-1/15cf99af5de54063fdabfefe66adc075/";
+$base = "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-1/15cf99af5de54063fdabfefe66adc075/";
 $file = "index.m3u8";
 
 function stream($url){
