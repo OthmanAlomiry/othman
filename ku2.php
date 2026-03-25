@@ -1,3 +1,3 @@
 <?php
-header("Location: http://kwtspta.cdn.mangomolo.com/sp/smil:sp.stream.smil/chunklist.m3u8");
+header("Location: http://kwtsplta.cdn.mangomolo.com/spl/smil:spl.stream.smil/chunklist.m3u8");
 exit;
