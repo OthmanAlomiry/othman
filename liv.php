@@ -85,10 +85,9 @@ date_default_timezone_set('Asia/Riyadh');
             border-bottom: 1px solid var(--glass-border); padding: 10px 0;
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
-        .top-header-row { width: 95%; display: flex; justify-content: flex-start; margin-bottom: 5px; }
-        
-        .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 10px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px; animation: badgePulse 2s infinite; }
-        @keyframes badgePulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); } 70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+
+        .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 15px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px; animation: badgePulse 2s infinite; }
+        @keyframes badgePulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 10px rgba(34, 197, 94, 0.2); } 100% { transform: scale(1); } }
         .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
 
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; }
@@ -108,9 +107,7 @@ date_default_timezone_set('Asia/Riyadh');
         .intro-icon { font-size: 90px; color: #fff; animation: pulseLogo 2s infinite ease-in-out; }
 
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
-        .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
-        @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
-
+        
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; min-height: 400px; }
         
         .channel-section { display: none; grid-column: 1/-1; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
@@ -124,15 +121,10 @@ date_default_timezone_set('Asia/Riyadh');
         .name-box-blue { background: var(--blue-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         
         .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; animation: glassGlow 3s infinite ease-in-out; }
-        @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 5px rgba(255,255,255,0.05); transform: scale(1); } 50% { box-shadow: 0 0 20px rgba(255,255,255,0.15); transform: scale(1.02); } }
+        @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 5px rgba(255,255,255,0.05); } 50% { box-shadow: 0 0 20px rgba(255,255,255,0.15); } }
         
         .video-container { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; overflow: hidden; }
         video, iframe { width: 100%; height: 100%; border: none; display: block; }
-        
-        .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; padding: 10px 15px; }
-        .match-card { min-width: 280px; background: var(--glass); border-radius: 20px; padding: 0 15px 15px 15px; border: 1px solid var(--glass-border); transition: all 0.3s ease; }
-        .league-title-box { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 8px 15px; margin: 0 -15px 15px -15px; text-align: center; color: #00ff87; font-size: 10px; font-weight: 800; }
-        .s-box { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 1.4em; font-weight: 900; }
         
         @keyframes blink { 50% { opacity: 0.1; } }
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
@@ -155,8 +147,6 @@ date_default_timezone_set('Asia/Riyadh');
             <span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span>
         </div>
     </div>
-
-    <div class="promo-text">للاشتراك في الباقة كاملة على جميع الأجهزة تواصل معنا عبر:</div>
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
         <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
@@ -166,18 +156,18 @@ date_default_timezone_set('Asia/Riyadh');
 
     <div class="category-tabs">
         <div class="cat-item active" onclick="switchSection('bein', this)"><img src="mg/bein.png"><span>beIN Sport</span></div>
-        <div class="cat-item" onclick="switchSection('shahad', this)"><img src="mg/shahd.png"><span>شاهد الرياضية</span></div>
+        <div class="cat-item" onclick="switchSection('shahad', this)"><img src="mg/shahd.png"><span>شاهد</span></div>
+        <div class="cat-item" onclick="switchSection('star', this)"><img src="mg/star.png"><span>STARZ</span></div>
         <div class="cat-item" onclick="switchSection('mbc', this)"><img src="mg/mbc.png"><span>MBC</span></div>
-        <div class="cat-item" onclick="switchSection('star', this)"><img src="mg/star.png"><span>Starzplay</span></div>
         <div class="cat-item" onclick="switchSection('alkas', this)"><img src="mg/alkas.png"><span>الكاس</span></div>
         <div class="cat-item" onclick="switchSection('ado', this)"><img src="mg/ado.png"><span>أبوظبي</span></div>
-        <div class="cat-item" onclick="switchSection('on', this)"><img src="mg/on.png"><span>On Sport</span></div>
+        <div class="cat-item" onclick="switchSection('on', this)"><img src="mg/on.png"><span>On sport</span></div>
         <div class="cat-item" onclick="switchSection('dubai', this)"><img src="mg/du.png"><span>دبي الرياضية</span></div>
+        <div class="cat-item" onclick="switchSection('kuwait', this)"><img src="mg/ku.png"><span>الكويت</span></div>
         <div class="cat-item" onclick="switchSection('moc', this)"><img src="mg/moc.png"><span>المغربية</span></div>
-        <div class="cat-item" onclick="switchSection('sky', this)"><img src="mg/sky.png"><span>Sky Sport</span></div>
-        <div class="cat-item" onclick="switchSection('plus', this)"><img src="mg/plus.png"><span>Canal+</span></div>
-        <div class="cat-item" onclick="switchSection('sporttv', this)"><img src="mg/sp.png"><span>Sport TV</span></div>
-        <div class="cat-item" onclick="switchSection('kuwait', this)"><img src="mg/ku.png"><span>الكويت الرياضية</span></div>
+        <div class="cat-item" onclick="switchSection('sky', this)"><img src="mg/sky.png"><span>sky</span></div>
+        <div class="cat-item" onclick="switchSection('plus', this)"><img src="mg/plus.png"><span>canal</span></div>
+        <div class="cat-item" onclick="switchSection('sporttv', this)"><img src="mg/sp.png"><span>sport tv</span></div>
     </div>
 </div>
 
@@ -192,79 +182,68 @@ date_default_timezone_set('Asia/Riyadh');
         <?php endfor; ?>
     </div>
 
+    <div id="section-shahad" class="channel-section">
+        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; color:#fff; padding:10px; border-right:4px solid #00ff87;">باقة شاهد الرياضية</div>
+        <div class="card"><div class="c-head"><div class="name-box-blue">شاهد الرياضية 1</div><div class="dot-blink"></div></div><div class="video-container" id="cont-sh1"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-sh1', 'b13.php', this)"><span>تشغيل البث</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-blue">شاهد الرياضية 2</div><div class="dot-blink"></div></div><div class="video-container" id="cont-sh2"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-sh2', 'b14.php', this)"><span>تشغيل البث</span></button></div>
+    </div>
+
+    <div id="section-star" class="channel-section">
+        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; color:#fff; padding:10px; border-right:4px solid #16a34a;">باقة STARZPLAY</div>
+        <div class="card"><div class="c-head"><div class="name-box-green">STARZPLAY 1</div><div class="dot-blink"></div></div><div class="video-container" id="cont-st1"><video playsinline controls></video></div><button class="play-btn-premium" onclick="robustPlay('cont-st1', 'b10.php', this)"><span>تشغيل البث</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-green">STARZPLAY 2</div><div class="dot-blink"></div></div><div class="video-container" id="cont-st2"><video playsinline controls></video></div><button class="play-btn-premium" onclick="robustPlay('cont-st2', 'b11.php', this)"><span>تشغيل البث</span></button></div>
+    </div>
+
+    <div id="section-ado" class="channel-section">
+        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; color:#fff; padding:10px; border-right:4px solid #f1c40f;">باقة أبوظبي الرياضية</div>
+        <div class="card"><div class="c-head"><div class="name-box-purple">AD Sport 1</div><div class="dot-blink"></div></div><div class="video-container" id="cont-ad1"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-ad1', 'ad1.php', this)"><span>تشغيل البث</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-purple">AD Sport 2</div><div class="dot-blink"></div></div><div class="video-container" id="cont-ad2"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-ad2', 'ad2.php', this)"><span>تشغيل البث</span></button></div>
+    </div>
+
+    <div id="section-on" class="channel-section">
+        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; color:#fff; padding:10px; border-right:4px solid #e11d48;">باقة On Sport</div>
+        <div class="card"><div class="c-head"><div class="name-box-blue">On Sport 1</div><div class="dot-blink"></div></div><div class="video-container" id="cont-on1"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-on1', 'o1.php', this)"><span>تشغيل البث</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-blue">On Sport 2</div><div class="dot-blink"></div></div><div class="video-container" id="cont-on2"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-on2', 'o2.php', this)"><span>تشغيل البث</span></button></div>
+    </div>
+
+    <div id="section-dubai" class="channel-section">
+        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; color:#fff; padding:10px; border-right:4px solid #00ff87;">باقة دبي الرياضية</div>
+        <div class="card"><div class="c-head"><div class="name-box-green">دبي الرياضية 1</div><div class="dot-blink"></div></div><div class="video-container" id="cont-du1"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-du1', 'd1.php', this)"><span>تشغيل البث</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-green">دبي الرياضية 2</div><div class="dot-blink"></div></div><div class="video-container" id="cont-du2"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-du2', 'd2.php', this)"><span>تشغيل البث</span></button></div>
+    </div>
+
+    <div id="section-plus" class="channel-section">
+        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; color:#fff; padding:10px; border-right:4px solid #fff;">باقة Canal+ Sport</div>
+        <div class="card"><div class="c-head"><div class="name-box-purple">Canal+ 1</div><div class="dot-blink"></div></div><div class="video-container" id="cont-c1"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-c1', 'c1.php', this)"><span>تشغيل البث</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-purple">Canal+ 2</div><div class="dot-blink"></div></div><div class="video-container" id="cont-c2"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-c2', 'c2.php', this)"><span>تشغيل البث</span></button></div>
+    </div>
+
+    <div id="section-sporttv" class="channel-section">
+        <div style="grid-column: 1/-1; font-size:18px; font-weight:900; color:#fff; padding:10px; border-right:4px solid #7c3aed;">باقة Sport TV</div>
+        <div class="card"><div class="c-head"><div class="name-box-blue">Sport TV 1</div><div class="dot-blink"></div></div><div class="video-container" id="cont-sp1"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-sp1', 'sp1.php', this)"><span>تشغيل البث</span></button></div>
+        <div class="card"><div class="c-head"><div class="name-box-blue">Sport TV 4</div><div class="dot-blink"></div></div><div class="video-container" id="cont-sp4"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-sp4', 'sp4.php', this)"><span>تشغيل البث</span></button></div>
+    </div>
+
+    <div id="section-sky" class="channel-section">
+        <div style="grid-column: 1/-1; text-align:center; padding:50px;">قنوات Sky Sport ستظهر هنا بنظام Iframe قريباً</div>
+    </div>
+
     <div id="section-mbc" class="channel-section">
-        <?php 
-        $mbc_ch = [
-            ['name' => 'MBC 1', 'file' => 'mb1.php'],
-            ['name' => 'MBC Action', 'file' => 'b12.php'],
-            ['name' => 'MBC مصر 1', 'file' => 'mbe1.php'],
-            ['name' => 'MBC مصر 2', 'file' => 'mbe2.php']
-        ];
+        <?php $mbc_ch = [['name' => 'MBC 1', 'file' => 'mb1.php'],['name' => 'MBC Action', 'file' => 'b12.php'],['name' => 'MBC مصر 1', 'file' => 'mbe1.php'],['name' => 'MBC مصر 2', 'file' => 'mbe2.php']];
         foreach($mbc_ch as $idx => $ch): ?>
-        <div class="card">
-            <div class="c-head"><div class="name-box-blue"><?php echo $ch['name']; ?></div><div class="dot-blink"></div></div>
-            <div class="video-container" id="cont-mbc<?php echo $idx; ?>"><video id="mbc<?php echo $idx; ?>" playsinline controls></video></div>
-            <button class="play-btn-premium" onclick="forceIframePlay('cont-mbc<?php echo $idx; ?>', '<?php echo $ch['file']; ?>', this)"><span>تشغيل البث</span></button>
-        </div>
+        <div class="card"><div class="c-head"><div class="name-box-blue"><?php echo $ch['name']; ?></div><div class="dot-blink"></div></div><div class="video-container" id="cont-mbc-old<?php echo $idx; ?>"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-mbc-old<?php echo $idx; ?>', '<?php echo $ch['file']; ?>', this)"><span>تشغيل البث</span></button></div>
         <?php endforeach; ?>
     </div>
 
     <div id="section-alkas" class="channel-section">
-        <?php 
-        $kas_ch = [
-            ['name' => 'الكاس 1', 'file' => 'k1.php', 'type' => 'hls'],
-            ['name' => 'الكاس 2', 'file' => 'k2.php', 'type' => 'hls'],
-            ['name' => 'الكاس 3', 'file' => 'k3.php', 'type' => 'hls'],
-            ['name' => 'الكاس 4', 'file' => 'k4.php', 'type' => 'iframe'],
-            ['name' => 'الكاس 5', 'file' => 'k5.php', 'type' => 'iframe'],
-            ['name' => 'الكاس 6', 'file' => 'k6.php', 'type' => 'iframe'],
-            ['name' => 'الكاس 7', 'file' => 'k7.php', 'type' => 'iframe'],
-            ['name' => 'SHOOF 1', 'file' => 'sh1.php', 'type' => 'iframe'],
-            ['name' => 'SHOOF 2', 'file' => 'sh2.php', 'type' => 'iframe']
-        ];
+        <?php $kas_ch = [['name' => 'الكاس 1', 'file' => 'k1.php'],['name' => 'الكاس 2', 'file' => 'k2.php'],['name' => 'الكاس 3', 'file' => 'k3.php'],['name' => 'الكاس 4', 'file' => 'k4.php'],['name' => 'الكاس 5', 'file' => 'k5.php'],['name' => 'الكاس 6', 'file' => 'k6.php'],['name' => 'الكاس 7', 'file' => 'k7.php'],['name' => 'SHOOF 1', 'file' => 'sh1.php'],['name' => 'SHOOF 2', 'file' => 'sh2.php']];
         foreach($kas_ch as $idx => $ch): ?>
-        <div class="card">
-            <div class="c-head"><div class="name-box-purple"><?php echo $ch['name']; ?></div><div class="dot-blink"></div></div>
-            <div class="video-container" id="cont-kas<?php echo $idx; ?>"><video id="kas<?php echo $idx; ?>" playsinline controls></video></div>
-            <?php if($ch['type'] == 'iframe'): ?>
-                <button class="play-btn-premium" onclick="forceIframePlay('cont-kas<?php echo $idx; ?>', '<?php echo $ch['file']; ?>', this)"><span>تشغيل البث المباشر</span></button>
-            <?php else: ?>
-                <button class="play-btn-premium" onclick="robustPlay('kas<?php echo $idx; ?>', '<?php echo $ch['file']; ?>', this)"><span>تشغيل البث</span></button>
-            <?php endif; ?>
-        </div>
-        <?php endforeach; ?>
-    </div>
-
-    <div id="section-kuwait" class="channel-section">
-        <?php 
-        $ku_ch = [['name' => 'KTV Sport', 'file' => 'ku1.php'], ['name' => 'KTV Sport Plus', 'file' => 'ku2.php']];
-        foreach($ku_ch as $idx => $ch): ?>
-        <div class="card">
-            <div class="c-head"><div class="name-box-blue"><?php echo $ch['name']; ?></div><div class="dot-blink"></div></div>
-            <div class="video-container" id="cont-ku<?php echo $idx; ?>"><video playsinline controls></video></div>
-            <button class="play-btn-premium" onclick="forceIframePlay('cont-ku<?php echo $idx; ?>', '<?php echo $ch['file']; ?>', this)"><span>تشغيل البث</span></button>
-        </div>
-        <?php endforeach; ?>
-    </div>
-
-    <div id="section-moc" class="channel-section">
-        <?php 
-        $ma_ch = [
-            ['name' => '2M', 'file' => '2m.php'],
-            ['name' => '2M Monde +1', 'file' => '2m2.php'],
-            ['name' => 'Al Aoula Inter', 'file' => 'aou.php'],
-            ['name' => 'Al Maghribia', 'file' => 'mg.php'],
-            ['name' => 'Arryadia', 'file' => 'arr.php']
-        ];
-        foreach($ma_ch as $idx => $ch): ?>
-        <div class="card">
-            <div class="c-head"><div class="name-box-green"><?php echo $ch['name']; ?></div><div class="dot-blink"></div></div>
-            <div class="video-container" id="cont-ma<?php echo $idx; ?>"><video playsinline controls></video></div>
-            <button class="play-btn-premium" onclick="forceIframePlay('cont-ma<?php echo $idx; ?>', '<?php echo $ch['file']; ?>', this)"><span>تشغيل البث</span></button>
-        </div>
+        <div class="card"><div class="c-head"><div class="name-box-purple"><?php echo $ch['name']; ?></div><div class="dot-blink"></div></div><div class="video-container" id="cont-kas-old<?php echo $idx; ?>"><video playsinline controls></video></div><button class="play-btn-premium" onclick="forceIframePlay('cont-kas-old<?php echo $idx; ?>', '<?php echo $ch['file']; ?>', this)"><span>تشغيل البث</span></button></div>
         <?php endforeach; ?>
     </div>
 </div>
+
+<footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
 
 <script>
 window.addEventListener('load', () => { setTimeout(() => document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'), 2000); });
@@ -278,10 +257,9 @@ function switchSection(sectionId, element) {
     if(target) { target.classList.add('active'); element.classList.add('active'); }
 }
 
-// دالة التشغيل بنظام الإطار (مثل Shoof) عثمان
 function forceIframePlay(contId, file, btn) {
     const container = document.getElementById(contId);
-    btn.innerText = "جاري الاتصال بالسيرفر...";
+    btn.innerText = "جاري الاتصال...";
     container.innerHTML = `<iframe src="${file}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
     btn.innerText = "تم التشغيل بنجاح";
 }
