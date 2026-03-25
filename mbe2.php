@@ -1,33 +1,37 @@
-<?php
-// رابط قناة MBC مصر 2 الذي أرسلته
-$remote_url = "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8";
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+        video { width: 100%; height: 100%; object-fit: contain; }
+    </style>
+</head>
+<body>
+    <video id="video" controls playsinline autoplay></video>
+    <script>
+        // رابط القناة الذي يعمل في VLC
+        var videoSrc = 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8';
+        var video = document.getElementById('video');
 
-// إعدادات محاكاة متصفح حقيقي لتجاوز الحماية
-$opts = [
-    "http" => [
-        "method" => "GET",
-        "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36\r\n" .
-                    "Origin: https://shd-gcp-live.edgenextcdn.net\r\n" .
-                    "Referer: https://shd-gcp-live.edgenextcdn.net/\r\n"
-    ]
-];
-
-$context = stream_context_create($opts);
-$content = @file_get_contents($remote_url, false, $context);
-
-if ($content === false) {
-    // في حال فشل السيرفر في الجلب المباشر، نقوم بالتحويل كحل أخير
-    header("Location: $remote_url");
-    exit;
-}
-
-// إعداد الرؤوس (Headers) لإجبار المتصفح على تشغيل الفيديو
-header("Content-Type: application/vnd.apple.mpegurl");
-header("Access-Control-Allow-Origin: *"); // السماح لموقعك بعرض البث
-header("Cache-Control: no-cache");
-
-// تصحيح المسارات الداخلية لملفات البث (مهم جداً لعمل البث المستمر)
-$base_url = "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/";
-$content = str_replace("index", $base_url . "index", $content);
-
-echo $content;
+        if (Hls.isSupported()) {
+            var hls = new Hls({
+                xhrSetup: function (xhr, url) {
+                    xhr.withCredentials = false;
+                }
+            });
+            hls.loadSource(videoSrc);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play();
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = videoSrc;
+            video.addEventListener('loadedmetadata', function() {
+                video.play();
+            });
+        }
+    </script>
+</body>
+</html>
