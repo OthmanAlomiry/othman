@@ -1,6 +1,6 @@
 <?php
 
-$base = "https://liveeu-gcp.alkassdigital.net/shooflive/";
+$base = "http://liveeu-gcp.alkassdigital.net/shooflive/";
 $file = "main.m3u8";
 
 function stream($url){
