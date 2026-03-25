@@ -77,7 +77,7 @@ date_default_timezone_set('Asia/Riyadh');
         }
         
         html { scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 260px; overflow-x: hidden; color: #e2e8f0; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 310px; overflow-x: hidden; color: #e2e8f0; }
 
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
@@ -86,11 +86,15 @@ date_default_timezone_set('Asia/Riyadh');
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
         .top-header-row { width: 95%; display: flex; justify-content: flex-start; margin-bottom: 5px; }
-        .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 10px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px; }
+        
+        /* نبض المتواجدين عثمان */
+        .online-count-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 3px 10px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: flex; align-items: center; gap: 5px; animation: badgePulse 2s infinite; }
+        @keyframes badgePulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); } 70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
         .dot-blink { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 1.5s infinite; }
 
+        .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; }
         .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-        .social-btn { padding: 6px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .social-btn { padding: 6px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: inline-flex; align-items: center; gap: 5px; }
 
         .category-tabs { display: flex; justify-content: flex-start; gap: 12px; width: 95%; overflow-x: auto; scrollbar-width: none; padding: 5px 0; margin-top: 5px; }
         .category-tabs::-webkit-scrollbar { display: none; }
@@ -118,7 +122,10 @@ date_default_timezone_set('Asia/Riyadh');
         .name-box-green { background: var(--green-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .name-box-blue { background: var(--blue-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         
-        .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; }
+        /* توهج أيقونة التشغيل عثمان */
+        .play-btn-premium { width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer; animation: glassGlow 3s infinite ease-in-out; }
+        @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 5px rgba(255,255,255,0.05); transform: scale(1); } 50% { box-shadow: 0 0 20px rgba(255,255,255,0.15); transform: scale(1.02); } }
+        
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; padding: 10px 15px; }
@@ -126,6 +133,9 @@ date_default_timezone_set('Asia/Riyadh');
         .league-title-box { background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--glass-border); padding: 8px 15px; margin: 0 -15px 15px -15px; text-align: center; color: #00ff87; font-size: 10px; font-weight: 800; }
         .s-box { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; font-size: 1.4em; font-weight: 900; }
         
+        /* وميض مباشر عثمان */
+        @keyframes blink { 50% { opacity: 0.1; } }
+
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
     </style>
 </head>
@@ -146,9 +156,13 @@ date_default_timezone_set('Asia/Riyadh');
             <span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span>
         </div>
     </div>
+
+    <div class="promo-text">للاشتراك في الباقة كاملة على جميع الأجهزة تواصل معنا عبر:</div>
     <div class="social-links">
-        <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366">واتساب</a>
-        <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc">تليجرام</a>
+        <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
+        <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
+        <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000"><i class="fab fa-snapchat"></i> سناب</a>
+        <a href="https://x.com/d_service_pro" class="social-btn" style="background:#000"><i class="fab fa-x-twitter"></i> تويتر</a>
     </div>
 
     <div class="category-tabs">
@@ -296,10 +310,6 @@ date_default_timezone_set('Asia/Riyadh');
             <button class="play-btn-premium" onclick="robustPlay('vidsp4', 'sp4.php', this)"><span>تشغيل البث</span></button>
         </div>
     </div>
-
-    <div id="section-ado" class="channel-section"><div style="grid-column:1/-1; text-align:center; padding:50px;">قنوات أبوظبي ستظهر هنا</div></div>
-    <div id="section-moc" class="channel-section"><div style="grid-column:1/-1; text-align:center; padding:50px;">قنوات المغربية ستظهر هنا</div></div>
-    <div id="section-sky" class="channel-section"><div style="grid-column:1/-1; text-align:center; padding:50px;">قنوات Sky Sport ستظهر هنا</div></div>
 </div>
 
 <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
@@ -313,10 +323,7 @@ function switchSection(sectionId, element) {
     document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
     const target = document.getElementById('section-' + sectionId);
-    if(target) {
-        target.classList.add('active');
-        element.classList.add('active');
-    }
+    if(target) { target.classList.add('active'); element.classList.add('active'); }
 }
 
 function robustPlay(vId, p, btn) {
