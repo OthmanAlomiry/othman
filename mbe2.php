@@ -3,44 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link href="https://vjs.zencdn.net/8.3.0/video-js.css" rel="stylesheet" />
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
-        .container { width: 100%; height: 100%; }
+        .video-js { width: 100%; height: 100%; }
+        /* إخفاء رسائل الخطأ المزعجة */
+        .vjs-error-display { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <video id="player" playsinline controls data-poster="mg/mbc.png"></video>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <video id="mbc-player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" crossorigin="anonymous" autoplay>
+        <source src="https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8" type="application/x-mpegURL">
+    </video>
+
+    <script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const video = document.querySelector('#player');
-            // الرابط الذي يعمل في VLC
-            const source = 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8';
-            
-            const defaultOptions = {};
-
-            if (Hls.isSupported()) {
-                const hls = new Hls({
-                    // إعدادات لمحاكاة طلب VLC تماماً
-                    enableWorker: true,
-                    lowLatencyMode: true,
-                    xhrSetup: function(xhr, url) {
-                        xhr.withCredentials = false;
-                    }
-                });
-                hls.loadSource(source);
-                hls.attachMedia(video);
-                window.hls = hls;
-            } else {
-                video.src = source;
+        var player = videojs('mbc-player', {
+            html5: {
+                vhs: {
+                    overrideNative: true,
+                    withCredentials: false
+                },
+                nativeVideoTracks: false,
+                nativeAudioTracks: false,
+                nativeTextTracks: false
             }
+        });
 
-            const player = new Plyr(video, defaultOptions);
+        player.ready(function() {
+            var promise = player.play();
+            if (promise !== undefined) {
+                promise.catch(function(error) {
+                    // في حال تطلب تفاعل المستخدم للبدء
+                    console.log("Autoplay prevented");
+                });
+            }
+        });
+
+        // محاولة إعادة الاتصال في حال انقطع البث
+        player.on('error', function() {
+            setTimeout(function() {
+                player.src({
+                    src: 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8',
+                    type: 'application/x-mpegURL'
+                });
+                player.play();
+            }, 2000);
         });
     </script>
 </body>
