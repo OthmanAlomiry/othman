@@ -70,12 +70,12 @@ date_default_timezone_set('Asia/Riyadh');
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; }
 
         .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; }
 
         .category-tabs { display: flex; gap: 12px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 10px 0; }
         .category-tabs::-webkit-scrollbar { display: none; }
         .cat-item { min-width: 85px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 12px 5px; border-radius: 20px; cursor: pointer; text-align: center; transition: 0.4s; }
-        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.05); }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
         .cat-item img { width: 38px; height: 38px; object-fit: contain; margin-bottom: 5px; }
         .cat-item span { font-size: 10px; font-weight: 900; color: #fff; display: block; }
 
@@ -84,12 +84,13 @@ date_default_timezone_set('Asia/Riyadh');
         .channel-section.active { display: grid; animation: slideUp 0.6s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--glass); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+        .card { background: var(--glass); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 15px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         .name-badge { padding: 5px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; color: #000; background: var(--blue-grad); }
         .play-btn { width: 90%; margin: 20px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 50px; font-weight: 900; cursor: pointer; }
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
+        @keyframes blink { 50% { opacity: 0.1; } }
         footer { text-align: center; padding: 50px; font-size: 11px; opacity: 0.5; }
     </style>
 </head>
@@ -108,6 +109,8 @@ date_default_timezone_set('Asia/Riyadh');
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
         <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
+        <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000"><i class="fab fa-snapchat"></i> سناب</a>
+        <a href="https://x.com/d_service_pro" class="social-btn" style="background:#000"><i class="fab fa-x-twitter"></i> تويتر</a>
     </div>
 
     <div class="category-tabs">
@@ -135,8 +138,7 @@ date_default_timezone_set('Asia/Riyadh');
     ?>
     <div id="section-<?php echo $sec; ?>" class="channel-section <?php echo ($sec == 'bein' ? 'active' : ''); ?>">
         <?php if(empty($channels)): ?>
-            <div style="grid-column: 1/-1; text-align:center; padding:100px; opacity:0.3;">
-                <i class="fas fa-tv" style="font-size:40px; margin-bottom:15px;"></i>
+            <div style="grid-column: 1/-1; text-align:center; padding:80px; opacity:0.3;">
                 <p>لا توجد قنوات حالياً.</p>
             </div>
         <?php endif; ?>
