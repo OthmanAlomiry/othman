@@ -6,19 +6,20 @@
     <title>بث مباشر MBC Masr 2</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
-        .player-container { position: relative; width: 100%; height: 100vh; }
+        .video-wrapper { position: relative; width: 100%; height: 100vh; }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
 
-<div class="player-container">
-    <iframe src="https://itube.stream/e/135" 
-            allow="autoplay; encrypted-media" 
+    <div class="video-wrapper">
+        <iframe 
+            src="https://thetvapp.to/embed/mbc-masr-2/" 
             allowfullscreen 
-            scrolling="no">
-    </iframe>
-</div>
+            scrolling="no" 
+            allow="autoplay; encrypted-media">
+        </iframe>
+    </div>
 
 </body>
 </html>
