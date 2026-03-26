@@ -36,71 +36,67 @@ date_default_timezone_set('Asia/Riyadh');
             --main: #e11d48; --bg-deep: #050c14; 
             --glass: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.15);
-            --purple-grad: linear-gradient(45deg, #7c3aed, #fff); 
-            --green-grad: linear-gradient(45deg, #16a34a, #fff);
             --blue-grad: linear-gradient(45deg, #0ea5e9, #fff);
         }
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 310px; color: #e2e8f0; overflow-x: hidden; }
 
-        /* الصفحة الترحيبية السينمائية */
+        /* الصفحة الترحيبية */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; transition: 1s ease-in-out; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
         .intro-icon { font-size: 80px; color: var(--main); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); text-shadow: 0 0 0px var(--main); } 50% { transform: scale(1.1); text-shadow: 0 0 30px var(--main); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); text-shadow: 0 0 30px var(--main); } 100% { transform: scale(1); } }
+        @keyframes load { from { width: 0%; } to { width: 100%; } }
 
-        /* الخلفية المتحركة بالمكعبات */
+        /* الخلفية */
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* الهيدر الثابت */
-        .header-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
-        .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 5px 15px; border-radius: 50px; color: #22c55e; font-size: 10px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; animation: badgeGlow 2s infinite; }
-        @keyframes badgeGlow { 50% { box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); } }
+        /* الهيدر */
+        .header-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
+        .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 5px 15px; border-radius: 50px; color: #22c55e; font-size: 10px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px; }
+        .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; opacity: 0.9; }
 
-        /* أزرار التواصل الاجتماعي */
-        .social-links { display: flex; justify-content: center; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
-        .social-btn { padding: 8px 18px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 11px; color: #fff; display: flex; align-items: center; gap: 6px; transition: 0.3s; }
-        .social-btn:hover { transform: translateY(-3px); }
+        /* أزرار التواصل */
+        .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
 
         /* الأقسام */
-        .category-tabs { display: flex; gap: 15px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 10px 0; }
-        .category-tabs::-webkit-scrollbar { display: none; }
+        .category-tabs { display: flex; gap: 12px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 10px 0; }
         .cat-item { min-width: 85px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 12px 5px; border-radius: 20px; cursor: pointer; text-align: center; transition: 0.4s; }
-        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.05); }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
         .cat-item img { width: 38px; height: 38px; object-fit: contain; margin-bottom: 5px; }
         .cat-item span { font-size: 10px; font-weight: 900; color: #fff; display: block; }
 
-        /* الشبكة والبطاقات */
+        /* البطاقات */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
         .channel-section { display: none; grid-column: 1/-1; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
         .channel-section.active { display: grid; animation: slideUp 0.6s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--glass); backdrop-filter: blur(10px); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); transition: 0.3s; }
-        .card:hover { border-color: var(--main); }
+        .card { background: var(--glass); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); }
         .c-head { padding: 15px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         .name-badge { padding: 5px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; color: #000; }
         
-        .play-btn { width: 90%; margin: 20px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 50px; font-weight: 900; cursor: pointer; transition: 0.3s; animation: glassPulse 3s infinite; }
-        @keyframes glassPulse { 50% { background: rgba(255,255,255,0.15); box-shadow: 0 0 20px rgba(255,255,255,0.1); } }
-        
-        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
+        .play-btn { width: 90%; margin: 20px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 50px; font-weight: 900; cursor: pointer; transition: 0.3s; }
+        .play-btn:hover { background: rgba(255,255,255,0.15); }
+
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
-        footer { text-align: center; padding: 50px; font-size: 12px; opacity: 0.6; }
+        @keyframes blink { 50% { opacity: 0.1; } }
+        footer { text-align: center; padding: 50px; font-size: 11px; opacity: 0.5; }
     </style>
 </head>
 <body>
 
 <div id="pro-intro">
     <div class="intro-icon"><i class="fas fa-play-circle"></i></div>
-    <h2 style="color:white; font-weight:900; letter-spacing: 2px;">الخدمة الرقمية</h2>
+    <h2 style="color:white; font-weight:900;">الخدمة الرقمية</h2>
     <div style="width:150px; height:3px; background:rgba(255,255,255,0.1); border-radius:10px; margin-top:20px; overflow:hidden;">
         <div style="width:100%; height:100%; background:var(--main); animation: load 2s forwards;"></div>
     </div>
 </div>
-@keyframes load { from { width: 0%; } to { width: 100%; } }
 
 <div class="bg-pattern"></div>
 
@@ -110,10 +106,13 @@ date_default_timezone_set('Asia/Riyadh');
         <span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span>
     </div>
 
+    <div class="promo-text">للاشتراك في الباقة كاملة على جميع الأجهزة تواصل معنا عبر:</div>
+
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
         <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
         <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000"><i class="fab fa-snapchat"></i> سناب</a>
+        <a href="https://x.com/d_service_pro" class="social-btn" style="background:#000"><i class="fab fa-x-twitter"></i> تويتر</a>
     </div>
 
     <div class="category-tabs">
@@ -140,9 +139,9 @@ date_default_timezone_set('Asia/Riyadh');
     ?>
     <div id="section-<?php echo $sec; ?>" class="channel-section <?php echo ($sec == 'bein' ? 'active' : ''); ?>">
         <?php if(empty($channels)): ?>
-            <div style="grid-column: 1/-1; text-align:center; padding:100px; opacity:0.3;">
-                <i class="fas fa-tv" style="font-size:50px; margin-bottom:15px;"></i>
-                <p>لا توجد قنوات في هذا القسم حالياً، أضفها من لوحة التحكم.</p>
+            <div style="grid-column: 1/-1; text-align:center; padding:80px; opacity:0.3;">
+                <i class="fas fa-tv" style="font-size:40px; margin-bottom:10px;"></i>
+                <p>لا توجد قنوات حالياً.</p>
             </div>
         <?php endif; ?>
         
@@ -153,7 +152,7 @@ date_default_timezone_set('Asia/Riyadh');
                 <div style="color:#ff4d4d; animation: blink 1s infinite; font-weight:900; font-size:10px;">● مباشر</div>
             </div>
             <div class="video-box" id="vid-<?php echo $ch['id']; ?>"></div>
-            <button class="play-btn" onclick="startStream('vid-<?php echo $ch['id']; ?>', '<?php echo $ch['file']; ?>', this)">تشغيل البث المباشر</button>
+            <button class="play-btn" onclick="startStream('vid-<?php echo $ch['id']; ?>', '<?php echo $ch['file']; ?>', this)">تشغيل البث</button>
         </div>
         <?php endforeach; ?>
     </div>
@@ -163,11 +162,8 @@ date_default_timezone_set('Asia/Riyadh');
 <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
 
 <script>
-// إخفاء الصفحة الترحيبية
 window.addEventListener('load', () => {
-    setTimeout(() => {
-        document.getElementById('pro-intro').classList.add('intro-hide');
-    }, 2000);
+    setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 2000);
 });
 
 function switchSection(id, element) {
@@ -179,12 +175,12 @@ function switchSection(id, element) {
 
 function startStream(boxId, file, btn) {
     document.getElementById(boxId).innerHTML = `<iframe src="${file}" allowfullscreen allow="autoplay"></iframe>`;
-    btn.innerText = "تم الاتصال بالسيرفر";
+    btn.innerText = "تم الاتصال";
 }
 
 setInterval(() => {
     fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(count => {
-        document.getElementById('realtime-visitors').innerText = count;
+        if(count && !isNaN(count)) document.getElementById('realtime-visitors').innerText = count;
     });
 }, 4000);
 </script>
