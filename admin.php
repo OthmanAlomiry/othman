@@ -135,7 +135,7 @@ if (isset($_GET['delete'])) {
             <?php endforeach; ?>
         </table>
         <br>
-        <a href="liv.php" style="color:#0ea5e9;">العودة للبث المباشر</a>
+        <a href="index.php" style="color:#0ea5e9;">العودة للبث المباشر</a>
     </div>
 </body>
 </html>
