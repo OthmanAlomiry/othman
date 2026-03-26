@@ -41,35 +41,29 @@ date_default_timezone_set('Asia/Riyadh');
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 310px; color: #e2e8f0; overflow-x: hidden; }
 
-        /* الصفحة الترحيبية */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; transition: 1s ease-in-out; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
         .intro-icon { font-size: 80px; color: var(--main); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); text-shadow: 0 0 30px var(--main); } 100% { transform: scale(1); } }
         @keyframes load { from { width: 0%; } to { width: 100%; } }
 
-        /* الخلفية */
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* الهيدر */
         .header-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 5px 15px; border-radius: 50px; color: #22c55e; font-size: 10px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px; }
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; opacity: 0.9; }
 
-        /* أزرار التواصل */
         .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
 
-        /* الأقسام */
         .category-tabs { display: flex; gap: 12px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 10px 0; }
         .cat-item { min-width: 85px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 12px 5px; border-radius: 20px; cursor: pointer; text-align: center; transition: 0.4s; }
         .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
         .cat-item img { width: 38px; height: 38px; object-fit: contain; margin-bottom: 5px; }
         .cat-item span { font-size: 10px; font-weight: 900; color: #fff; display: block; }
 
-        /* البطاقات */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
         .channel-section { display: none; grid-column: 1/-1; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
         .channel-section.active { display: grid; animation: slideUp 0.6s ease-out; }
@@ -173,9 +167,23 @@ function switchSection(id, element) {
     element.classList.add('active');
 }
 
+// الدالة المحدثة لحل مشكلة التشغيل التلقائي
 function startStream(boxId, file, btn) {
-    document.getElementById(boxId).innerHTML = `<iframe src="${file}" allowfullscreen allow="autoplay"></iframe>`;
-    btn.innerText = "تم الاتصال";
+    const container = document.getElementById(boxId);
+    // تصفير المحتوى أولاً
+    container.innerHTML = "";
+    
+    // إنشاء الإطار برمجياً لضمان تمرير الخصائص الصحيحة
+    const iframe = document.createElement('iframe');
+    iframe.src = file + "?autoplay=1";
+    iframe.allow = "autoplay; encrypted-media";
+    iframe.allowFullscreen = true;
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.style.border = "none";
+    
+    container.appendChild(iframe);
+    btn.innerText = "جاري البث...";
 }
 
 setInterval(() => {
