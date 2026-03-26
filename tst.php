@@ -2,68 +2,39 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Stream Player</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
-        body { background-color: #000; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; }
-        #video-container { width: 100%; max-width: 850px; position: relative; }
-        video { width: 100%; border: 1px solid #333; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        body { background: #000; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .container { width: 100%; max-width: 800px; }
     </style>
 </head>
 <body>
 
-<div id="video-container">
-    <video id="video" controls autoplay playsinline></video>
+<div class="container">
+    <video id="player" playsinline controls data-poster="https://bitdash-a.akamaihd.net/content/sintel/poster.png">
+        <source src="https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8" type="application/x-mpegURL">
+    </video>
 </div>
 
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script>
-    var video = document.getElementById('video');
-    // الرابط الخاص بك
-    var videoSrc = 'https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8';
-
-    if (Hls.isSupported()) {
-        var hls = new Hls({
-            // إعدادات لتجاوز مشاكل التحميل
-            xhrSetup: function(xhr, url) {
-                // محاكاة متصفح حقيقي في كل طلب
-                xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-            }
-        });
+    document.addEventListener('DOMContentLoaded', () => {
+        const video = document.querySelector('video');
+        const source = video.getElementsByTagName('source')[0].src;
         
-        hls.loadSource(videoSrc);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
-            video.play();
-        });
+        const defaultOptions = {};
 
-        // معالجة الأخطاء وإعادة المحاولة تلقائياً
-        hls.on(Hls.Events.ERROR, function (event, data) {
-            if (data.fatal) {
-                switch (data.type) {
-                    case Hls.ErrorTypes.NETWORK_ERROR:
-                        console.log("خطأ في الشبكة، محاولة إعادة الاتصال...");
-                        hls.startLoad();
-                        break;
-                    case Hls.ErrorTypes.MEDIA_ERROR:
-                        console.log("خطأ في الوسائط، محاولة الإصلاح...");
-                        hls.recoverMediaError();
-                        break;
-                    default:
-                        hls.destroy();
-                        break;
-                }
-            }
-        });
-    }
-    // دعم خاص لمتصفح Safari على iPhone
-    else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = videoSrc;
-        video.addEventListener('loadedmetadata', function() {
-            video.play();
-        });
-    }
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(source);
+            hls.attachMedia(video);
+            window.hls = hls;
+        }
+
+        const player = new Plyr(video, defaultOptions);
+    });
 </script>
-
 </body>
 </html>
