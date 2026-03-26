@@ -5,7 +5,7 @@ error_reporting(0);
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69c4ad66c3097a1dd55f06d6';
 
-$user = "admin"; $pass = "1405";
+$user = "othman"; $pass = "1405";
 
 if(isset($_GET['out'])){ session_destroy(); header("Location: admin.php"); exit; }
 if(isset($_POST['in'])){
