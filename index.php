@@ -1,21 +1,18 @@
 <?php
 session_start();
-error_reporting(0); // إخفاء الأخطاء المزعجة
+ini_set('display_errors', 1); // إظهار الخطأ لو حدث بدلاً من الصفحة البيضاء
+error_reporting(E_ALL);
 
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69c4ad66c3097a1dd55f06d6';
 
-// دالة جلب البيانات السحابية
+// دالة الاتصال السحابي باستخدام cURL (أفضل لـ Render)
 function getCloudData($bin, $key) {
-    $url = "https://api.jsonbin.io/v3/b/" . $bin . "/latest";
-    $opts = [
-        "http" => [
-            "method" => "GET",
-            "header" => "X-Master-Key: " . $key . "\r\n" . "X-Bin-Meta: false\r\n"
-        ]
-    ];
-    $context = stream_context_create($opts);
-    $res = file_get_contents($url, false, $context);
+    $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
+    $res = curl_exec($ch);
+    curl_close($ch);
     return json_decode($res, true);
 }
 
@@ -24,7 +21,7 @@ $all_channels = isset($data['custom_channels']) ? $data['custom_channels'] : [];
 
 function filterSec($channels, $sec) {
     return array_filter($channels, function($c) use ($sec) {
-        return (trim(strtolower($c['section'])) == trim(strtolower($sec)));
+        return (isset($c['section']) && trim(strtolower($c['section'])) == trim(strtolower($sec)));
     });
 }
 ?>
@@ -38,9 +35,9 @@ function filterSec($channels, $sec) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --main: #e11d48; --bg: #050c14; --glass: rgba(255,255,255,0.05); }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--bg); color: white; padding-top: 280px; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--bg); color: white; padding-top: 250px; }
         .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5,12,20,0.9); backdrop-filter: blur(15px); padding: 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .tabs { display: flex; gap: 10px; overflow-x: auto; padding: 10px; scrollbar-width: none; justify-content: center; }
+        .tabs { display: flex; gap: 10px; overflow-x: auto; padding: 10px; justify-content: center; }
         .tab { min-width: 80px; background: var(--glass); padding: 10px; border-radius: 15px; cursor: pointer; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); }
         .tab.active { border-color: var(--main); background: rgba(225,29,72,0.1); }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; }
@@ -55,7 +52,7 @@ function filterSec($channels, $sec) {
 <body>
 
 <div class="header">
-    <div style="color:#22c55e; margin-bottom:10px; font-size:12px;">● البث المباشر يعمل الآن</div>
+    <div style="color:#22c55e; margin-bottom:10px; font-size:12px;">● متصل بالسحابة</div>
     <div class="tabs">
         <div class="tab active" onclick="sw('bein', this)">beIN</div>
         <div class="tab" onclick="sw('mbc', this)">MBC</div>
@@ -70,9 +67,9 @@ function filterSec($channels, $sec) {
         <div id="s-<?php echo $s; ?>" class="sec <?php echo ($s=='bein'?'active':''); ?>">
             <?php foreach($list as $ch): ?>
             <div class="card">
-                <div style="padding:10px; font-weight:bold;"><?php echo $ch['name']; ?></div>
+                <div style="padding:15px; font-weight:bold;"><?php echo $ch['name']; ?></div>
                 <div class="v-box" id="v-<?php echo $ch['id']; ?>"></div>
-                <button class="btn" onclick="play('v-<?php echo $ch['id']; ?>','<?php echo $ch['file']; ?>',this)">تشغيل</button>
+                <button class="btn" onclick="play('v-<?php echo $ch['id']; ?>','<?php echo $ch['file']; ?>',this)">تشغيل البث</button>
             </div>
             <?php endforeach; ?>
         </div>
@@ -88,7 +85,7 @@ function sw(id, el) {
 }
 function play(id, f, b) {
     document.getElementById(id).innerHTML = `<iframe src="${f}?autoplay=1&muted=1" allow="autoplay" allowfullscreen></iframe>`;
-    b.innerText = "جاري العرض";
+    b.innerText = "تم الاتصال";
 }
 </script>
 </body>
