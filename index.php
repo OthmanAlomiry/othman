@@ -54,7 +54,7 @@ date_default_timezone_set('Asia/Riyadh');
             --blue-grad: linear-gradient(45deg, #0ea5e9, #fff);
         }
         
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 310px; color: #e2e8f0; overflow-x: hidden; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 320px; color: #e2e8f0; overflow-x: hidden; }
 
         /* الصفحة الترحيبية */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; transition: 1s ease-in-out; }
@@ -62,7 +62,7 @@ date_default_timezone_set('Asia/Riyadh');
         .intro-icon { font-size: 80px; color: var(--main); animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); text-shadow: 0 0 30px var(--main); } }
 
-        /* الخلفية المتحركة */
+        /* الخلفية المتحركة بالمكعبات */
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
@@ -74,12 +74,14 @@ date_default_timezone_set('Asia/Riyadh');
 
         /* التواصل الاجتماعي */
         .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; }
+        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .social-btn:hover { transform: translateY(-3px); }
 
-        /* الأقسام */
+        /* الأقسام - 12 قسماً */
         .category-tabs { display: flex; gap: 12px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 10px 0; }
+        .category-tabs::-webkit-scrollbar { display: none; }
         .cat-item { min-width: 85px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 12px 5px; border-radius: 20px; cursor: pointer; text-align: center; transition: 0.4s; }
-        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.05); }
         .cat-item img { width: 38px; height: 38px; object-fit: contain; margin-bottom: 5px; }
         .cat-item span { font-size: 10px; font-weight: 900; color: #fff; display: block; }
 
@@ -89,11 +91,13 @@ date_default_timezone_set('Asia/Riyadh');
         .channel-section.active { display: grid; animation: slideUp 0.6s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--glass); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); }
+        .card { background: var(--glass); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); transition: 0.3s; }
+        .card:hover { border-color: var(--main); }
         .c-head { padding: 15px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         .name-badge { padding: 5px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; color: #000; background: var(--blue-grad); }
         
-        .play-btn { width: 90%; margin: 20px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 50px; font-weight: 900; cursor: pointer; }
+        .play-btn { width: 90%; margin: 20px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 50px; font-weight: 900; cursor: pointer; transition: 0.3s; }
+        .play-btn:hover { background: rgba(255, 255, 255, 0.15); box-shadow: 0 0 15px var(--main); }
         
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
@@ -129,19 +133,24 @@ date_default_timezone_set('Asia/Riyadh');
         <div class="cat-item" onclick="switchSection('ado', this)"><img src="mg/ado.png"><span>أبوظبي</span></div>
         <div class="cat-item" onclick="switchSection('dubai', this)"><img src="mg/du.png"><span>دبي</span></div>
         <div class="cat-item" onclick="switchSection('kuwait', this)"><img src="mg/ku.png"><span>الكويت</span></div>
+        <div class="cat-item" onclick="switchSection('star', this)"><img src="mg/star.png"><span>STARZPLAY</span></div>
+        <div class="cat-item" onclick="switchSection('moc', this)"><img src="mg/moc.png"><span>المغربية</span></div>
+        <div class="cat-item" onclick="switchSection('sky', this)"><img src="mg/sky.png"><span>Sky</span></div>
+        <div class="cat-item" onclick="switchSection('plus', this)"><img src="mg/plus.png"><span>Canal+</span></div>
     </div>
 </div>
 
 <div class="grid">
     <?php 
-    $sections = ['bein', 'shahad', 'mbc', 'alkas', 'on', 'ado', 'dubai', 'kuwait'];
+    $sections = ['bein', 'shahad', 'mbc', 'alkas', 'on', 'ado', 'dubai', 'kuwait', 'star', 'moc', 'sky', 'plus'];
     foreach($sections as $sec): 
         $channels = filterSection($all_channels, $sec);
     ?>
     <div id="section-<?php echo $sec; ?>" class="channel-section <?php echo ($sec == 'bein' ? 'active' : ''); ?>">
         <?php if(empty($channels)): ?>
-            <div style="grid-column: 1/-1; text-align:center; padding:80px; opacity:0.3;">
-                <p>لا توجد قنوات حالياً.</p>
+            <div style="grid-column: 1/-1; text-align:center; padding:100px; opacity:0.3;">
+                <i class="fas fa-tv" style="font-size:40px; margin-bottom:15px;"></i>
+                <p>لا توجد قنوات حالياً في هذا القسم.</p>
             </div>
         <?php endif; ?>
         
