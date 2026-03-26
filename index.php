@@ -1,6 +1,11 @@
 <?php
 session_start();
-// --- نظام العداد الحقيقي المتطور ---
+
+// --- إعدادات السحابة الخاصة بك (JSONbin) عثمان ---
+$API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
+$BIN_ID = '69c4ad66c3097a1dd55f06d6';
+
+// --- نظام عداد المتواجدين الحقيقي ---
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
     $session_id = session_id(); $time = time();
@@ -12,15 +17,21 @@ if (isset($_GET['fetch_visitors'])) {
 }
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
 
-// --- الربط مع لوحة التحكم (قاعدة البيانات) ---
-$db_file = 'channels_db.json';
-$channels_db = file_exists($db_file) ? json_decode(file_get_contents($db_file), true) : ['custom_channels' => []];
-
-function getChannels($section, $db) {
-    return array_filter($db['custom_channels'], function($ch) use ($section) {
-        return ($ch['section'] == $section && $ch['status'] == 'show');
+// --- دالة جلب القنوات من السحابة لضمان عدم الحذف ---
+function getChannelsCloud($section, $bin, $key) {
+    $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
+    $res = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($res, true);
+    $allChannels = isset($data['custom_channels']) ? $data['custom_channels'] : [];
+    
+    return array_filter($allChannels, function($c) use ($section) {
+        return ($c['section'] == $section);
     });
 }
+
 date_default_timezone_set('Asia/Riyadh');
 ?>
 <!DOCTYPE html>
@@ -41,11 +52,11 @@ date_default_timezone_set('Asia/Riyadh');
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 310px; color: #e2e8f0; overflow-x: hidden; }
 
-        /* الشاشة الترحيبية */
+        /* الصفحة الترحيبية */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; transition: 1s ease-in-out; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
         .intro-icon { font-size: 80px; color: var(--main); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); text-shadow: 0 0 30px var(--main); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); text-shadow: 0 0 30px var(--main); } }
         @keyframes load { from { width: 0%; } to { width: 100%; } }
 
         /* الخلفية المتحركة */
@@ -53,7 +64,7 @@ date_default_timezone_set('Asia/Riyadh');
         .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* الهيدر الثابت */
+        /* الهيدر */
         .header-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 5px 15px; border-radius: 50px; color: #22c55e; font-size: 10px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px; }
         .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; }
@@ -80,7 +91,7 @@ date_default_timezone_set('Asia/Riyadh');
         .name-badge { padding: 5px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; color: #000; }
         
         .play-btn { width: 90%; margin: 20px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 50px; font-weight: 900; cursor: pointer; transition: 0.3s; }
-        .play-btn:hover { background: rgba(255,255,255,0.15); box-shadow: 0 0 20px rgba(225, 29, 72, 0.2); }
+        .play-btn:hover { background: rgba(255,255,255,0.15); }
 
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
@@ -106,7 +117,7 @@ date_default_timezone_set('Asia/Riyadh');
         <span>متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span>
     </div>
 
-    <div class="promo-text">للاشتراك في الباقة كاملة على جميع الأجهزة تواصل معنا عبر:</div>
+    <div class="promo-text">للاشتراك في الباقة كاملة تواصل معنا عبر:</div>
 
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
@@ -135,13 +146,13 @@ date_default_timezone_set('Asia/Riyadh');
     <?php 
     $sections = ['bein', 'shahad', 'mbc', 'alkas', 'on', 'ado', 'dubai', 'kuwait', 'star', 'moc', 'sky', 'plus'];
     foreach($sections as $sec): 
-        $channels = getChannels($sec, $channels_db);
+        $channels = getChannelsCloud($sec, $BIN_ID, $API_KEY);
     ?>
     <div id="section-<?php echo $sec; ?>" class="channel-section <?php echo ($sec == 'bein' ? 'active' : ''); ?>">
         <?php if(empty($channels)): ?>
             <div style="grid-column: 1/-1; text-align:center; padding:80px; opacity:0.3;">
                 <i class="fas fa-tv" style="font-size:40px; margin-bottom:10px;"></i>
-                <p>لا توجد قنوات حالياً في هذا القسم.</p>
+                <p>لا توجد قنوات حالياً.</p>
             </div>
         <?php endif; ?>
         
@@ -173,20 +184,17 @@ function switchSection(id, element) {
     element.classList.add('active');
 }
 
-// دالة التشغيل التلقائي الصامت - الحل النهائي عثمان
 function startStream(boxId, file, btn) {
     const container = document.getElementById(boxId);
     container.innerHTML = ""; 
-    
     const iframe = document.createElement('iframe');
-    // إضافة باراميترات التشغيل التلقائي والصمت
+    // التشغيل التلقائي مع الصمت لتجاوز حماية المتصفحات عثمان
     iframe.src = file + (file.includes('?') ? '&' : '?') + "autoplay=1&muted=1";
     iframe.allow = "autoplay; encrypted-media";
     iframe.allowFullscreen = true;
     iframe.style.width = "100%";
     iframe.style.height = "100%";
     iframe.style.border = "none";
-    
     container.appendChild(iframe);
     btn.innerText = "جاري البث...";
 }
