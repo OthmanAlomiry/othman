@@ -138,8 +138,8 @@ date_default_timezone_set('Asia/Riyadh');
         <div class="cat-item" onclick="switchSection('ado', this)"><img src="mg/ado.png"><span>أبوظبي</span></div>
         <div class="cat-item" onclick="switchSection('dubai', this)"><img src="mg/du.png"><span>دبي</span></div>
         <div class="cat-item" onclick="switchSection('kuwait', this)"><img src="mg/ku.png"><span>الكويت</span></div>
-        <div class="cat-item" onclick="switchSection('sporttv', this)"><img src="mg/sp.png"><span>Sport TV</span></div>
-        <div class="cat-item" onclick="switchSection('sky', this)"><img src="mg/sky.png"><span>Sky</span></div>
+        <div class="cat-item" onclick="switchSection('sporttv', this)"><img src="mg/sp.png"><span>Sky</span></div>
+        <div class="cat-item" onclick="switchSection('sky', this)"><img src="mg/sky.png"><span>Sport TV</span></div>
         <div class="cat-item" onclick="switchSection('plus', this)"><img src="mg/plus.png"><span>Canal+</span></div>
         <div class="cat-item" onclick="switchSection('star', this)"><img src="mg/star.png"><span>STARZPLAY</span></div>
         <div class="cat-item" onclick="switchSection('moc', this)"><img src="mg/moc.png"><span>المغربية</span></div>
