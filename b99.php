@@ -15,7 +15,7 @@
     <script>
         var video = document.getElementById('video');
         // رابط الـ Worker الخاص بك بعد التحديث
-        var videoSrc = 'https://still-surf-2ef3.othman1405.workers.dev';
+        var videoSrc = 'https://bein9.othman1405.workers.dev';
 
         if (Hls.isSupported()) {
             var hls = new Hls();
