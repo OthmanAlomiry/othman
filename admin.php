@@ -33,15 +33,43 @@ if(isset($_SESSION['ok'])){
     $res = callCloud("GET", $BIN_ID, $API_KEY);
     $channels = isset($res['record']['custom_channels']) ? $res['record']['custom_channels'] : [];
 
-    if(isset($_POST['add'])){
-        $channels[] = ['id'=>uniqid(), 'name'=>$_POST['n'], 'file'=>$_POST['f'], 'section'=>$_POST['s']];
+    // ميزة الحفظ (إضافة أو تعديل)
+    if(isset($_POST['save_ch'])){
+        $target_id = $_POST['edit_id'];
+        $ch_data = [
+            'id' => (!empty($target_id)) ? $target_id : uniqid(),
+            'name' => $_POST['n'],
+            'file' => $_POST['f'],
+            'section' => $_POST['s']
+        ];
+
+        if(!empty($target_id)){
+            // وضع التعديل
+            foreach($channels as &$c){
+                if($c['id'] == $target_id){ $c = $ch_data; break; }
+            }
+        } else {
+            // وضع الإضافة
+            $channels[] = $ch_data;
+        }
+
         callCloud("PUT", $BIN_ID, $API_KEY, ['custom_channels'=>array_values($channels)]);
         header("Location: admin.php"); exit;
     }
+
+    // ميزة الحذف
     if(isset($_GET['del'])){
         $channels = array_filter($channels, function($c){ return $c['id'] !== $_GET['del']; });
         callCloud("PUT", $BIN_ID, $API_KEY, ['custom_channels'=>array_values($channels)]);
         header("Location: admin.php"); exit;
+    }
+
+    // جلب بيانات القناة المراد تعديلها
+    $edit_ch = null;
+    if(isset($_GET['edit'])){
+        foreach($channels as $c){
+            if($c['id'] == $_GET['edit']){ $edit_ch = $c; break; }
+        }
     }
 }
 ?>
@@ -67,7 +95,9 @@ if(isset($_SESSION['ok'])){
             display: flex; justify-content: space-between; align-items: center;
         }
         .ch-info span { display: block; font-size: 12px; color: #aaa; }
-        .del-link { color: #ff4d4d; text-decoration: none; font-size: 14px; font-weight: bold; }
+        .actions { display: flex; gap: 10px; }
+        .del-link { color: #ff4d4d; text-decoration: none; font-size: 13px; font-weight: bold; }
+        .edit-link { color: #0ea5e9; text-decoration: none; font-size: 13px; font-weight: bold; }
         .logout { display: block; margin-top: 30px; color: #888; text-decoration: none; font-size: 13px; }
     </style>
 </head>
@@ -84,37 +114,42 @@ if(isset($_SESSION['ok'])){
     </div>
 <?php else: ?>
     <div class="box">
-        <h2>➕ إضافة قناة سحابية</h2>
+        <h2><?php echo $edit_ch ? "✏️ تعديل قناة" : "➕ إضافة قناة سحابية"; ?></h2>
         <form method="POST">
-            <input name="n" placeholder="اسم القناة (مثلاً: beIN 1)" required>
-            <input name="f" placeholder="اسم الملف (مثلاً: b1.php)" required>
+            <input type="hidden" name="edit_id" value="<?php echo $edit_ch ? $edit_ch['id'] : ''; ?>">
+            <input name="n" placeholder="اسم القناة" value="<?php echo $edit_ch ? $edit_ch['name'] : ''; ?>" required>
+            <input name="f" placeholder="اسم الملف" value="<?php echo $edit_ch ? $edit_ch['file'] : ''; ?>" required>
             <select name="s">
-                <option value="bein">beIN Sport</option>
-                <option value="shahad">شاهد الرياضية</option>
-                <option value="mbc">باقة MBC</option>
-                <option value="alkas">باقة الكاس</option>
-                <option value="on">On Sport</option>
-                <option value="ado">أبوظبي الرياضية</option>
-                <option value="dubai">دبي الرياضية</option>
-                <option value="kuwait">الكويت الرياضية</option>
-                <option value="star">STARZPLAY</option>
-                <option value="moc">الباقة المغربية</option>
-                <option value="sky">Sky Sport</option>
-                <option value="plus">Canal+</option>
+                <?php 
+                $sections = [
+                    'bein'=>'beIN Sport', 'shahad'=>'شاهد الرياضية', 'mbc'=>'باقة MBC', 
+                    'alkas'=>'باقة الكاس', 'on'=>'On Sport', 'ado'=>'أبوظبي الرياضية', 
+                    'dubai'=>'دبي الرياضية', 'kuwait'=>'الكويت الرياضية', 'sporttv'=>'Sport TV',
+                    'sky'=>'Sky Sport', 'plus'=>'Canal+', 'star'=>'STARZPLAY', 'moc'=>'الباقة المغربية'
+                ];
+                foreach($sections as $val => $name){
+                    $sel = ($edit_ch && $edit_ch['section'] == $val) ? "selected" : "";
+                    echo "<option value='$val' $sel>$name</option>";
+                }
+                ?>
             </select>
-            <button name="add">حفظ القناة في السحابة</button>
+            <button name="save_ch"><?php echo $edit_ch ? "تحديث البيانات" : "حفظ القناة"; ?></button>
+            <?php if($edit_ch): ?><a href="admin.php" style="display:block; text-align:center; color:#aaa; font-size:12px; margin-top:5px; text-decoration:none;">إلغاء التعديل</a><?php endif; ?>
         </form>
 
         <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
 
         <h2>📺 القنوات المضافة (<?php echo count($channels); ?>)</h2>
-        <?php foreach($channels as $c): ?>
+        <?php foreach(array_reverse($channels) as $c): ?>
             <div class="ch-card">
                 <div class="ch-info">
-                    <strong><?php echo $ch_name = $c['name']; ?></strong>
+                    <strong><?php echo $c['name']; ?></strong>
                     <span>القسم: <?php echo strtoupper($c['section']); ?> | الملف: <?php echo $c['file']; ?></span>
                 </div>
-                <a href="?del=<?php echo $c['id']; ?>" class="del-link" onclick="return confirm('حذف القناة؟')">حذف</a>
+                <div class="actions">
+                    <a href="?edit=<?php echo $c['id']; ?>" class="edit-link">تعديل</a>
+                    <a href="?del=<?php echo $c['id']; ?>" class="del-link" onclick="return confirm('حذف القناة؟')">حذف</a>
+                </div>
             </div>
         <?php endforeach; ?>
 
