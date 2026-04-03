@@ -1,19 +1,20 @@
+
+
 <?php
 /**
- * beIN Live - Low Bandwidth Edition
+ * beIN Live - Anti-Lag Edition
  * d-service.pro
  */
 
 $remote_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/67397.m3u8";
 $base_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/";
 
-// 1. معالجة قطع الفيديو مع تقليل ضغط الطلبات
+// 1. معالجة قطع الفيديو مع تحسين سرعة القراءة
 if (isset($_GET['ts'])) {
     $ts_url = urldecode($_GET['ts']);
     header("Content-Type: video/mp2t");
     header("Access-Control-Allow-Origin: *");
-    // زيادة مدة الكاش لتقليل إعادة تحميل نفس القطع
-    header("Cache-Control: public, max-age=30"); 
+    header("Cache-Control: public, max-age=10"); // زيادة الكاش لـ 10 ثواني للقطع لضمان السلاسة
 
     $opts = [
         "http" => [
@@ -25,12 +26,12 @@ if (isset($_GET['ts'])) {
     
     $context = stream_context_create($opts);
     
+    // استخدام fopen بدلاً من readfile للتحكم في تدفق البيانات بقطع كبيرة 64KB
     $fp = @fopen($ts_url, 'rb', false, $context);
     if ($fp) {
-        // تقليل حجم الـ Chunk لتقليل الضغط اللحظي على الباندويث
         while (!feof($fp)) {
-            echo fread($fp, 32768); // 32KB بدلاً من 64KB
-            flush();
+            echo fread($fp, 65536);
+            flush(); // إرسال البيانات للمتصفح فوراً دون انتظار امتلاء بفر PHP
         }
         fclose($fp);
     }
@@ -61,7 +62,7 @@ if (isset($_GET['m3u8'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>beIN Live PRO - Balanced</title>
+    <title>beIN Live PRO - Stable</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -78,29 +79,35 @@ if (isset($_GET['m3u8'])) {
         if (Hls.isSupported()) {
             var hls = new Hls({
                 enableWorker: true,
+                // نغلق الـ Low Latency لزيادة الثبات (لأن الثبات أهم من السرعة الآن)
                 lowLatencyMode: false, 
-                // تقليل البفر قليلاً من 30 إلى 15 لتوفير استهلاك البيانات الضائعة
-                maxBufferLength: 15,        
-                maxMaxBufferLength: 30,     
-                maxBufferSize: 30 * 1000 * 1000, 
                 
-                manifestLoadingMaxRetry: 10,
-                levelLoadingMaxRetry: 10,
-                nudgeOffset: 0.5,
+                // --- إعدادات الدرع الواقي من التقطيع ---
+                maxBufferLength: 30,        // سحب 30 ثانية من البث مسبقاً (احتياطي ضخم)
+                maxMaxBufferLength: 60,     // السماح بالوصول لدقيقة كاملة من التخزين
+                maxBufferSize: 60 * 1000 * 1000, // 60 ميجابايت من الذاكرة
+                
+                // معالجة الأخطاء والقفز التلقائي
+                manifestLoadingMaxRetry: 20,
+                levelLoadingMaxRetry: 20,
+                nudgeOffset: 0.5,           // قفزة أكبر (نصف ثانية) لتجاوز "الفريمات" التالفة
+                nudgeMaxRetry: 30,
+                
+                // تحسين سرعة استعادة البث
+                appendErrorMaxRetry: 10,
                 enableSoftwareAES: true
             });
             
             hls.loadSource(videoSrc);
             hls.attachMedia(video);
-            
-            // ميزة إضافية: إيقاف البث إذا خرج المستخدم من الصفحة لتوفير الباندويث
-            document.addEventListener("visibilitychange", function() {
-                if (document.hidden) {
-                    video.pause();
+            hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
+
+            hls.on(Hls.Events.ERROR, function (event, data) {
+                if (data.fatal) {
+                    if (data.type === Hls.ErrorTypes.NETWORK_ERROR) { hls.startLoad(); }
+                    else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) { hls.recoverMediaError(); }
                 }
             });
-
-            hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
         } 
         else if (video.canPlayType('application/vnd.apple.mpegurl')) {
             video.src = videoSrc;
