@@ -1,29 +1,31 @@
 <?php
 // رابط البث الأصلي
 $remoteUrl = "http://apk.arabic-ch.space/live/006900/index.m3u8";
+$baseUrl = "http://apk.arabic-ch.space/live/006900/";
 
-// استخراج الرابط الأساسي (Base URL) لجلب ملفات الـ .ts لاحقاً
-$baseUrl = substr($remoteUrl, 0, strrpos($remoteUrl, '/') + 1);
-
-$options = [
+// إعداد الطلب لمحاكاة متصفح حقيقي تماماً
+$opts = [
     "http" => [
-        "header" => "User-Agent: VLC/3.0.18 LibVLC/3.0.18\r\n",
-        "follow_location" => 1
+        "method" => "GET",
+        "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36\r\n" .
+                    "Accept: */*\r\n" .
+                    "Origin: http://apk.arabic-ch.space\r\n" . // إيهام السيرفر أن الطلب داخلي
+                    "Referer: http://apk.arabic-ch.space/\r\n"
     ]
 ];
 
-$context = stream_context_create($options);
+$context = stream_context_create($opts);
 $content = file_get_contents($remoteUrl, false, $context);
 
 if ($content === FALSE) {
-    die("تعذر الوصول للسيرفر الأصلي");
+    header("HTTP/1.1 403 Forbidden");
+    die("السيرفر الأصلي رفض الاتصال. قد يكون محظوراً على سيرفرات الاستضافة.");
 }
 
-// إضافة الرابط الأساسي قبل أي ملف .ts لا يحتوي على رابط كامل
-// هذا يضمن أن المتصفح يعرف من أين يحمل قطع الفيديو
-$content = preg_replace('/^(?!http)(.*\.ts)$/m', $baseUrl . '$1', $content);
+// تعديل الروابط الداخلية لملفات الـ .ts لتصبح روابط كاملة
+$content = preg_replace('/(?<!http:\/\/)(?<!https:\/\/)([\w\.-]+\.ts)/', $baseUrl . '$1', $content);
 
-// إرسال الترويسات
+// إرسال البيانات للمتصفح
 header("Content-Type: application/vnd.apple.mpegurl");
 header("Access-Control-Allow-Origin: *");
 header("Cache-Control: no-cache");
