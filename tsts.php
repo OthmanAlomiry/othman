@@ -1,30 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Live Player</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-</head>
-<body>
-    <video id="video" controls autoplay style="width:100%; max-width:800px;"></video>
+<?php
 
-    <script>
-      var video = document.getElementById('video');
-      var videoSrc = 'http://apk.arabic-ch.space/live/006900/index.m3u8';
+$base = "http://apk.arabic-ch.space/live/006900/";
+$file = "index.m3u8";
 
-      if (Hls.isSupported()) {
-        var hls = new Hls();
-        hls.loadSource(videoSrc);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
-          video.play();
-        });
-      }
-      else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = videoSrc;
-        video.addEventListener('loadedmetadata', function() {
-          video.play();
-        });
-      }
-    </script>
-</body>
-</html>
+function stream($url){
+
+$ch = curl_init($url);
+
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_BUFFERSIZE, 8192);
+curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
+curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch,$data){
+echo $data;
+flush();
+return strlen($data);
+});
+
+curl_exec($ch);
+curl_close($ch);
+
+}
+
+if(isset($_GET['ts'])){
+header("Content-Type: video/mp2t");
+stream($base.$_GET['ts']);
+exit;
+}
+
+header("Content-Type: application/vnd.apple.mpegurl");
+
+$m3u8 = file_get_contents($base.$file);
+$lines = explode("\n",$m3u8);
+
+foreach($lines as &$line){
+if(strpos($line,'.ts') !== false){
+$line = "tsts.php?ts=".$line;
+}
+}
+
+echo implode("\n",$lines);
+
+?>
