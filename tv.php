@@ -1,6 +1,6 @@
 <?php
 // الرابط غير الرسمي الذي زودتني به
-$remote_url = "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8";
+$remote_url = "http://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8";
 
 if (isset($_GET['stream'])) {
     // محاكاة دقيقة لـ VLC لتجاوز الحظر
@@ -23,7 +23,7 @@ if (isset($_GET['stream'])) {
     }
 
     // تعديل الروابط الداخلية لملفات الـ .ts لتصبح روابط كاملة
-    $base = "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/";
+    $base = "http://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/";
     $data = preg_replace('/([\w\.-]+\.ts)/', $base . '$1', $data);
 
     header("Content-Type: application/vnd.apple.mpegurl");
