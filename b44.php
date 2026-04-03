@@ -1,43 +1,39 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>beIN Live - d-service</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        video { width: 100%; height: auto; max-width: 100%; background: #000; }
-    </style>
-</head>
-<body>
+<?php
+// رابط القناة الأصلي
+$remote_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/67341.m3u8";
 
-    <video id="video" controls autoplay playsinline></video>
+if (isset($_GET['ts'])) {
+    // جلب قطع الفيديو مباشرة
+    $ts_url = urldecode($_GET['ts']);
+    header("Content-Type: video/mp2t");
+    $opts = ["http" => ["header" => "User-Agent: VLC/3.0.18\r\n"]];
+    $context = stream_context_create($opts);
+    readfile($ts_url, false, $context);
+    exit;
+}
 
-    <script>
-        var video = document.getElementById('video');
-        // رابط الـ Worker الخاص بك (تأكد أنه نفس الرابط السابق)
-        var videoSrc = 'https://bein4.othman1405.workers.dev';
+// جلب ملف القائمة وتعديل الروابط لتمر عبر هذا الملف نفسه
+$opts = ["http" => ["header" => "User-Agent: VLC/3.0.18\r\n"]];
+$context = stream_context_create($opts);
+$content = file_get_contents($remote_url, false, $context);
 
-        if (Hls.isSupported()) {
-            var hls = new Hls({
-                enableWorker: true,
-                lowLatencyMode: true,
-                manifestLoadingMaxRetry: 5,
-                levelLoadingMaxRetry: 5
-            });
-            hls.loadSource(videoSrc);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play();
-            });
-        } 
-        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = videoSrc;
-            video.addEventListener('loadedmetadata', function() {
-                video.play();
-            });
+if ($content) {
+    header("Content-Type: application/vnd.apple.mpegurl");
+    header("Access-Control-Allow-Origin: *");
+    
+    $base_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/";
+    $lines = explode("\n", $content);
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line && $line[0] !== '#') {
+            $full_ts = (strpos($line, 'http') === 0) ? $line : $base_url . $line;
+            echo "b44.php?ts=" . urlencode($full_ts) . "\n";
+        } else {
+            echo $line . "\n";
         }
-    </script>
-</body>
-</html>
+    }
+} else {
+    // إذا لم يعمل، سنعرض مشغل فيديو احتياطي يحاول الاتصال المباشر
+    include_once 'fallback_player.html'; 
+}
+exit;
