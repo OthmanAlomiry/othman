@@ -1,42 +1,42 @@
 <?php
 /**
- * beIN Live Stream Relay - d-service.pro
- * النسخة النهائية: أداء عالٍ + تشغيل سريع
+ * beIN Live Stream SD - d-service.pro
+ * نسخة الجودة المتوسطة: تشغيل فوري وبدون تقطيع
  */
 
-// رابط القناة الأصلي من سيرفر Lynx
-$remote_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/67341.m3u8";
+// الرابط الجديد ذو الجودة الأقل (SD)
+$remote_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/67397.m3u8";
 $base_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/";
 
-// 1. معالجة قطع الفيديو (TS) - الجزء المسؤول عن جلب الصورة والصوت
+// 1. معالجة قطع الفيديو (TS) - نقل البيانات بسرعة Chunks
 if (isset($_GET['ts'])) {
     $ts_url = urldecode($_GET['ts']);
     
     header("Content-Type: video/mp2t");
     header("Access-Control-Allow-Origin: *");
-    header("Cache-Control: no-cache, must-revalidate");
+    header("Cache-Control: public, max-age=3600"); // تخزين مؤقت خفيف للقطع
 
     $opts = [
         "http" => [
             "header" => "User-Agent: VLC/3.0.18\r\n",
-            "timeout" => 5 // تقليل وقت الانتظار للقطع المتأخرة
+            "timeout" => 5
         ]
     ];
     $context = stream_context_create($opts);
     
-    // استخدام حجم قطعة أكبر (64KB) لتدفق بيانات أسرع للمتصفح
+    // فتح الرابط ونقل البيانات بقطع 64KB لسرعة التدفق
     $handle = @fopen($ts_url, "rb", false, $context);
     if ($handle) {
         while (!feof($handle)) {
-            echo fread($handle, 65536); // نقل 64 كيلوبايت في كل دورة
-            flush(); // دفع البيانات فوراً للمشغل
+            echo fread($handle, 65536); 
+            flush(); 
         }
         fclose($handle);
     }
     exit;
 }
 
-// 2. معالجة قائمة التشغيل (m3u8) عند طلب المشغل لها
+// 2. معالجة قائمة التشغيل (m3u8) عند طلب المشغل
 if (isset($_GET['m3u8'])) {
     header("Content-Type: application/vnd.apple.mpegurl");
     header("Access-Control-Allow-Origin: *");
@@ -65,7 +65,7 @@ if (isset($_GET['m3u8'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>beIN SPORTS Live - D-Service</title>
+    <title>beIN SD Live - D-Service</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body, html { 
@@ -73,7 +73,7 @@ if (isset($_GET['m3u8'])) {
             background: #000; display: flex; align-items: center; 
             justify-content: center; overflow: hidden; 
         }
-        #video { width: 100%; height: auto; max-width: 100%; background: #000; }
+        #video { width: 100%; height: auto; max-width: 100%; }
     </style>
 </head>
 <body>
@@ -87,12 +87,10 @@ if (isset($_GET['m3u8'])) {
         if (Hls.isSupported()) {
             var hls = new Hls({
                 enableWorker: true,
-                lowLatencyMode: true, // وضع التأخير المنخفض للبدء فوراً
-                maxBufferLength: 10,  // تقليل حجم المخزن المؤقت للبدء بسرعة
-                maxMaxBufferLength: 20,
-                startLevel: -1,       // ترك اختيار أفضل جودة للمشغل تلقائياً
-                manifestLoadingMaxRetry: 10,
-                levelLoadingMaxRetry: 10
+                lowLatencyMode: true,
+                maxBufferLength: 5,   // تقليل البفر للبدء الفوري
+                maxMaxBufferLength: 10,
+                manifestLoadingMaxRetry: 20
             });
             
             hls.loadSource(videoSrc);
@@ -102,7 +100,6 @@ if (isset($_GET['m3u8'])) {
                 video.play();
             });
 
-            // إعادة المحاولة التلقائية في حال حدوث أي خطأ في السيرفر
             hls.on(Hls.Events.ERROR, function (event, data) {
                 if (data.fatal) {
                     switch (data.type) {
@@ -114,7 +111,7 @@ if (isset($_GET['m3u8'])) {
             });
         } 
         else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            // دعم متصفح Safari الأصلي في الآيفون
+            // دعم آيفون (سفاري)
             video.src = videoSrc;
             video.addEventListener('loadedmetadata', function() {
                 video.play();
