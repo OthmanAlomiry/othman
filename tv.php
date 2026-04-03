@@ -1,62 +1,71 @@
 <?php
-// --- الجزء الأول: معالجة البث (البروكسي) ---
-if (isset($_GET['get_stream'])) {
-    $url = "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8";
-    
-    $options = [
+// الرابط غير الرسمي الذي زودتني به
+$remote_url = "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/index.m3u8";
+
+if (isset($_GET['stream'])) {
+    // محاكاة دقيقة لـ VLC لتجاوز الحظر
+    $opts = [
         "http" => [
             "method" => "GET",
-            "header" => "User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)\r\n" .
-                        "Referer: https://shahid.mbc.net/\r\n" .
-                        "Origin: https://shahid.mbc.net\r\n"
+            "header" => "User-Agent: VLC/3.0.18 LibVLC/3.0.18\r\n" .
+                        "Accept: */*\r\n" .
+                        "Range: bytes=0-\r\n" .
+                        "Connection: close\r\n"
         ]
     ];
 
-    $context = stream_context_create($options);
-    $content = @file_get_contents($url, false, $context);
+    $context = stream_context_create($opts);
+    $data = @file_get_contents($remote_url, false, $context);
 
-    if ($content !== FALSE) {
-        // تحويل الروابط النسبية إلى روابط كاملة لضمان عملها في المتصفح
-        $base = "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/";
-        $content = preg_replace('/([\w\.-]+\.ts)/', $base . '$1', $content);
-        
-        header("Content-Type: application/vnd.apple.mpegurl");
-        header("Access-Control-Allow-Origin: *");
-        echo $content;
-        exit;
+    if ($data === FALSE) {
+        header("HTTP/1.1 403 Forbidden");
+        die("السيرفر الأصلي حظر الوصول من سيرفر الاستضافة.");
     }
+
+    // تعديل الروابط الداخلية لملفات الـ .ts لتصبح روابط كاملة
+    $base = "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-masr-2/754931856515075b0aabf0e583495c68/";
+    $data = preg_replace('/([\w\.-]+\.ts)/', $base . '$1', $data);
+
+    header("Content-Type: application/vnd.apple.mpegurl");
+    header("Access-Control-Allow-Origin: *");
+    echo $data;
+    exit;
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D-Service | بث مباشر MBC Masr 2</title>
-    
-    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <title>D-Service Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        body { background-color: #1a1a1a; color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: auto; }
-        .video-js { width: 100% !important; height: 450px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h1 { color: #f39c12; margin-bottom: 20px; }
-        .status { margin-top: 10px; font-size: 14px; color: #aaa; }
+        body { background: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        video { width: 100%; max-width: 800px; background: #222; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>D-Service Live</h1>
-    
-    <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" poster="https://d-service.pro/logo.png" data-setup='{}'>
-        <source src="?get_stream=1" type="application/vnd.apple.mpegurl">
-        <p class="vjs-no-js">متصفحك لا يدعم تشغيل الفيديو، يرجى تحديث المتصفح.</p>
-    </video>
+<video id="video" controls autoplay playsinline></video>
 
-    <div class="status">البث المباشر: MBC Masr 2 (HD)</div>
-</div>
+<script>
+  var video = document.getElementById('video');
+  // الرابط يشير لنفس الملف مع بارامتر السيرفر
+  var videoSrc = window.location.href.split('?')[0] + '?stream=1';
 
-<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+  if (Hls.isSupported()) {
+    var hls = new Hls({
+        xhrSetup: function (xhr, url) {
+            xhr.withCredentials = false; // لتجنب مشاكل CORS
+        }
+    });
+    hls.loadSource(videoSrc);
+    hls.attachMedia(video);
+  } 
+  else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = videoSrc;
+  }
+</script>
 </body>
 </html>
