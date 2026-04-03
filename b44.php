@@ -1,42 +1,17 @@
 <?php
 /**
- * beIN Live PRO - Cloudflare Edition (Zero Render Usage)
+ * beIN Live PRO - Zero Bandwidth & High Stability
+ * d-service.pro
  */
 
-// ضع رابط الـ Worker الخاص بك هنا
-$cloudflare_worker_url = "https://bein4.othman1405.workers.dev"; 
-
+// الرابط الأصلي للقناة
 $remote_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/67397.m3u8";
-$base_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/";
-
-if (isset($_GET['m3u8'])) {
-    header("Content-Type: application/vnd.apple.mpegurl");
-    header("Access-Control-Allow-Origin: *");
-    
-    $opts = ["http" => ["header" => "User-Agent: VLC/3.0.18\r\n"]];
-    $content = @file_get_contents($remote_url, false, stream_context_create($opts));
-    
-    if ($content) {
-        $lines = explode("\n", $content);
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line && $line[0] !== '#') {
-                $full_ts = (strpos($line, 'http') === 0) ? $line : $base_url . $line;
-                // الطلب يذهب للـ Worker مباشرة
-                echo $cloudflare_worker_url . "?ts=" . urlencode($full_ts) . "\n";
-            } else {
-                echo $line . "\n";
-            }
-        }
-    }
-    exit;
-}
 ?>
 <!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>beIN Live PRO - Stable</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
@@ -49,17 +24,25 @@ if (isset($_GET['m3u8'])) {
 
     <script>
         var video = document.getElementById('video');
-        var videoSrc = 'b44.php?m3u8=true';
+        // الرابط المباشر من السيرفر الأصلي
+        var videoSrc = '<?php echo $remote_url; ?>';
 
         if (Hls.isSupported()) {
             var hls = new Hls({
                 enableWorker: true,
                 lowLatencyMode: false, 
-                maxBufferLength: 30, // البفر الذي طلبته لتقليل التقطيع
+                // إعدادات البفر التي طلبتها لضمان عدم التقطيع
+                maxBufferLength: 30,        
                 maxMaxBufferLength: 60,
+                maxBufferSize: 60 * 1000 * 1000,
+                
+                manifestLoadingMaxRetry: 20,
+                levelLoadingMaxRetry: 20,
                 nudgeOffset: 0.5,
+                nudgeMaxRetry: 30,
                 enableSoftwareAES: true,
-                // إضافة مهمة لضمان عمل طلبات الـ Worker
+                
+                // هذه الإعدادات تجعل المتصفح يطلب الفيديو مباشرة دون وسيط
                 xhrSetup: function(xhr, url) {
                     xhr.withCredentials = false;
                 }
@@ -67,9 +50,24 @@ if (isset($_GET['m3u8'])) {
             
             hls.loadSource(videoSrc);
             hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play().catch(function(e) {
+                    console.log("Auto-play blocked, waiting for interaction");
+                });
+            });
+
+            hls.on(Hls.Events.ERROR, function (event, data) {
+                if (data.fatal) {
+                    switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR: hls.startLoad(); break;
+                        case Hls.ErrorTypes.MEDIA_ERROR: hls.recoverMediaError(); break;
+                        default: hls.destroy(); break;
+                    }
+                }
+            });
         } 
         else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            // دعم الآيفون (سفاري) المباشر
             video.src = videoSrc;
         }
     </script>
