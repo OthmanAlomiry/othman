@@ -1,55 +1,34 @@
 <?php
 /**
- * beIN Live - Anti-Lag Edition
+ * beIN Live - Cloudflare Integrated Edition
  * d-service.pro
  */
+
+// رابط الـ Worker الخاص بك الذي أنشأته للتو
+$cloudflare_worker_url = "https://bein4.othman1405.workers.dev"; 
 
 $remote_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/67397.m3u8";
 $base_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/";
 
-// 1. معالجة قطع الفيديو مع تحسين سرعة القراءة
-if (isset($_GET['ts'])) {
-    $ts_url = urldecode($_GET['ts']);
-    header("Content-Type: video/mp2t");
-    header("Access-Control-Allow-Origin: *");
-    header("Cache-Control: public, max-age=10"); // زيادة الكاش لـ 10 ثواني للقطع لضمان السلاسة
-
-    $opts = [
-        "http" => [
-            "header" => "User-Agent: VLC/3.0.18\r\n",
-            "method" => "GET",
-            "timeout" => 5
-        ]
-    ];
-    
-    $context = stream_context_create($opts);
-    
-    // استخدام fopen بدلاً من readfile للتحكم في تدفق البيانات بقطع كبيرة 64KB
-    $fp = @fopen($ts_url, 'rb', false, $context);
-    if ($fp) {
-        while (!feof($fp)) {
-            echo fread($fp, 65536);
-            flush(); // إرسال البيانات للمتصفح فوراً دون انتظار امتلاء بفر PHP
-        }
-        fclose($fp);
-    }
-    exit;
-}
-
-// 2. معالجة قائمة التشغيل
+// معالجة قائمة التشغيل m3u8 عند طلب المشغل لها
 if (isset($_GET['m3u8'])) {
     header("Content-Type: application/vnd.apple.mpegurl");
     header("Access-Control-Allow-Origin: *");
     
-    $content = @file_get_contents($remote_url, false, stream_context_create(["http" => ["header" => "User-Agent: VLC/3.0.18\r\n"]]));
+    $opts = ["http" => ["header" => "User-Agent: VLC/3.0.18\r\n"]];
+    $content = @file_get_contents($remote_url, false, stream_context_create($opts));
+    
     if ($content) {
         $lines = explode("\n", $content);
         foreach ($lines as $line) {
             $line = trim($line);
             if ($line && $line[0] !== '#') {
                 $full_ts = (strpos($line, 'http') === 0) ? $line : $base_url . $line;
-                echo "b44.php?ts=" . urlencode($full_ts) . "\n";
-            } else { echo $line . "\n"; }
+                // توجيه روابط الفيديو (TS) لتمر عبر Cloudflare Worker الخاص بك
+                echo $cloudflare_worker_url . "?ts=" . urlencode($full_ts) . "\n";
+            } else {
+                echo $line . "\n";
+            }
         }
     }
     exit;
@@ -60,7 +39,7 @@ if (isset($_GET['m3u8'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>beIN Live PRO - Stable</title>
+    <title>beIN Live PRO - Cloud Powered</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -77,22 +56,12 @@ if (isset($_GET['m3u8'])) {
         if (Hls.isSupported()) {
             var hls = new Hls({
                 enableWorker: true,
-                // نغلق الـ Low Latency لزيادة الثبات (لأن الثبات أهم من السرعة الآن)
-                lowLatencyMode: false, 
-                
-                // --- إعدادات الدرع الواقي من التقطيع ---
-                maxBufferLength: 30,        // سحب 30 ثانية من البث مسبقاً (احتياطي ضخم)
-                maxMaxBufferLength: 60,     // السماح بالوصول لدقيقة كاملة من التخزين
-                maxBufferSize: 60 * 1000 * 1000, // 60 ميجابايت من الذاكرة
-                
-                // معالجة الأخطاء والقفز التلقائي
+                lowLatencyMode: false, // نغلقه لزيادة الثبات عبر الكاش
+                maxBufferLength: 30,   // سحب 30 ثانية احتياطياً لامتصاص أي تقطيع
+                maxMaxBufferLength: 60,
                 manifestLoadingMaxRetry: 20,
                 levelLoadingMaxRetry: 20,
-                nudgeOffset: 0.5,           // قفزة أكبر (نصف ثانية) لتجاوز "الفريمات" التالفة
-                nudgeMaxRetry: 30,
-                
-                // تحسين سرعة استعادة البث
-                appendErrorMaxRetry: 10,
+                nudgeOffset: 0.5,
                 enableSoftwareAES: true
             });
             
