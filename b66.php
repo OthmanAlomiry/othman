@@ -51,7 +51,7 @@ if (isset($_GET['m3u8'])) {
             $line = trim($line);
             if ($line && $line[0] !== '#') {
                 $full_ts = (strpos($line, 'http') === 0) ? $line : $base_url . $line;
-                echo "b44.php?ts=" . urlencode($full_ts) . "\n";
+                echo "b66.php?ts=" . urlencode($full_ts) . "\n";
             } else {
                 echo $line . "\n";
             }
