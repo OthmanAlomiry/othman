@@ -1,16 +1,16 @@
 <?php
 /**
- * beIN Live - Cloudflare Integrated Edition
+ * beIN Live - Cloudflare Powered (Zero Bandwidth on Render)
  * d-service.pro
  */
 
-// رابط الـ Worker الخاص بك الذي أنشأته للتو
+// ضع رابط الـ Worker الخاص بك هنا
 $cloudflare_worker_url = "https://bein4.othman1405.workers.dev"; 
 
 $remote_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/67397.m3u8";
 $base_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/";
 
-// معالجة قائمة التشغيل m3u8 عند طلب المشغل لها
+// معالجة قائمة التشغيل - هذا الجزء لا يستهلك باندويث لأنه نصوص فقط
 if (isset($_GET['m3u8'])) {
     header("Content-Type: application/vnd.apple.mpegurl");
     header("Access-Control-Allow-Origin: *");
@@ -24,7 +24,7 @@ if (isset($_GET['m3u8'])) {
             $line = trim($line);
             if ($line && $line[0] !== '#') {
                 $full_ts = (strpos($line, 'http') === 0) ? $line : $base_url . $line;
-                // توجيه روابط الفيديو (TS) لتمر عبر Cloudflare Worker الخاص بك
+                // هنا السر: بدلاً من استدعاء b44.php?ts، نستدعي Cloudflare مباشرة
                 echo $cloudflare_worker_url . "?ts=" . urlencode($full_ts) . "\n";
             } else {
                 echo $line . "\n";
@@ -39,7 +39,7 @@ if (isset($_GET['m3u8'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>beIN Live PRO - Cloud Powered</title>
+    <title>beIN Live PRO - Stable</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -51,13 +51,14 @@ if (isset($_GET['m3u8'])) {
 
     <script>
         var video = document.getElementById('video');
+        // يتم طلب ملف القائمة من Render (حجمه صغير جداً)
         var videoSrc = 'b44.php?m3u8=true';
 
         if (Hls.isSupported()) {
             var hls = new Hls({
                 enableWorker: true,
-                lowLatencyMode: false, // نغلقه لزيادة الثبات عبر الكاش
-                maxBufferLength: 30,   // سحب 30 ثانية احتياطياً لامتصاص أي تقطيع
+                lowLatencyMode: false, 
+                maxBufferLength: 30,        // سحب 30 ثانية احتياطياً
                 maxMaxBufferLength: 60,
                 manifestLoadingMaxRetry: 20,
                 levelLoadingMaxRetry: 20,
