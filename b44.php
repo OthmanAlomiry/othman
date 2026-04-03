@@ -1,5 +1,3 @@
-
-
 <?php
 /**
  * beIN Live - Anti-Lag Edition
