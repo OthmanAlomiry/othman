@@ -1,44 +1,28 @@
 <?php
+// رابط البث الأصلي
+$remoteUrl = "http://apk.arabic-ch.space/live/006900/index.m3u8";
 
-$base = "http://apk.arabic-ch.space/live/006900/";
-$file = "index.m3u8";
+// إعدادات الطلب لمحاكاة برنامج VLC أو متصفح حقيقي
+$options = [
+    "http" => [
+        "header" => "User-Agent: VLC/3.0.18 LibVLC/3.0.18\r\n", // محاكاة VLC
+        "follow_location" => 1,
+        "timeout" => 10
+    ]
+];
 
-function stream($url){
+$context = stream_context_create($options);
+$content = file_get_contents($remoteUrl, false, $context);
 
-$ch = curl_init($url);
-
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-curl_setopt($ch, CURLOPT_BUFFERSIZE, 8192);
-curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
-curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch,$data){
-echo $data;
-flush();
-return strlen($data);
-});
-
-curl_exec($ch);
-curl_close($ch);
-
+if ($content === FALSE) {
+    header("HTTP/1.1 500 Internal Server Error");
+    echo "خطأ في الاتصال بسيرفر البث.";
+    exit;
 }
 
-if(isset($_GET['ts'])){
-header("Content-Type: video/mp2t");
-stream($base.$_GET['ts']);
-exit;
-}
-
+// إرسال الترويسات المناسبة للمتصفح ليقرأ الملف كبث فيديو
 header("Content-Type: application/vnd.apple.mpegurl");
+header("Access-Control-Allow-Origin: *"); // لحل مشكلة CORS
+header("Cache-Control: no-cache");
 
-$m3u8 = file_get_contents($base.$file);
-$lines = explode("\n",$m3u8);
-
-foreach($lines as &$line){
-if(strpos($line,'.ts') !== false){
-$line = "tsts.php?ts=".$line;
-}
-}
-
-echo implode("\n",$lines);
-
-?>
+echo $content;
