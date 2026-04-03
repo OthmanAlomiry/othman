@@ -1,7 +1,6 @@
 <?php
 /**
- * beIN Live - Cloudflare Powered (Zero Bandwidth on Render)
- * d-service.pro
+ * beIN Live PRO - Cloudflare Edition (Zero Render Usage)
  */
 
 // ضع رابط الـ Worker الخاص بك هنا
@@ -10,7 +9,6 @@ $cloudflare_worker_url = "https://bein4.othman1405.workers.dev";
 $remote_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/67397.m3u8";
 $base_url = "http://ibo.lynxiptv.com/live/276983819492/Dm00SSnT73/";
 
-// معالجة قائمة التشغيل - هذا الجزء لا يستهلك باندويث لأنه نصوص فقط
 if (isset($_GET['m3u8'])) {
     header("Content-Type: application/vnd.apple.mpegurl");
     header("Access-Control-Allow-Origin: *");
@@ -24,7 +22,7 @@ if (isset($_GET['m3u8'])) {
             $line = trim($line);
             if ($line && $line[0] !== '#') {
                 $full_ts = (strpos($line, 'http') === 0) ? $line : $base_url . $line;
-                // هنا السر: بدلاً من استدعاء b44.php?ts، نستدعي Cloudflare مباشرة
+                // الطلب يذهب للـ Worker مباشرة
                 echo $cloudflare_worker_url . "?ts=" . urlencode($full_ts) . "\n";
             } else {
                 echo $line . "\n";
@@ -38,7 +36,7 @@ if (isset($_GET['m3u8'])) {
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>beIN Live PRO - Stable</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
@@ -51,31 +49,25 @@ if (isset($_GET['m3u8'])) {
 
     <script>
         var video = document.getElementById('video');
-        // يتم طلب ملف القائمة من Render (حجمه صغير جداً)
         var videoSrc = 'b44.php?m3u8=true';
 
         if (Hls.isSupported()) {
             var hls = new Hls({
                 enableWorker: true,
                 lowLatencyMode: false, 
-                maxBufferLength: 30,        // سحب 30 ثانية احتياطياً
+                maxBufferLength: 30, // البفر الذي طلبته لتقليل التقطيع
                 maxMaxBufferLength: 60,
-                manifestLoadingMaxRetry: 20,
-                levelLoadingMaxRetry: 20,
                 nudgeOffset: 0.5,
-                enableSoftwareAES: true
+                enableSoftwareAES: true,
+                // إضافة مهمة لضمان عمل طلبات الـ Worker
+                xhrSetup: function(xhr, url) {
+                    xhr.withCredentials = false;
+                }
             });
             
             hls.loadSource(videoSrc);
             hls.attachMedia(video);
             hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
-
-            hls.on(Hls.Events.ERROR, function (event, data) {
-                if (data.fatal) {
-                    if (data.type === Hls.ErrorTypes.NETWORK_ERROR) { hls.startLoad(); }
-                    else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) { hls.recoverMediaError(); }
-                }
-            });
         } 
         else if (video.canPlayType('application/vnd.apple.mpegurl')) {
             video.src = videoSrc;
