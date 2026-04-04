@@ -1,7 +1,7 @@
 <?php
 
-$base = "http://xmrcars.org:8080/bn3hd/";
-$file = "mono.m3u8";
+$base = "http://sportook.online/BEIN-SP2/";
+$file = "video.m3u8";
 
 function stream($url){
 
