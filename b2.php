@@ -1,6 +1,6 @@
 <?php
 
-$base = "http://xmrcars.org:8080/bn2hd/";
+$base = "http://sportook.online/BEIN-SP2/tracks-v1a1/";
 $file = "mono.m3u8";
 
 function stream($url){
