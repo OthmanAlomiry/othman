@@ -1,6 +1,6 @@
 <?php
 
-$base = "http://sportook.online/BEIN-SP2/";
+$base = "http://sportook.online/BEIN-SP3/";
 $file = "video.m3u8";
 
 function stream($url){
