@@ -1,7 +1,7 @@
 <?php
 
-$base = "http://sportfet.shop/BEIN-S4/tracks-v1a1/";
-$file = "mono.m3u8";
+$base = "http://sportook.online/BEIN-SP4/";
+$file = "video.m3u8";
 
 function stream($url){
 
