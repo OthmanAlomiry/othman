@@ -75,16 +75,16 @@ date_default_timezone_set('Asia/Riyadh');
         .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
         .social-btn:hover { transform: translateY(-2px); }
 
-        /* تعديل الشريط الإخباري: انسيابي، أكبر، ومن اليسار لليمين عثمان */
-        .news-ticker { background: rgba(225, 29, 72, 0.18); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 42px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
-        .ticker-label { background: var(--main); color: #fff; padding: 0 15px; height: 100%; display: flex; align-items: center; font-size: 11px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
-        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
-        .ticker-move { display: inline-block; white-space: nowrap; animation: ticker-scroll 20s linear infinite; padding-left: 100%; }
-        .ticker-text { color: #fff; font-size: 15px; font-weight: 700; padding: 0 40px; display: inline-block; }
+        /* تعديل الشريط الإخباري: سرعة هادئة، مقاس أصغر، انسيابية تامة عثمان */
+        .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 35px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
+        .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+        .ticker-wrap { flex: 1; overflow: hidden; direction: rtl; position: relative; width: 100%; height: 100%; display: flex; align-items: center; padding-right: 80px; }
+        .ticker-move { display: inline-block; white-space: nowrap; animation: ticker-scroll-rtl 40s linear infinite; }
+        .ticker-text { color: #fff; font-size: 13px; font-weight: 700; padding: 0 60px; display: inline-block; }
         
-        @keyframes ticker-scroll {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        @keyframes ticker-scroll-rtl {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
         }
 
         .category-tabs { display: flex; gap: 10px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 8px 0; }
@@ -97,13 +97,10 @@ date_default_timezone_set('Asia/Riyadh');
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; margin-top: 0px; }
         .channel-section { display: none; grid-column: 1/-1; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
         .channel-section.active { display: grid; animation: slideUp 0.6s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
         .card { background: var(--glass); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
         .c-head { padding: 15px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         .name-badge { padding: 5px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; color: #000; background: var(--blue-grad); }
         .play-btn { width: 90%; margin: 20px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 50px; font-weight: 900; cursor: pointer; }
-        
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
         footer { text-align: center; padding: 50px; font-size: 11px; opacity: 0.5; }
