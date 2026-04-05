@@ -75,6 +75,7 @@ date_default_timezone_set('Asia/Riyadh');
         .intro-subtitle { color: #94a3b8; font-size: 14px; margin-top: 5px; }
         .loading-bar { width: 150px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 30px; overflow: hidden; position: relative; }
         .loading-bar::after { content: ""; position: absolute; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--main), transparent); animation: loadingMove 1.5s infinite; }
+
         @keyframes glowPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes loadingMove { 100% { left: 100%; } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -89,33 +90,34 @@ date_default_timezone_set('Asia/Riyadh');
         .social-btn { 
             padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; 
             font-size: 9px; color: #fff; transition: 0.3s; flex: 1; text-align: center;
-            border: 1.5px solid #ffffff; /* حدود بيضاء عثمان */
+            border: 1.5px solid #ffffff; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .social-btn:hover { transform: translateY(-3px); filter: brightness(1.2); }
-        .btn-wa { background: #25d366; }
-        .btn-tg { background: #0088cc; }
-        .btn-sn { background: #FFFC00; color: #000 !important; }
-        .btn-tw { background: #000; }
+        .btn-wa { background: #25d366; } .btn-tg { background: #0088cc; } .btn-sn { background: #FFFC00; color: #000 !important; } .btn-tw { background: #000; }
 
-        /* الشريط الإخباري المستمر */
+        /* الشريط الإخباري */
         .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
-        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; display: flex; align-items: center; }
+        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
         .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 60s linear infinite; width: max-content; }
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
         /* الأقسام */
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
+        .category-tabs::-webkit-scrollbar { display: none; }
         .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.4s; }
         .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.03); }
         .cat-item img { width: 26px; height: 26px; object-fit: contain; margin-bottom: 4px; }
         .cat-item span { font-size: 8px; font-weight: 900; color: #fff; display: block; }
 
-        /* كروت القنوات */
+        /* الشبكة والكروت */
         .grid { padding: 15px; }
-        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 20px; }
+        .channel-section { display: none; width: 100%; }
+        .channel-section.active { display: block; animation: slideUp 0.6s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 20px; width: 100%; }
         .c-head { padding: 12px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         .name-badge { padding: 5px 12px; border-radius: 10px; font-size: 10px; font-weight: 900; color: #000; background: var(--blue-grad); }
         .play-btn { width: 90%; margin: 15px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 12px; }
@@ -195,7 +197,7 @@ date_default_timezone_set('Asia/Riyadh');
     <div class="grid">
         <?php $count = 0; foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
         <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($count == 0 ? 'active' : '') ?>">
-            <?php if(empty($channels)): ?><div style="grid-column: 1/-1; text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div><?php endif; ?>
+            <?php if(empty($channels)): ?><div style="text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div><?php endif; ?>
             <?php foreach($channels as $ch): ?>
             <div class="card">
                 <div class="c-head"><div class="name-badge"><?= $ch['name'] ?></div><div style="color:#ff4d4d; animation: blink 1s infinite; font-weight:900; font-size:10px;">● مباشر</div></div>
@@ -257,14 +259,21 @@ window.addEventListener('load', () => {
 function switchSection(id, element) {
     document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
-    document.getElementById('section-' + id).classList.add('active');
+    let target = document.getElementById('section-' + id);
+    if(target) target.classList.add('active');
     element.classList.add('active');
 }
+
 function startStream(boxId, file, btn) {
     document.getElementById(boxId).innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
     btn.innerText = "تم الاتصال";
 }
-setInterval(() => { fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(count => { document.getElementById('realtime-visitors').innerText = count; }); }, 4000);
+
+setInterval(() => { 
+    fetch(window.location.pathname + '?fetch_visitors=1')
+    .then(res => res.text())
+    .then(count => { document.getElementById('realtime-visitors').innerText = count; }); 
+}, 4000);
 </script>
 </body>
 </html>
