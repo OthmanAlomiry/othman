@@ -56,8 +56,8 @@ date_default_timezone_set('Asia/Riyadh');
             --blue-grad: linear-gradient(45deg, #0ea5e9, #fff);
         }
         
-        /* ضبط المسافة لتكون 240 بكسل عثمان (لإغلاق الفجوة) */
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 240px; color: #e2e8f0; overflow-x: hidden; }
+        /* ضبط المسافة النهائية 210px لتقليل الفراغ عثمان */
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 210px; color: #e2e8f0; overflow-x: hidden; }
 
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; transition: 1s ease-in-out; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
@@ -74,30 +74,27 @@ date_default_timezone_set('Asia/Riyadh');
 
         .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
         .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
-        .social-btn:hover { transform: translateY(-2px); }
 
-        .news-ticker { background: rgba(225, 29, 72, 0.12); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 6px 0; overflow: hidden; white-space: nowrap; margin-bottom: 8px; display: flex; align-items: center; }
-        .news-ticker marquee { color: #fff; font-size: 11px; font-weight: 700; flex: 1; }
-        .ticker-label { background: var(--main); color: #fff; padding: 2px 10px; border-radius: 4px; font-size: 9px; margin-right: 10px; font-weight: 900; z-index: 2; }
+        /* تعديل الشريط الإخباري ليبدأ فوراً عثمان */
+        .news-ticker { background: rgba(225, 29, 72, 0.12); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 6px 0; overflow: hidden; display: flex; align-items: center; position: relative; margin-bottom: 8px; }
+        .ticker-label { background: var(--main); color: #fff; padding: 2px 10px; border-radius: 4px; font-size: 9px; margin-right: 10px; font-weight: 900; z-index: 5; position: relative; }
+        .ticker-wrap { width: 100%; overflow: hidden; padding-left: 100%; }
+        .ticker-move { display: inline-block; white-space: nowrap; padding-right: 100%; animation: tickerMove 20s linear infinite; color: #fff; font-size: 11px; font-weight: 700; }
+        @keyframes tickerMove { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
         .category-tabs { display: flex; gap: 10px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
-        .category-tabs::-webkit-scrollbar { display: none; }
-        .cat-item { min-width: 70px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 15px; cursor: pointer; text-align: center; transition: 0.4s; }
-        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.03); }
+        .cat-item { min-width: 70px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 15px; cursor: pointer; text-align: center; }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
         .cat-item img { width: 28px; height: 28px; object-fit: contain; margin-bottom: 4px; }
         .cat-item span { font-size: 9px; font-weight: 900; color: #fff; display: block; }
 
-        /* تقليل الـ margin-top هنا لتقريب الكروت أكثر عثمان */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; margin-top: 0px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; margin-top: -10px; }
         .channel-section { display: none; grid-column: 1/-1; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
         .channel-section.active { display: grid; animation: slideUp 0.6s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
         .card { background: var(--glass); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
         .c-head { padding: 15px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         .name-badge { padding: 5px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; color: #000; background: var(--blue-grad); }
         .play-btn { width: 90%; margin: 20px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 50px; font-weight: 900; cursor: pointer; }
-        
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
         footer { text-align: center; padding: 50px; font-size: 11px; opacity: 0.5; }
@@ -125,7 +122,9 @@ date_default_timezone_set('Asia/Riyadh');
     <?php if($news['status'] == 'show'): ?>
     <div class="news-ticker">
         <span class="ticker-label">تنبيهات</span>
-        <marquee behavior="scroll" direction="right" scrollamount="6"><?= $news['text'] ?></marquee>
+        <div class="ticker-wrap">
+            <div class="ticker-move"><?= $news['text'] ?></div>
+        </div>
     </div>
     <?php endif; ?>
 
