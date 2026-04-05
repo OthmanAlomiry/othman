@@ -63,7 +63,6 @@ date_default_timezone_set('Asia/Riyadh');
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 260px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; }
 
-        /* حاوية الصفحة لتصغير العرض كما في الصورة عثمان */
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; }
 
         /* شاشة الدخول الاحترافية */
@@ -76,33 +75,32 @@ date_default_timezone_set('Asia/Riyadh');
         .intro-subtitle { color: #94a3b8; font-size: 14px; margin-top: 5px; }
         .loading-bar { width: 150px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 30px; overflow: hidden; position: relative; }
         .loading-bar::after { content: ""; position: absolute; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--main), transparent); animation: loadingMove 1.5s infinite; }
-
         @keyframes glowPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes loadingMove { 100% { left: 100%; } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* الهيدر الثابت داخل الحاوية المصغرة */
+        /* الهيدر الثابت */
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 14px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
         .promo-text { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 10px; }
         
-        /* أزرار التواصل الاجتماعي مع توهج وحدود عثمان */
-        .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; padding: 0 10px; }
+        /* أزرار التواصل الاجتماعي - سطر واحد وحدود بيضاء عثمان */
+        .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 12px; flex-wrap: nowrap; padding: 0 10px; }
         .social-btn { 
-            padding: 6px 12px; border-radius: 50px; text-decoration: none; font-weight: bold; 
-            font-size: 9px; color: #fff; transition: 0.3s; flex: 1; min-width: 70px; text-align: center;
-            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; 
+            font-size: 9px; color: #fff; transition: 0.3s; flex: 1; text-align: center;
+            border: 1.5px solid #ffffff; /* حدود بيضاء عثمان */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .social-btn:hover { transform: translateY(-3px); box-shadow: 0 0 15px currentColor; border-color: #fff; }
-        /* ألوان التوهج المخصصة */
-        .btn-wa { background: #25d366; box-shadow: 0 0 12px rgba(37, 211, 102, 0.3); }
-        .btn-tg { background: #0088cc; box-shadow: 0 0 12px rgba(0, 136, 204, 0.3); }
-        .btn-sn { background: #FFFC00; color: #000 !important; box-shadow: 0 0 12px rgba(255, 252, 0, 0.3); }
-        .btn-tw { background: #000; border: 1px solid #333; box-shadow: 0 0 12px rgba(255, 255, 255, 0.1); }
+        .social-btn:hover { transform: translateY(-3px); filter: brightness(1.2); }
+        .btn-wa { background: #25d366; }
+        .btn-tg { background: #0088cc; }
+        .btn-sn { background: #FFFC00; color: #000 !important; }
+        .btn-tw { background: #000; }
 
         /* الشريط الإخباري المستمر */
         .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
-        .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
+        .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
         .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; display: flex; align-items: center; }
         .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 60s linear infinite; width: max-content; }
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
@@ -131,7 +129,6 @@ date_default_timezone_set('Asia/Riyadh');
         .panel-header { background: var(--main); color: white; padding: 12px; font-weight: 900; font-size: 13px; display: flex; justify-content: space-between; }
         .panel-list { overflow-y: auto; padding: 10px; }
         .notify-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 10px; margin-bottom: 6px; border-right: 3px solid #0ea5e9; font-size: 11px; }
-
         .notify-bell-btn { position: fixed; bottom: 25px; left: 20px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; }
         .notify-dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; }
 
