@@ -1,187 +1,240 @@
 <?php
 session_start();
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+error_reporting(0);
 
-// --- بيانات السحابة ---
+// --- بيانات السحابة الخاصة بك عثمان ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69c4ad66c3097a1dd55f06d6';
-$user_admin = "othman"; $pass_admin = "1405";
 
-if(isset($_GET['out'])){ session_destroy(); header("Location: admin.php"); exit; }
-if(isset($_POST['login'])){
-    if($_POST['u'] == $user_admin && $_POST['p'] == $pass_admin){ $_SESSION['ok'] = true; }
+// دالة فحص الإشعارات (تستخدمها تقنية AJAX)
+if(isset($_GET['check_notify'])) {
+    $ch = curl_init("https://api.jsonbin.io/v3/b/" . $BIN_ID . "/latest");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $API_KEY, "X-Bin-Meta: false"]);
+    $res = json_decode(curl_exec($ch), true);
+    echo json_encode($res['notification']); exit;
 }
 
-function callCloud($method, $bin, $key, $data = null) {
-    $url = "https://api.jsonbin.io/v3/b/" . $bin . ($method == "GET" ? "/latest" : "");
-    $ch = curl_init($url);
+// --- نظام عداد المتواجدين ---
+$visitors_file = 'online_visitors.txt';
+if (isset($_GET['fetch_visitors'])) {
+    $session_id = session_id(); $time = time();
+    $data = file_exists($visitors_file) ? unserialize(file_get_contents($visitors_file)) : [];
+    $data[$session_id] = $time;
+    foreach ($data as $id => $last_time) { if ($time - $last_time > 120) unset($data[$id]); }
+    file_put_contents($visitors_file, serialize($data));
+    echo count($data); exit; 
+}
+$online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
+
+// --- دالة جلب البيانات السحابية الكاملة ---
+function getCloudFullData($bin, $key) {
+    $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $headers = ["X-Master-Key: " . $key];
-    if($method == "PUT") {
-        $headers[] = "Content-Type: application/json";
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data, JSON_UNESCAPED_UNICODE));
-    }
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
     $res = curl_exec($ch);
     curl_close($ch);
     return json_decode($res, true);
 }
 
-if(isset($_SESSION['ok'])){
-    $res = callCloud("GET", $BIN_ID, $API_KEY);
-    $record = isset($res['record']) ? $res['record'] : [];
-    $channels = isset($record['custom_channels']) ? $record['custom_channels'] : [];
-    $sections = isset($record['sections']) ? $record['sections'] : [];
-    $news_ticker = isset($record['news_ticker']) ? $record['news_ticker'] : ['text' => 'مرحباً بكم', 'status' => 'hide'];
-    $notification = isset($record['notification']) ? $record['notification'] : ['id' => '', 'msg' => ''];
+$cloud = getCloudFullData($BIN_ID, $API_KEY);
+$all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : [];
+$active_sections = array_filter($cloud['sections'] ?: [], function($s) { return $s['status'] == 'show'; });
+$news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : ['text' => '', 'status' => 'hide'];
 
-    // --- تحديث السحابة الشامل ---
-    function sync($bin, $key, $channels, $sections, $news, $notify) {
-        callCloud("PUT", $bin, $key, [
-            'custom_channels' => array_values($channels),
-            'sections' => array_values($sections),
-            'news_ticker' => $news,
-            'notification' => $notify
-        ]);
-    }
-
-    // --- 0. إرسال إشعار فوري جديد ---
-    if(isset($_POST['send_notify'])){
-        $notification = [
-            'id' => uniqid(),
-            'msg' => $_POST['notify_msg'],
-            'time' => time()
-        ];
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
-        header("Location: admin.php"); exit;
-    }
-
-    // --- 1. إدارة الشريط الإخباري ---
-    if(isset($_POST['update_ticker'])){
-        $news_ticker = ['text' => $_POST['ticker_text'], 'status' => $_POST['ticker_status']];
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
-        header("Location: admin.php"); exit;
-    }
-
-    // --- 2. إدارة الأقسام (حفظ / تعديل) ---
-    if(isset($_POST['save_sec'])){
-        $sec_id = $_POST['sec_id'] ?: uniqid();
-        $new_sec = ['id' => $sec_id, 'name' => $_POST['sec_name'], 'key' => $_POST['sec_key'], 'img' => $_POST['sec_img'], 'status' => $_POST['sec_status']];
-        $found = false;
-        foreach($sections as &$s){ if($s['id'] == $sec_id){ $s = $new_sec; $found = true; break; } }
-        if(!$found) $sections[] = $new_sec;
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
-        header("Location: admin.php#sections_area"); exit;
-    }
-
-    if(isset($_GET['del_sec'])){
-        $sections = array_filter($sections, function($s){ return $s['id'] !== $_GET['del_sec']; });
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
-        header("Location: admin.php#sections_area"); exit;
-    }
-
-    // --- 3. إدارة القنوات (حفظ / تعديل) ---
-    if(isset($_POST['save_ch'])){
-        $target_id = $_POST['edit_id'];
-        $ch_data = ['id' => $target_id ?: uniqid(), 'name' => $_POST['n'], 'file' => $_POST['f'], 'section' => $_POST['s']];
-        if(!empty($target_id)){ foreach($channels as &$c){ if($c['id'] == $target_id){ $c = $ch_data; break; } } } else { $channels[] = $ch_data; }
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
-        header("Location: admin.php#channels_area"); exit;
-    }
-
-    if(isset($_GET['del'])){
-        $channels = array_filter($channels, function($c){ return $c['id'] !== $_GET['del']; });
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
-        header("Location: admin.php#channels_area"); exit;
-    }
-
-    $edit_ch = null; if(isset($_GET['edit'])){ foreach($channels as $c){ if($c['id'] == $_GET['edit']){ $edit_ch = $c; break; } } }
-    $edit_sec = null; if(isset($_GET['edit_sec'])){ foreach($sections as $s){ if($s['id'] == $_GET['edit_sec']){ $edit_sec = $s; break; } } }
+function filterSection($channels, $sec) {
+    return array_filter($channels, function($c) use ($sec) { 
+        return (isset($c['section']) && trim(strtolower($c['section'])) == trim(strtolower($sec))); 
+    });
 }
+date_default_timezone_set('Asia/Riyadh');
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم عثمان المطورة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بوابة الرياضة - الخدمة الرقمية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #050c14; color: white; font-family: 'Tajawal', sans-serif; margin: 0; padding: 15px; font-size: 14px; }
-        .box { max-width: 600px; margin: 15px auto; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        h2 { color: #e11d48; font-size: 1.1rem; border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 0; }
-        input, select, button, textarea { width: 100%; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; font-family: inherit; }
-        button { background: #e11d48; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #f43f5e; }
-        .item-card { background: rgba(255,255,255,0.03); margin: 8px 0; padding: 12px; border-radius: 10px; border-right: 3px solid #e11d48; display: flex; justify-content: space-between; align-items: center; }
-        .btns a { text-decoration: none; font-size: 12px; font-weight: bold; margin-right: 10px; }
-        .del { color: #ff4d4d; } .edit { color: #0ea5e9; }
+        :root { 
+            --main: #e11d48; --bg-deep: #050c14; 
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --blue-grad: linear-gradient(45deg, #0ea5e9, #fff);
+        }
+        
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 240px; color: #e2e8f0; overflow-x: hidden; }
+
+        /* ستايل الإشعارات المنبثقة عثمان */
+        #notify-toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: #0ea5e9; color: white; padding: 15px; border-radius: 15px; z-index: 5000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        #notify-toast.show { top: 20px; }
+        .notify-bell-btn { position: fixed; bottom: 20px; left: 20px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 2000; box-shadow: 0 5px 15px rgba(225,29,72,0.4); cursor: pointer; }
+        .notify-dot { position: absolute; top: 0; right: 0; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; }
+
+        #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; transition: 1s ease-in-out; }
+        .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
+        .intro-icon { font-size: 80px; color: var(--main); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); text-shadow: 0 0 30px var(--main); } }
+
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
+        .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
+        @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
+
+        .header-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
+        .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 14px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
+        .promo-text { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+
+        .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .social-btn:hover { transform: translateY(-2px); }
+
+        .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
+        .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
+        .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 50s linear infinite; width: max-content; }
+        .ticker-text { color: #fff; font-size: 13px; font-weight: 700; padding: 0 60px; display: inline-block; }
+        @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+
+        .category-tabs { display: flex; gap: 10px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 8px 0; }
+        .cat-item { min-width: 70px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 15px; cursor: pointer; text-align: center; }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
+        .cat-item img { width: 28px; height: 28px; object-fit: contain; margin-bottom: 4px; }
+        .cat-item span { font-size: 9px; font-weight: 900; color: #fff; display: block; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; margin-top: 0px; }
+        .channel-section { display: none; grid-column: 1/-1; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .channel-section.active { display: grid; animation: slideUp 0.6s ease-out; }
+        .card { background: var(--glass); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+        .c-head { padding: 15px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
+        .name-badge { padding: 5px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; color: #000; background: var(--blue-grad); }
+        .play-btn { width: 90%; margin: 20px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 50px; font-weight: 900; cursor: pointer; }
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
+        iframe { width: 100%; height: 100%; border: none; }
+        footer { text-align: center; padding: 50px; font-size: 11px; opacity: 0.5; }
     </style>
 </head>
 <body>
 
-<?php if(!isset($_SESSION['ok'])): ?>
-    <div class="box" style="margin-top: 100px; text-align: center;">
-        <h2>🔐 دخول الإدارة</h2>
-        <form method="POST"><input name="u" placeholder="اليوزر"><input type="password" name="p" placeholder="الباسورد"><button name="login">دخول</button></form>
-    </div>
-<?php else: ?>
+<div id="notify-toast"><i class="fas fa-info-circle"></i> <span id="notify-txt"></span></div>
 
-    <div class="box">
-        <h2>🔔 إرسال إشعار فوري (Pop-up)</h2>
-        <form method="POST">
-            <textarea name="notify_msg" placeholder="اكتب نص الإشعار هنا..." rows="2" required></textarea>
-            <button name="send_notify" style="background:#0ea5e9">إرسال الإشعار الآن</button>
-        </form>
-    </div>
+<div class="notify-bell-btn" onclick="showLastNotify()"><i class="fas fa-bell"></i><div class="notify-dot" id="n-dot"></div></div>
 
-    <div class="box">
-        <h2>📰 الشريط الإخباري (Ticker)</h2>
-        <form method="POST">
-            <textarea name="ticker_text" placeholder="نص الشريط..." required><?= $news_ticker['text'] ?></textarea>
-            <select name="ticker_status">
-                <option value="show" <?= ($news_ticker['status']=='show')?'selected':'' ?>>إظهار الشريط</option>
-                <option value="hide" <?= ($news_ticker['status']=='hide')?'selected':'' ?>>إخفاء الشريط</option>
-            </select>
-            <button name="update_ticker" style="background:#22c55e">تحديث الشريط</button>
-        </form>
+<div id="pro-intro">
+    <div class="intro-icon"><i class="fas fa-play-circle"></i></div>
+    <h2 style="color:white; font-weight:900;">الخدمة الرقمية</h2>
+</div>
+
+<div class="bg-pattern"></div>
+
+<div class="header-fixed">
+    <div class="online-badge"><span>● متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span></div>
+    <div class="promo-text">للاشتراك في الباقة كاملة تواصل معنا عبر:</div>
+    <div class="social-links">
+        <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
+        <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
+        <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000"><i class="fab fa-snapchat"></i> سناب</a>
+        <a href="https://x.com/d_service_pro" class="social-btn" style="background:#000"><i class="fab fa-x-twitter"></i> تويتر</a>
     </div>
 
-    <div class="box" id="sections_area">
-        <h2>📂 إدارة الأقسام</h2>
-        <form method="POST">
-            <input type="hidden" name="sec_id" value="<?= $edit_sec ? $edit_sec['id'] : '' ?>">
-            <input name="sec_name" placeholder="اسم القسم" value="<?= $edit_sec ? $edit_sec['name'] : '' ?>" required>
-            <input name="sec_key" placeholder="الكود" value="<?= $edit_sec ? $edit_sec['key'] : '' ?>" required>
-            <input name="sec_img" placeholder="الصورة" value="<?= $edit_sec ? $edit_sec['img'] : '' ?>" required>
-            <select name="sec_status"><option value="show" <?= ($edit_sec && $edit_sec['status']=='show')?'selected':'' ?>>إظهار</option><option value="hide" <?= ($edit_sec && $edit_sec['status']=='hide')?'selected':'' ?>>إخفاء</option></select>
-            <button name="save_sec" style="background:#0ea5e9">حفظ القسم</button>
-        </form>
-        <?php foreach($sections as $s): ?>
-            <div class="item-card"><div><b><?= $s['name'] ?></b></div><div class="btns"><a href="?edit_sec=<?= $s['id'] ?>#sections_area" class="edit">تعديل</a><a href="?del_sec=<?= $s['id'] ?>" class="del">حذف</a></div></div>
+    <?php if($news['status'] == 'show'): ?>
+    <div class="news-ticker">
+        <span class="ticker-label">تنبيهات</span>
+        <div class="ticker-wrap">
+            <div class="ticker-move">
+                <span class="ticker-text"><?= $news['text'] ?></span>
+                <span class="ticker-text"><?= $news['text'] ?></span>
+                <span class="ticker-text"><?= $news['text'] ?></span>
+                <span class="ticker-text"><?= $news['text'] ?></span>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <div class="category-tabs">
+        <?php $count = 0; foreach($active_sections as $s): ?>
+            <div class="cat-item <?= ($count == 0 ? 'active' : '') ?>" onclick="switchSection('<?= $s['key'] ?>', this)">
+                <img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span>
+            </div>
+        <?php $count++; endforeach; ?>
+    </div>
+</div>
+
+<div class="grid">
+    <?php $count = 0; foreach($active_sections as $s): 
+        $channels = filterSection($all_channels, $s['key']);
+    ?>
+    <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($count == 0 ? 'active' : '') ?>">
+        <?php if(empty($channels)): ?>
+            <div style="grid-column: 1/-1; text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div>
+        <?php endif; ?>
+        <?php foreach($channels as $ch): ?>
+        <div class="card">
+            <div class="c-head">
+                <div class="name-badge"><?= $ch['name'] ?></div>
+                <div style="color:#ff4d4d; animation: blink 1s infinite; font-weight:900; font-size:10px;">● مباشر</div>
+            </div>
+            <div class="video-box" id="vid-<?= $ch['id'] ?>"></div>
+            <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">تشغيل البث</button>
+        </div>
         <?php endforeach; ?>
     </div>
+    <?php $count++; endforeach; ?>
+</div>
 
-    <div class="box" id="channels_area">
-        <h2>📺 إدارة القنوات</h2>
-        <form method="POST">
-            <input type="hidden" name="edit_id" value="<?= $edit_ch ? $edit_ch['id'] : '' ?>">
-            <input name="n" placeholder="اسم القناة" value="<?= $edit_ch ? $edit_ch['name'] : '' ?>" required>
-            <input name="f" placeholder="الملف" value="<?= $edit_ch ? $edit_ch['file'] : '' ?>" required>
-            <select name="s" required>
-                <option value="">-- اختر القسم --</option>
-                <?php foreach($sections as $s): ?>
-                    <option value="<?= $s['key'] ?>" <?= ($edit_ch && $edit_ch['section']==$s['key'])?'selected':'' ?>><?= $s['name'] ?></option>
-                <?php endforeach; ?>
-            </select>
-            <button name="save_ch">حفظ القناة</button>
-        </form>
-        <?php foreach(array_reverse($channels) as $c): ?>
-            <div class="item-card"><div><b><?= $c['name'] ?></b></div><div class="btns"><a href="?edit=<?= $c['id'] ?>#channels_area" class="edit">تعديل</a><a href="?del=<?= $c['id'] ?>" class="del">حذف</a></div></div>
-        <?php endforeach; ?>
-        <center style="margin-top:20px;"><a href="index.php" style="color:#aaa; text-decoration:none;">← الموقع</a> | <a href="?out=1" style="color:#ff4d4d; text-decoration:none;">خروج</a></center>
-    </div>
-<?php endif; ?>
+<footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
+
+<script>
+let lastNotifyId = localStorage.getItem('last_notify_id') || "";
+
+function checkNotifications() {
+    fetch(window.location.pathname + '?check_notify=1')
+    .then(res => res.json())
+    .then(data => {
+        if(data && data.id && data.id !== lastNotifyId) {
+            lastNotifyId = data.id;
+            localStorage.setItem('last_notify_id', data.id);
+            localStorage.setItem('last_notify_msg', data.msg);
+            
+            document.getElementById('notify-txt').innerText = data.msg;
+            document.getElementById('notify-toast').classList.add('show');
+            document.getElementById('n-dot').style.display = 'block';
+            
+            setTimeout(() => { document.getElementById('notify-toast').classList.remove('show'); }, 6000);
+        }
+    });
+}
+
+function showLastNotify() {
+    let msg = localStorage.getItem('last_notify_msg');
+    if(msg) {
+        document.getElementById('notify-txt').innerText = msg;
+        document.getElementById('notify-toast').classList.add('show');
+        document.getElementById('n-dot').style.display = 'none';
+        setTimeout(() => { document.getElementById('notify-toast').classList.remove('show'); }, 4000);
+    }
+}
+
+setInterval(checkNotifications, 10000); 
+
+window.addEventListener('load', () => { 
+    setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 1500); 
+    checkNotifications();
+});
+
+function switchSection(id, element) {
+    document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
+    let target = document.getElementById('section-' + id);
+    if(target) target.classList.add('active');
+    element.classList.add('active');
+}
+function startStream(boxId, file, btn) {
+    document.getElementById(boxId).innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    btn.innerText = "تم الاتصال";
+}
+setInterval(() => { fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(count => { document.getElementById('realtime-visitors').innerText = count; }); }, 4000);
+</script>
 </body>
 </html>
