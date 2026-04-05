@@ -56,7 +56,7 @@ date_default_timezone_set('Asia/Riyadh');
             --blue-grad: linear-gradient(45deg, #0ea5e9, #fff);
         }
         
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 320px; color: #e2e8f0; overflow-x: hidden; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 280px; color: #e2e8f0; overflow-x: hidden; }
 
         /* الصفحة الترحيبية */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; transition: 1s ease-in-out; }
@@ -70,22 +70,22 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
         /* الهيدر الفخم */
-        .header-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
-        .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 5px 15px; border-radius: 50px; color: #22c55e; font-size: 10px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px; }
-        .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .header-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 8px 0; text-align: center; }
+        .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 14px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
+        .promo-text { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 8px; }
 
-        /* أزرار التواصل الكبيرة */
-        .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
-        .social-btn:hover { transform: translateY(-3px); }
+        /* أزرار التواصل */
+        .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .social-btn:hover { transform: translateY(-2px); }
 
         /* شريط الأخبار المتحرك */
-        .news-ticker { background: rgba(225, 29, 72, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 8px 0; overflow: hidden; white-space: nowrap; margin-bottom: 10px; display: flex; align-items: center; }
+        .news-ticker { background: rgba(225, 29, 72, 0.12); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 6px 0; overflow: hidden; white-space: nowrap; margin-bottom: 8px; display: flex; align-items: center; }
         .news-ticker marquee { color: #fff; font-size: 11px; font-weight: 700; flex: 1; }
-        .ticker-label { background: var(--main); color: #fff; padding: 2px 12px; border-radius: 5px; font-size: 10px; margin-right: 10px; font-weight: 900; z-index: 2; }
+        .ticker-label { background: var(--main); color: #fff; padding: 2px 10px; border-radius: 4px; font-size: 9px; margin-right: 10px; font-weight: 900; z-index: 2; }
 
-        /* --- تعديل مقاسات الأقسام لتصبح أصغر عثمان --- */
-        .category-tabs { display: flex; gap: 10px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 8px 0; }
+        /* أقسام القنوات */
+        .category-tabs { display: flex; gap: 10px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
         .category-tabs::-webkit-scrollbar { display: none; }
         .cat-item { min-width: 70px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 15px; cursor: pointer; text-align: center; transition: 0.4s; }
         .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.03); }
@@ -152,7 +152,7 @@ date_default_timezone_set('Asia/Riyadh');
     ?>
     <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($count == 0 ? 'active' : '') ?>">
         <?php if(empty($channels)): ?>
-            <div style="grid-column: 1/-1; text-align:center; padding:100px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div>
+            <div style="grid-column: 1/-1; text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div>
         <?php endif; ?>
         <?php foreach($channels as $ch): ?>
         <div class="card">
