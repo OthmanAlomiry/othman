@@ -75,13 +75,14 @@ date_default_timezone_set('Asia/Riyadh');
         .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
         .social-btn:hover { transform: translateY(-2px); }
 
-        /* تعديل الشريط الإخباري ليكون انسيابي جداً عثمان */
-        .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 35px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
+        /* تعديل الشريط الإخباري: انسيابي، أكبر، ومن اليسار لليمين عثمان */
+        .news-ticker { background: rgba(225, 29, 72, 0.18); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 42px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 15px; height: 100%; display: flex; align-items: center; font-size: 11px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
-        .ticker-content { display: flex; white-space: nowrap; padding-right: 100px; animation: slide-left 25s linear infinite; direction: ltr; width: 100%; }
-        .ticker-text { color: #fff; font-size: 14px; font-weight: 700; padding: 0 50px; }
+        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
+        .ticker-move { display: inline-block; white-space: nowrap; animation: ticker-scroll 20s linear infinite; padding-left: 100%; }
+        .ticker-text { color: #fff; font-size: 15px; font-weight: 700; padding: 0 40px; display: inline-block; }
         
-        @keyframes slide-left {
+        @keyframes ticker-scroll {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
         }
@@ -130,9 +131,11 @@ date_default_timezone_set('Asia/Riyadh');
     <?php if($news['status'] == 'show'): ?>
     <div class="news-ticker">
         <span class="ticker-label">تنبيهات</span>
-        <div class="ticker-content">
-            <span class="ticker-text"><?= $news['text'] ?></span>
-            <span class="ticker-text"><?= $news['text'] ?></span>
+        <div class="ticker-wrap">
+            <div class="ticker-move">
+                <span class="ticker-text"><?= $news['text'] ?></span>
+                <span class="ticker-text"><?= $news['text'] ?></span>
+            </div>
         </div>
     </div>
     <?php endif; ?>
