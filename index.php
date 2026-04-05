@@ -84,13 +84,13 @@ date_default_timezone_set('Asia/Riyadh');
         .news-ticker marquee { color: #fff; font-size: 11px; font-weight: 700; flex: 1; }
         .ticker-label { background: var(--main); color: #fff; padding: 2px 12px; border-radius: 5px; font-size: 10px; margin-right: 10px; font-weight: 900; z-index: 2; }
 
-        /* الأقسام الفخمة */
-        .category-tabs { display: flex; gap: 12px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 10px 0; }
+        /* --- تعديل مقاسات الأقسام لتصبح أصغر عثمان --- */
+        .category-tabs { display: flex; gap: 10px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 8px 0; }
         .category-tabs::-webkit-scrollbar { display: none; }
-        .cat-item { min-width: 85px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 12px 5px; border-radius: 20px; cursor: pointer; text-align: center; transition: 0.4s; }
-        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.05); }
-        .cat-item img { width: 38px; height: 38px; object-fit: contain; margin-bottom: 5px; }
-        .cat-item span { font-size: 10px; font-weight: 900; color: #fff; display: block; }
+        .cat-item { min-width: 70px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 15px; cursor: pointer; text-align: center; transition: 0.4s; }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.03); }
+        .cat-item img { width: 28px; height: 28px; object-fit: contain; margin-bottom: 4px; }
+        .cat-item span { font-size: 9px; font-weight: 900; color: #fff; display: block; }
 
         /* الشبكة والكروت */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; margin-top: -10px; }
