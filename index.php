@@ -65,7 +65,7 @@ date_default_timezone_set('Asia/Riyadh');
 
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; }
 
-        /* شاشة الدخول الاحترافية */
+        /* شاشة الدخول الاحترافية عثمان */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s cubic-bezier(0.65, 0, 0.35, 1); }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
         .loader-content { display: flex; flex-direction: column; align-items: center; }
@@ -85,6 +85,7 @@ date_default_timezone_set('Asia/Riyadh');
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 14px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
         .promo-text { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 10px; }
         
+        /* أزرار التواصل الاجتماعي - حدود بيضاء عثمان */
         .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 12px; flex-wrap: nowrap; padding: 0 10px; }
         .social-btn { 
             padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; 
@@ -119,37 +120,30 @@ date_default_timezone_set('Asia/Riyadh');
         .c-head { padding: 12px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         .name-badge { padding: 5px 12px; border-radius: 10px; font-size: 10px; font-weight: 900; color: #000; background: var(--blue-grad); }
         
-        /* مباشر المحسنة عثمان */
-        .live-badge { 
-            display: flex; align-items: center; gap: 5px; background: rgba(225, 29, 72, 0.2); 
-            padding: 4px 10px; border-radius: 8px; border: 1px solid var(--main);
-            color: #ff4d4d; font-weight: 900; font-size: 10px; text-transform: uppercase;
-        }
+        .live-badge { display: flex; align-items: center; gap: 5px; background: rgba(225, 29, 72, 0.2); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--main); color: #ff4d4d; font-weight: 900; font-size: 10px; }
         .live-dot { width: 6px; height: 6px; background: #ff4d4d; border-radius: 50%; animation: pulse-red 1.2s infinite; }
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 77, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
 
         /* زر التشغيل الفخم عثمان */
-        .play-btn { 
-            width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-            color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; 
-            font-weight: 900; cursor: pointer; font-size: 13px; transition: 0.4s;
-            backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
+        .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 13px; transition: 0.4s; }
         .play-btn:hover { background: var(--main); border-color: var(--main); transform: scale(1.02); box-shadow: 0 0 20px rgba(225, 29, 72, 0.4); }
-        .play-btn i { font-size: 16px; }
 
-        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
-        iframe { width: 100%; height: 100%; border: none; }
+        /* وضع الصورة الترحيبية داخل الفيديو عثمان */
+        .video-box { 
+            width: 100%; aspect-ratio: 16/9; background: #000; 
+            background-image: url('mg/wel.png'); 
+            background-size: cover; background-position: center; 
+            position: relative;
+        }
+        iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-        /* الإشعارات عثمان */
+        /* الإشعارات */
         #notify-toast { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; background: rgba(14, 165, 233, 0.95); backdrop-filter: blur(10px); color: white; padding: 12px 18px; border-radius: 20px; z-index: 6000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: 0.6s; border: 1px solid rgba(255,255,255,0.2); }
         #notify-toast.show { top: 20px; }
         #notify-panel { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: 280px; max-height: 350px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid var(--glass-border); z-index: 5500; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
         .panel-header { background: var(--main); color: white; padding: 12px; font-weight: 900; font-size: 13px; display: flex; justify-content: space-between; }
         .panel-list { overflow-y: auto; padding: 10px; }
         .notify-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 10px; margin-bottom: 6px; border-right: 3px solid #0ea5e9; font-size: 11px; }
-
         .notify-bell-btn { position: fixed; bottom: 25px; left: 20px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; }
         .notify-dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; }
 
@@ -288,7 +282,9 @@ function switchSection(id, element) {
 }
 
 function startStream(boxId, file, btn) {
-    document.getElementById(boxId).innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    let vBox = document.getElementById(boxId);
+    vBox.style.backgroundImage = "none"; // إخفاء الصورة عثمان
+    vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
     btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الاتصال بالبث';
 }
 
