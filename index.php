@@ -6,13 +6,21 @@ error_reporting(0);
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69c4ad66c3097a1dd55f06d6';
 
-// دالة فحص الإشعارات (تستخدمها تقنية AJAX)
+// دالة فحص الإشعارات (AJAX)
 if(isset($_GET['check_notify'])) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $BIN_ID . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $API_KEY, "X-Bin-Meta: false"]);
     $res = json_decode(curl_exec($ch), true);
-    echo json_encode($res['notification']); exit;
+    
+    // فلترة الإشعارات: إذا كان الإشعار أقدم من 24 ساعة لا نرسله عثمان
+    $notify = $res['notification'];
+    if (isset($notify['time']) && (time() - $notify['time'] > 86400)) {
+        echo json_encode(null); 
+    } else {
+        echo json_encode($notify);
+    }
+    exit;
 }
 
 // --- نظام عداد المتواجدين ---
@@ -67,17 +75,26 @@ date_default_timezone_set('Asia/Riyadh');
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 240px; color: #e2e8f0; overflow-x: hidden; }
 
-        /* ستايل الإشعارات المنبثقة عثمان */
-        #notify-toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: #0ea5e9; color: white; padding: 15px; border-radius: 15px; z-index: 5000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        /* ستايل الإشعار المتطور - شكل الجوال عثمان */
+        #notify-toast { 
+            position: fixed; top: -120px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 380px; background: rgba(14, 165, 233, 0.95); 
+            backdrop-filter: blur(10px); color: white; padding: 12px 18px; 
+            border-radius: 20px; z-index: 5000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
+            transition: 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
+            display: flex; flex-direction: column; gap: 4px; border: 1px solid rgba(255,255,255,0.2);
+        }
         #notify-toast.show { top: 20px; }
-        .notify-bell-btn { position: fixed; bottom: 20px; left: 20px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 2000; box-shadow: 0 5px 15px rgba(225,29,72,0.4); cursor: pointer; }
-        .notify-dot { position: absolute; top: 0; right: 0; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; }
+        .notify-header { display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 5px; }
+        .notify-header b { font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .notify-time { font-size: 10px; opacity: 0.8; }
+        .notify-body { font-size: 12px; line-height: 1.4; font-weight: 500; }
+
+        .notify-bell-btn { position: fixed; bottom: 25px; left: 25px; width: 50px; height: 50px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 2000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
+        .notify-dot { position: absolute; top: 2px; right: 2px; width: 13px; height: 13px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; animation: blink 1s infinite; }
 
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; transition: 1s ease-in-out; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
-        .intro-icon { font-size: 80px; color: var(--main); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); text-shadow: 0 0 30px var(--main); } }
-
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
@@ -88,7 +105,6 @@ date_default_timezone_set('Asia/Riyadh');
 
         .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
         .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
-        .social-btn:hover { transform: translateY(-2px); }
 
         .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
@@ -112,20 +128,23 @@ date_default_timezone_set('Asia/Riyadh');
         .play-btn { width: 90%; margin: 20px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 50px; font-weight: 900; cursor: pointer; }
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
+        @keyframes blink { 50% { opacity: 0.1; } }
         footer { text-align: center; padding: 50px; font-size: 11px; opacity: 0.5; }
     </style>
 </head>
 <body>
 
-<div id="notify-toast"><i class="fas fa-info-circle"></i> <span id="notify-txt"></span></div>
+<div id="notify-toast">
+    <div class="notify-header">
+        <b><i class="fas fa-bell"></i> تنبيه إداري</b>
+        <span class="notify-time" id="notify-time">الآن</span>
+    </div>
+    <div class="notify-body" id="notify-txt"></div>
+</div>
 
 <div class="notify-bell-btn" onclick="showLastNotify()"><i class="fas fa-bell"></i><div class="notify-dot" id="n-dot"></div></div>
 
-<div id="pro-intro">
-    <div class="intro-icon"><i class="fas fa-play-circle"></i></div>
-    <h2 style="color:white; font-weight:900;">الخدمة الرقمية</h2>
-</div>
-
+<div id="pro-intro"><div class="intro-icon"><i class="fas fa-play-circle"></i></div><h2 style="color:white; font-weight:900;">الخدمة الرقمية</h2></div>
 <div class="bg-pattern"></div>
 
 <div class="header-fixed">
@@ -141,40 +160,26 @@ date_default_timezone_set('Asia/Riyadh');
     <?php if($news['status'] == 'show'): ?>
     <div class="news-ticker">
         <span class="ticker-label">تنبيهات</span>
-        <div class="ticker-wrap">
-            <div class="ticker-move">
-                <span class="ticker-text"><?= $news['text'] ?></span>
-                <span class="ticker-text"><?= $news['text'] ?></span>
-                <span class="ticker-text"><?= $news['text'] ?></span>
-                <span class="ticker-text"><?= $news['text'] ?></span>
-            </div>
-        </div>
+        <div class="ticker-wrap"><div class="ticker-move">
+                <span class="ticker-text"><?= $news['text'] ?></span><span class="ticker-text"><?= $news['text'] ?></span><span class="ticker-text"><?= $news['text'] ?></span><span class="ticker-text"><?= $news['text'] ?></span>
+        </div></div>
     </div>
     <?php endif; ?>
 
     <div class="category-tabs">
         <?php $count = 0; foreach($active_sections as $s): ?>
-            <div class="cat-item <?= ($count == 0 ? 'active' : '') ?>" onclick="switchSection('<?= $s['key'] ?>', this)">
-                <img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span>
-            </div>
+            <div class="cat-item <?= ($count == 0 ? 'active' : '') ?>" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
         <?php $count++; endforeach; ?>
     </div>
 </div>
 
 <div class="grid">
-    <?php $count = 0; foreach($active_sections as $s): 
-        $channels = filterSection($all_channels, $s['key']);
-    ?>
+    <?php $count = 0; foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
     <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($count == 0 ? 'active' : '') ?>">
-        <?php if(empty($channels)): ?>
-            <div style="grid-column: 1/-1; text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div>
-        <?php endif; ?>
+        <?php if(empty($channels)): ?><div style="grid-column: 1/-1; text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div><?php endif; ?>
         <?php foreach($channels as $ch): ?>
         <div class="card">
-            <div class="c-head">
-                <div class="name-badge"><?= $ch['name'] ?></div>
-                <div style="color:#ff4d4d; animation: blink 1s infinite; font-weight:900; font-size:10px;">● مباشر</div>
-            </div>
+            <div class="c-head"><div class="name-badge"><?= $ch['name'] ?></div><div style="color:#ff4d4d; animation: blink 1s infinite; font-weight:900; font-size:10px;">● مباشر</div></div>
             <div class="video-box" id="vid-<?= $ch['id'] ?>"></div>
             <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">تشغيل البث</button>
         </div>
@@ -183,10 +188,23 @@ date_default_timezone_set('Asia/Riyadh');
     <?php $count++; endforeach; ?>
 </div>
 
-<footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
-
 <script>
 let lastNotifyId = localStorage.getItem('last_notify_id') || "";
+
+function timeSince(date) {
+    var seconds = Math.floor((new Date() - date) / 1000);
+    var interval = seconds / 31536000;
+    if (interval > 1) return "منذ مدة";
+    interval = seconds / 2592000;
+    if (interval > 1) return "منذ أيام";
+    interval = seconds / 86400;
+    if (interval > 1) return "منذ " + Math.floor(interval) + " يوم";
+    interval = seconds / 3600;
+    if (interval > 1) return "منذ " + Math.floor(interval) + " ساعة";
+    interval = seconds / 60;
+    if (interval > 1) return "منذ " + Math.floor(interval) + " دقيقة";
+    return "الآن";
+}
 
 function checkNotifications() {
     fetch(window.location.pathname + '?check_notify=1')
@@ -196,28 +214,31 @@ function checkNotifications() {
             lastNotifyId = data.id;
             localStorage.setItem('last_notify_id', data.id);
             localStorage.setItem('last_notify_msg', data.msg);
+            localStorage.setItem('last_notify_time', data.time);
             
-            document.getElementById('notify-txt').innerText = data.msg;
-            document.getElementById('notify-toast').classList.add('show');
+            showToast(data.msg, data.time);
             document.getElementById('n-dot').style.display = 'block';
-            
-            setTimeout(() => { document.getElementById('notify-toast').classList.remove('show'); }, 6000);
         }
     });
 }
 
+function showToast(msg, timestamp) {
+    document.getElementById('notify-txt').innerText = msg;
+    document.getElementById('notify-time').innerText = timeSince(new Date(timestamp * 1000));
+    document.getElementById('notify-toast').classList.add('show');
+    setTimeout(() => { document.getElementById('notify-toast').classList.remove('show'); }, 7000);
+}
+
 function showLastNotify() {
     let msg = localStorage.getItem('last_notify_msg');
+    let time = localStorage.getItem('last_notify_time');
     if(msg) {
-        document.getElementById('notify-txt').innerText = msg;
-        document.getElementById('notify-toast').classList.add('show');
+        showToast(msg, time);
         document.getElementById('n-dot').style.display = 'none';
-        setTimeout(() => { document.getElementById('notify-toast').classList.remove('show'); }, 4000);
     }
 }
 
 setInterval(checkNotifications, 10000); 
-
 window.addEventListener('load', () => { 
     setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 1500); 
     checkNotifications();
