@@ -13,7 +13,6 @@ if(isset($_GET['check_notify'])) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $API_KEY, "X-Bin-Meta: false"]);
     $res = json_decode(curl_exec($ch), true);
     $notify = $res['notification'];
-    // تجاهل الإشعارات الأقدم من 48 ساعة لضمان النظافة
     if (isset($notify['time']) && (time() - $notify['time'] > 172800)) { echo json_encode(null); } 
     else { echo json_encode($notify); }
     exit;
@@ -63,49 +62,75 @@ date_default_timezone_set('Asia/Riyadh');
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 240px; color: #e2e8f0; overflow-x: hidden; }
 
-        /* بوب أب الإشعار السريع عثمان */
+        /* شاشة الدخول الاحترافية الجديدة - عثمان */
+        #pro-intro { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            z-index: 9999; transition: 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
+        
+        .loader-content { position: relative; display: flex; flex-direction: column; align-items: center; }
+        .intro-icon-box {
+            width: 100px; height: 100px; background: var(--main); border-radius: 30%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 50px rgba(225, 29, 72, 0.5);
+            animation: bounceIn 1s ease-out, glowPulse 2s infinite ease-in-out;
+        }
+        .intro-icon-box i { font-size: 50px; color: white; }
+        
+        .intro-title { 
+            margin-top: 25px; color: white; font-weight: 900; font-size: 24px; 
+            letter-spacing: 1px; text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .intro-subtitle { color: #94a3b8; font-size: 14px; margin-top: 5px; font-weight: 400; }
+
+        .loading-bar { 
+            width: 150px; height: 4px; background: rgba(255,255,255,0.1); 
+            border-radius: 10px; margin-top: 30px; overflow: hidden; position: relative;
+        }
+        .loading-bar::after {
+            content: ""; position: absolute; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, var(--main), transparent);
+            animation: loadingMove 1.5s infinite;
+        }
+
+        @keyframes glowPulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(225, 29, 72, 0.4); } 50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(225, 29, 72, 0.7); } }
+        @keyframes loadingMove { 100% { left: 100%; } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* باقي التنسيقات كما هي بدون تغيير عثمان */
         #notify-toast { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 380px; background: rgba(14, 165, 233, 0.95); backdrop-filter: blur(10px); color: white; padding: 12px 18px; border-radius: 20px; z-index: 6000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); border: 1px solid rgba(255,255,255,0.2); }
         #notify-toast.show { top: 20px; }
-
-        /* مركز الإشعارات (القائمة) عثمان */
         #notify-panel { position: fixed; bottom: 85px; left: 20px; width: 300px; max-height: 400px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid var(--glass-border); z-index: 5500; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); animation: slideInUp 0.3s ease; }
         .panel-header { background: var(--main); color: white; padding: 12px; font-weight: 900; font-size: 14px; display: flex; justify-content: space-between; }
         .panel-list { overflow-y: auto; padding: 10px; flex: 1; }
         .notify-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 8px; border-right: 3px solid #0ea5e9; }
         .notify-item small { display: block; font-size: 9px; opacity: 0.6; margin-top: 5px; }
-        @keyframes slideInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
         .notify-bell-btn { position: fixed; bottom: 25px; left: 25px; width: 50px; height: 50px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
         .notify-dot { position: absolute; top: 2px; right: 2px; width: 13px; height: 13px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; animation: blink 1s infinite; }
-
-        #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9000; transition: 1s ease-in-out; }
-        .intro-hide { opacity: 0; visibility: hidden; }
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
-        @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
-
         .header-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 14px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
         .promo-text { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 8px; }
         .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-        .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; }
-
+        .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
         .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
-        .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
-        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; position: relative; display: flex; align-items: center; }
+        .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
         .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 80s linear infinite; width: max-content; }
         .ticker-text { color: #fff; font-size: 13px; font-weight: 700; padding: 0 80px; display: inline-block; }
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
-
         .category-tabs { display: flex; gap: 10px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 8px 0; }
         .cat-item { min-width: 70px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 15px; cursor: pointer; text-align: center; }
         .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
         .cat-item img { width: 28px; height: 28px; object-fit: contain; margin-bottom: 4px; }
         .cat-item span { font-size: 9px; font-weight: 900; color: #fff; display: block; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; margin-top: 0px; }
         .channel-section { display: none; grid-column: 1/-1; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        .channel-section.active { display: grid; animation: slideUp 0.6s; }
+        .channel-section.active { display: grid; animation: slideUp 0.6s ease-out; }
         .card { background: var(--glass); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
         .c-head { padding: 15px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         .name-badge { padding: 5px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; color: #000; background: var(--blue-grad); }
@@ -117,6 +142,17 @@ date_default_timezone_set('Asia/Riyadh');
 </head>
 <body>
 
+<div id="pro-intro">
+    <div class="loader-content">
+        <div class="intro-icon-box">
+            <i class="fas fa-play-circle"></i>
+        </div>
+        <h2 class="intro-title">الخدمة الرقمية</h2>
+        <span class="intro-subtitle">بوابتك لعالم الرياضة والترفيه</span>
+        <div class="loading-bar"></div>
+    </div>
+</div>
+
 <div id="notify-toast">
     <div style="display:flex; justify-content:space-between; margin-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
         <b style="font-size:12px;"><i class="fas fa-bell"></i> تنبيه جديد</b>
@@ -127,23 +163,21 @@ date_default_timezone_set('Asia/Riyadh');
 
 <div id="notify-panel">
     <div class="panel-header"><span>🔔 مركز الإشعارات</span><i class="fas fa-times" onclick="toggleNotifyPanel()" style="cursor:pointer;"></i></div>
-    <div class="panel-list" id="panel-list">
-        </div>
+    <div class="panel-list" id="panel-list"></div>
 </div>
 
 <div class="notify-bell-btn" onclick="toggleNotifyPanel()"><i class="fas fa-bell"></i><div class="notify-dot" id="n-dot"></div></div>
 
-<div id="pro-intro"><div class="intro-icon"><i class="fas fa-play-circle"></i></div><h2 style="color:white; font-weight:900;">الخدمة الرقمية</h2></div>
 <div class="bg-pattern"></div>
 
 <div class="header-fixed">
     <div class="online-badge"><span>● متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span></div>
     <div class="promo-text">للاشتراك في الباقة كاملة تواصل معنا عبر:</div>
     <div class="social-links">
-        <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366">واتساب</a>
-        <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc">تليجرام</a>
-        <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000">سناب</a>
-        <a href="https://x.com/d_service_pro" class="social-btn" style="background:#000">تويتر</a>
+        <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
+        <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
+        <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000"><i class="fab fa-snapchat"></i> سناب</a>
+        <a href="https://x.com/d_service_pro" class="social-btn" style="background:#000"><i class="fab fa-x-twitter"></i> تويتر</a>
     </div>
 
     <?php if($news['status'] == 'show'): ?>
@@ -204,13 +238,9 @@ function checkNotifications() {
         if(data && data.id && data.id !== lastNotifyId) {
             lastNotifyId = data.id;
             localStorage.setItem('last_notify_id', data.id);
-            
-            // إضافة الإشعار للسجل عثمان
             notifyHistory.push(data);
-            if(notifyHistory.length > 10) notifyHistory.shift(); // احتفاظ بآخر 10 فقط
+            if(notifyHistory.length > 10) notifyHistory.shift();
             localStorage.setItem('notify_history', JSON.stringify(notifyHistory));
-            
-            // عرض التوست السريع
             document.getElementById('notify-txt').innerText = data.msg;
             document.getElementById('notify-toast').classList.add('show');
             document.getElementById('n-dot').style.display = 'block';
@@ -222,7 +252,7 @@ function checkNotifications() {
 
 setInterval(checkNotifications, 10000);
 window.addEventListener('load', () => { 
-    setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 1500); 
+    setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 2000); 
     checkNotifications();
     renderHistory();
 });
