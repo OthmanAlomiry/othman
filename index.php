@@ -75,16 +75,16 @@ date_default_timezone_set('Asia/Riyadh');
         .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
         .social-btn:hover { transform: translateY(-2px); }
 
-        /* تعديل الشريط الإخباري: سرعة هادئة، مقاس أصغر، انسيابية تامة عثمان */
-        .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 35px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
+        /* تعديل الشريط الإخباري: انسيابي جداً، سرعة منخفضة، من اليسار لليمين عثمان */
+        .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
-        .ticker-wrap { flex: 1; overflow: hidden; direction: rtl; position: relative; width: 100%; height: 100%; display: flex; align-items: center; padding-right: 80px; }
-        .ticker-move { display: inline-block; white-space: nowrap; animation: ticker-scroll-rtl 40s linear infinite; }
-        .ticker-text { color: #fff; font-size: 13px; font-weight: 700; padding: 0 60px; display: inline-block; }
+        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
+        .ticker-move { display: flex; white-space: nowrap; animation: ticker-scroll-ltr 60s linear infinite; width: fit-content; }
+        .ticker-text { color: #fff; font-size: 13px; font-weight: 700; padding: 0 80px; display: inline-block; }
         
-        @keyframes ticker-scroll-rtl {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+        @keyframes ticker-scroll-ltr {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); } /* حركة دائرية مستمرة */
         }
 
         .category-tabs { display: flex; gap: 10px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 8px 0; }
@@ -129,7 +129,9 @@ date_default_timezone_set('Asia/Riyadh');
     <div class="news-ticker">
         <span class="ticker-label">تنبيهات</span>
         <div class="ticker-wrap">
-            <div class="ticker-move">
+            <div class="ticker-move" style="transform: translateX(-50%);">
+                <span class="ticker-text"><?= $news['text'] ?></span>
+                <span class="ticker-text"><?= $news['text'] ?></span>
                 <span class="ticker-text"><?= $news['text'] ?></span>
                 <span class="ticker-text"><?= $news['text'] ?></span>
             </div>
