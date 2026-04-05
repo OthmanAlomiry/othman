@@ -35,43 +35,50 @@ if(isset($_SESSION['ok'])){
     $channels = isset($record['custom_channels']) ? $record['custom_channels'] : [];
     $sections = isset($record['sections']) ? $record['sections'] : [];
     $news_ticker = isset($record['news_ticker']) ? $record['news_ticker'] : ['text' => 'مرحباً بكم', 'status' => 'hide'];
+    $notification = isset($record['notification']) ? $record['notification'] : ['id' => '', 'msg' => ''];
 
     // --- تحديث السحابة الشامل ---
-    function sync($bin, $key, $channels, $sections, $news) {
+    function sync($bin, $key, $channels, $sections, $news, $notify) {
         callCloud("PUT", $bin, $key, [
             'custom_channels' => array_values($channels),
             'sections' => array_values($sections),
-            'news_ticker' => $news
+            'news_ticker' => $news,
+            'notification' => $notify
         ]);
+    }
+
+    // --- 0. إرسال إشعار فوري جديد ---
+    if(isset($_POST['send_notify'])){
+        $notification = [
+            'id' => uniqid(),
+            'msg' => $_POST['notify_msg'],
+            'time' => time()
+        ];
+        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
+        header("Location: admin.php"); exit;
     }
 
     // --- 1. إدارة الشريط الإخباري ---
     if(isset($_POST['update_ticker'])){
         $news_ticker = ['text' => $_POST['ticker_text'], 'status' => $_POST['ticker_status']];
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker);
+        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
         header("Location: admin.php"); exit;
     }
 
     // --- 2. إدارة الأقسام (حفظ / تعديل) ---
     if(isset($_POST['save_sec'])){
         $sec_id = $_POST['sec_id'] ?: uniqid();
-        $new_sec = [
-            'id' => $sec_id,
-            'name' => $_POST['sec_name'],
-            'key' => $_POST['sec_key'],
-            'img' => $_POST['sec_img'],
-            'status' => $_POST['sec_status']
-        ];
+        $new_sec = ['id' => $sec_id, 'name' => $_POST['sec_name'], 'key' => $_POST['sec_key'], 'img' => $_POST['sec_img'], 'status' => $_POST['sec_status']];
         $found = false;
         foreach($sections as &$s){ if($s['id'] == $sec_id){ $s = $new_sec; $found = true; break; } }
         if(!$found) $sections[] = $new_sec;
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker);
+        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
         header("Location: admin.php#sections_area"); exit;
     }
 
     if(isset($_GET['del_sec'])){
         $sections = array_filter($sections, function($s){ return $s['id'] !== $_GET['del_sec']; });
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker);
+        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
         header("Location: admin.php#sections_area"); exit;
     }
 
@@ -79,20 +86,17 @@ if(isset($_SESSION['ok'])){
     if(isset($_POST['save_ch'])){
         $target_id = $_POST['edit_id'];
         $ch_data = ['id' => $target_id ?: uniqid(), 'name' => $_POST['n'], 'file' => $_POST['f'], 'section' => $_POST['s']];
-        if(!empty($target_id)){
-            foreach($channels as &$c){ if($c['id'] == $target_id){ $c = $ch_data; break; } }
-        } else { $channels[] = $ch_data; }
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker);
+        if(!empty($target_id)){ foreach($channels as &$c){ if($c['id'] == $target_id){ $c = $ch_data; break; } } } else { $channels[] = $ch_data; }
+        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
         header("Location: admin.php#channels_area"); exit;
     }
 
     if(isset($_GET['del'])){
         $channels = array_filter($channels, function($c){ return $c['id'] !== $_GET['del']; });
-        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker);
+        sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
         header("Location: admin.php#channels_area"); exit;
     }
 
-    // جلب بيانات التعديل
     $edit_ch = null; if(isset($_GET['edit'])){ foreach($channels as $c){ if($c['id'] == $_GET['edit']){ $edit_ch = $c; break; } } }
     $edit_sec = null; if(isset($_GET['edit_sec'])){ foreach($sections as $s){ if($s['id'] == $_GET['edit_sec']){ $edit_sec = $s; break; } } }
 }
@@ -101,7 +105,7 @@ if(isset($_SESSION['ok'])){
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم عثمان</title>
+    <title>لوحة تحكم عثمان المطورة</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: #050c14; color: white; font-family: 'Tajawal', sans-serif; margin: 0; padding: 15px; font-size: 14px; }
@@ -111,10 +115,8 @@ if(isset($_SESSION['ok'])){
         button { background: #e11d48; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         button:hover { background: #f43f5e; }
         .item-card { background: rgba(255,255,255,0.03); margin: 8px 0; padding: 12px; border-radius: 10px; border-right: 3px solid #e11d48; display: flex; justify-content: space-between; align-items: center; }
-        .info b { display: block; color: #fff; } .info span { font-size: 11px; color: #aaa; }
         .btns a { text-decoration: none; font-size: 12px; font-weight: bold; margin-right: 10px; }
         .del { color: #ff4d4d; } .edit { color: #0ea5e9; }
-        .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #333; margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -127,9 +129,17 @@ if(isset($_SESSION['ok'])){
 <?php else: ?>
 
     <div class="box">
-        <h2>📰 الشريط الإخباري</h2>
+        <h2>🔔 إرسال إشعار فوري (Pop-up)</h2>
         <form method="POST">
-            <textarea name="ticker_text" placeholder="اكتب نص الشريط هنا..." required><?= $news_ticker['text'] ?></textarea>
+            <textarea name="notify_msg" placeholder="اكتب نص الإشعار هنا..." rows="2" required></textarea>
+            <button name="send_notify" style="background:#0ea5e9">إرسال الإشعار الآن</button>
+        </form>
+    </div>
+
+    <div class="box">
+        <h2>📰 الشريط الإخباري (Ticker)</h2>
+        <form method="POST">
+            <textarea name="ticker_text" placeholder="نص الشريط..." required><?= $news_ticker['text'] ?></textarea>
             <select name="ticker_status">
                 <option value="show" <?= ($news_ticker['status']=='show')?'selected':'' ?>>إظهار الشريط</option>
                 <option value="hide" <?= ($news_ticker['status']=='hide')?'selected':'' ?>>إخفاء الشريط</option>
@@ -139,24 +149,17 @@ if(isset($_SESSION['ok'])){
     </div>
 
     <div class="box" id="sections_area">
-        <h2>📂 إدارة الأقسام (Icons)</h2>
+        <h2>📂 إدارة الأقسام</h2>
         <form method="POST">
             <input type="hidden" name="sec_id" value="<?= $edit_sec ? $edit_sec['id'] : '' ?>">
             <input name="sec_name" placeholder="اسم القسم" value="<?= $edit_sec ? $edit_sec['name'] : '' ?>" required>
-            <input name="sec_key" placeholder="الكود (ssc, bein...)" value="<?= $edit_sec ? $edit_sec['key'] : '' ?>" required>
-            <input name="sec_img" placeholder="مسار الصورة (mg/icon.png)" value="<?= $edit_sec ? $edit_sec['img'] : '' ?>" required>
-            <select name="sec_status">
-                <option value="show" <?= ($edit_sec && $edit_sec['status']=='show')?'selected':'' ?>>إظهار في الموقع</option>
-                <option value="hide" <?= ($edit_sec && $edit_sec['status']=='hide')?'selected':'' ?>>إخفاء من الموقع</option>
-            </select>
-            <button name="save_sec" style="background:#0ea5e9"><?= $edit_sec ? 'تحديث القسم' : 'إضافة قسم جديد' ?></button>
-            <?php if($edit_sec): ?><a href="admin.php" style="color:#aaa; font-size:11px; display:block; text-align:center;">إلغاء التعديل</a><?php endif; ?>
+            <input name="sec_key" placeholder="الكود" value="<?= $edit_sec ? $edit_sec['key'] : '' ?>" required>
+            <input name="sec_img" placeholder="الصورة" value="<?= $edit_sec ? $edit_sec['img'] : '' ?>" required>
+            <select name="sec_status"><option value="show" <?= ($edit_sec && $edit_sec['status']=='show')?'selected':'' ?>>إظهار</option><option value="hide" <?= ($edit_sec && $edit_sec['status']=='hide')?'selected':'' ?>>إخفاء</option></select>
+            <button name="save_sec" style="background:#0ea5e9">حفظ القسم</button>
         </form>
         <?php foreach($sections as $s): ?>
-            <div class="item-card" style="border-color: <?= $s['status']=='show'?'#22c55e':'#555' ?>">
-                <div class="info"><b><?= $s['name'] ?> <small class="badge"><?= $s['key'] ?></small></b><span><?= $s['img'] ?></span></div>
-                <div class="btns"><a href="?edit_sec=<?= $s['id'] ?>#sections_area" class="edit">تعديل</a><a href="?del_sec=<?= $s['id'] ?>" class="del" onclick="return confirm('حذف القسم؟')">حذف</a></div>
-            </div>
+            <div class="item-card"><div><b><?= $s['name'] ?></b></div><div class="btns"><a href="?edit_sec=<?= $s['id'] ?>#sections_area" class="edit">تعديل</a><a href="?del_sec=<?= $s['id'] ?>" class="del">حذف</a></div></div>
         <?php endforeach; ?>
     </div>
 
@@ -165,26 +168,19 @@ if(isset($_SESSION['ok'])){
         <form method="POST">
             <input type="hidden" name="edit_id" value="<?= $edit_ch ? $edit_ch['id'] : '' ?>">
             <input name="n" placeholder="اسم القناة" value="<?= $edit_ch ? $edit_ch['name'] : '' ?>" required>
-            <input name="f" placeholder="الملف (b1.php)" value="<?= $edit_ch ? $edit_ch['file'] : '' ?>" required>
+            <input name="f" placeholder="الملف" value="<?= $edit_ch ? $edit_ch['file'] : '' ?>" required>
             <select name="s" required>
                 <option value="">-- اختر القسم --</option>
                 <?php foreach($sections as $s): ?>
                     <option value="<?= $s['key'] ?>" <?= ($edit_ch && $edit_ch['section']==$s['key'])?'selected':'' ?>><?= $s['name'] ?></option>
                 <?php endforeach; ?>
             </select>
-            <button name="save_ch"><?= $edit_ch ? 'تحديث القناة' : 'إضافة القناة' ?></button>
-            <?php if($edit_ch): ?><a href="admin.php" style="color:#aaa; font-size:11px; display:block; text-align:center;">إلغاء التعديل</a><?php endif; ?>
+            <button name="save_ch">حفظ القناة</button>
         </form>
         <?php foreach(array_reverse($channels) as $c): ?>
-            <div class="item-card">
-                <div class="info"><b><?= $c['name'] ?></b><span>القسم: <?= strtoupper($c['section']) ?></span></div>
-                <div class="btns"><a href="?edit=<?= $c['id'] ?>#channels_area" class="edit">تعديل</a><a href="?del=<?= $c['id'] ?>" class="del" onclick="return confirm('حذف القناة؟')">حذف</a></div>
-            </div>
+            <div class="item-card"><div><b><?= $c['name'] ?></b></div><div class="btns"><a href="?edit=<?= $c['id'] ?>#channels_area" class="edit">تعديل</a><a href="?del=<?= $c['id'] ?>" class="del">حذف</a></div></div>
         <?php endforeach; ?>
-        <center style="margin-top:20px;">
-            <a href="index.php" style="color:#aaa; text-decoration:none; font-size:12px;">← الموقع</a> | 
-            <a href="?out=1" style="color:#ff4d4d; text-decoration:none; font-size:12px;">خروج</a>
-        </center>
+        <center style="margin-top:20px;"><a href="index.php" style="color:#aaa; text-decoration:none;">← الموقع</a> | <a href="?out=1" style="color:#ff4d4d; text-decoration:none;">خروج</a></center>
     </div>
 <?php endif; ?>
 </body>
