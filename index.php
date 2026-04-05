@@ -85,7 +85,6 @@ date_default_timezone_set('Asia/Riyadh');
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 14px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
         .promo-text { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 10px; }
         
-        /* أزرار التواصل الاجتماعي - سطر واحد وحدود بيضاء عثمان */
         .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 12px; flex-wrap: nowrap; padding: 0 10px; }
         .social-btn { 
             padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; 
@@ -95,17 +94,16 @@ date_default_timezone_set('Asia/Riyadh');
         }
         .btn-wa { background: #25d366; } .btn-tg { background: #0088cc; } .btn-sn { background: #FFFC00; color: #000 !important; } .btn-tw { background: #000; }
 
-        /* الشريط الإخباري */
+        /* الشريط الإخباري المستمر */
         .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
-        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
+        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; display: flex; align-items: center; }
         .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 60s linear infinite; width: max-content; }
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
         /* الأقسام */
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
-        .category-tabs::-webkit-scrollbar { display: none; }
         .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.4s; }
         .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.03); }
         .cat-item img { width: 26px; height: 26px; object-fit: contain; margin-bottom: 4px; }
@@ -120,17 +118,38 @@ date_default_timezone_set('Asia/Riyadh');
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 20px; width: 100%; }
         .c-head { padding: 12px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         .name-badge { padding: 5px 12px; border-radius: 10px; font-size: 10px; font-weight: 900; color: #000; background: var(--blue-grad); }
-        .play-btn { width: 90%; margin: 15px auto; display: block; background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 12px; }
+        
+        /* مباشر المحسنة عثمان */
+        .live-badge { 
+            display: flex; align-items: center; gap: 5px; background: rgba(225, 29, 72, 0.2); 
+            padding: 4px 10px; border-radius: 8px; border: 1px solid var(--main);
+            color: #ff4d4d; font-weight: 900; font-size: 10px; text-transform: uppercase;
+        }
+        .live-dot { width: 6px; height: 6px; background: #ff4d4d; border-radius: 50%; animation: pulse-red 1.2s infinite; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 77, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
+
+        /* زر التشغيل الفخم عثمان */
+        .play-btn { 
+            width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; 
+            font-weight: 900; cursor: pointer; font-size: 13px; transition: 0.4s;
+            backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .play-btn:hover { background: var(--main); border-color: var(--main); transform: scale(1.02); box-shadow: 0 0 20px rgba(225, 29, 72, 0.4); }
+        .play-btn i { font-size: 16px; }
+
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* الإشعارات */
+        /* الإشعارات عثمان */
         #notify-toast { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; background: rgba(14, 165, 233, 0.95); backdrop-filter: blur(10px); color: white; padding: 12px 18px; border-radius: 20px; z-index: 6000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: 0.6s; border: 1px solid rgba(255,255,255,0.2); }
         #notify-toast.show { top: 20px; }
         #notify-panel { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: 280px; max-height: 350px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid var(--glass-border); z-index: 5500; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
         .panel-header { background: var(--main); color: white; padding: 12px; font-weight: 900; font-size: 13px; display: flex; justify-content: space-between; }
         .panel-list { overflow-y: auto; padding: 10px; }
         .notify-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 10px; margin-bottom: 6px; border-right: 3px solid #0ea5e9; font-size: 11px; }
+
         .notify-bell-btn { position: fixed; bottom: 25px; left: 20px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; }
         .notify-dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; }
 
@@ -200,9 +219,14 @@ date_default_timezone_set('Asia/Riyadh');
             <?php if(empty($channels)): ?><div style="text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div><?php endif; ?>
             <?php foreach($channels as $ch): ?>
             <div class="card">
-                <div class="c-head"><div class="name-badge"><?= $ch['name'] ?></div><div style="color:#ff4d4d; animation: blink 1s infinite; font-weight:900; font-size:10px;">● مباشر</div></div>
+                <div class="c-head">
+                    <div class="name-badge"><?= $ch['name'] ?></div>
+                    <div class="live-badge"><div class="live-dot"></div> مباشر</div>
+                </div>
                 <div class="video-box" id="vid-<?= $ch['id'] ?>"></div>
-                <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">تشغيل البث</button>
+                <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">
+                    <i class="fas fa-play-circle"></i> تشغيل البث المباشر
+                </button>
             </div>
             <?php endforeach; ?>
         </div>
@@ -259,14 +283,13 @@ window.addEventListener('load', () => {
 function switchSection(id, element) {
     document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
-    let target = document.getElementById('section-' + id);
-    if(target) target.classList.add('active');
+    document.getElementById('section-' + id).classList.add('active');
     element.classList.add('active');
 }
 
 function startStream(boxId, file, btn) {
     document.getElementById(boxId).innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-    btn.innerText = "تم الاتصال";
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الاتصال بالبث';
 }
 
 setInterval(() => { 
