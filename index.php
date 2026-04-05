@@ -85,8 +85,20 @@ date_default_timezone_set('Asia/Riyadh');
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 14px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
         .promo-text { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 10px; }
-        .social-links { display: flex; justify-content: center; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; padding: 0 10px; }
-        .social-btn { padding: 6px 12px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; transition: 0.3s; flex: 1; min-width: 70px; text-align: center; }
+        
+        /* أزرار التواصل الاجتماعي مع توهج وحدود عثمان */
+        .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; padding: 0 10px; }
+        .social-btn { 
+            padding: 6px 12px; border-radius: 50px; text-decoration: none; font-weight: bold; 
+            font-size: 9px; color: #fff; transition: 0.3s; flex: 1; min-width: 70px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .social-btn:hover { transform: translateY(-3px); box-shadow: 0 0 15px currentColor; border-color: #fff; }
+        /* ألوان التوهج المخصصة */
+        .btn-wa { background: #25d366; box-shadow: 0 0 12px rgba(37, 211, 102, 0.3); }
+        .btn-tg { background: #0088cc; box-shadow: 0 0 12px rgba(0, 136, 204, 0.3); }
+        .btn-sn { background: #FFFC00; color: #000 !important; box-shadow: 0 0 12px rgba(255, 252, 0, 0.3); }
+        .btn-tw { background: #000; border: 1px solid #333; box-shadow: 0 0 12px rgba(255, 255, 255, 0.1); }
 
         /* الشريط الإخباري المستمر */
         .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
@@ -112,7 +124,7 @@ date_default_timezone_set('Asia/Riyadh');
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* الإشعارات عثمان */
+        /* الإشعارات */
         #notify-toast { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; background: rgba(14, 165, 233, 0.95); backdrop-filter: blur(10px); color: white; padding: 12px 18px; border-radius: 20px; z-index: 6000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: 0.6s; border: 1px solid rgba(255,255,255,0.2); }
         #notify-toast.show { top: 20px; }
         #notify-panel { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: 280px; max-height: 350px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid var(--glass-border); z-index: 5500; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
@@ -161,10 +173,10 @@ date_default_timezone_set('Asia/Riyadh');
         <div class="online-badge"><span>● متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span></div>
         <div class="promo-text">للاشتراك في الباقة كاملة تواصل معنا عبر:</div>
         <div class="social-links">
-            <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366">واتساب</a>
-            <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc">تليجرام</a>
-            <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000">سناب</a>
-            <a href="https://x.com/d_service_pro" class="social-btn" style="background:#000">تويتر</a>
+            <a href="https://wa.me/966505571164" class="social-btn btn-wa">واتساب</a>
+            <a href="https://t.me/d_s_pro" class="social-btn btn-tg">تليجرام</a>
+            <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-sn">سناب</a>
+            <a href="https://x.com/d_service_pro" class="social-btn btn-tw">تويتر</a>
         </div>
 
         <?php if($news['status'] == 'show'): ?>
