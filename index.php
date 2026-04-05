@@ -58,33 +58,27 @@ date_default_timezone_set('Asia/Riyadh');
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 280px; color: #e2e8f0; overflow-x: hidden; }
 
-        /* الصفحة الترحيبية */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; transition: 1s ease-in-out; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
         .intro-icon { font-size: 80px; color: var(--main); animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); text-shadow: 0 0 30px var(--main); } }
 
-        /* الخلفية الاحترافية */
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* الهيدر الفخم */
         .header-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 8px 0; text-align: center; }
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 14px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
         .promo-text { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 8px; }
 
-        /* أزرار التواصل */
         .social-links { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
         .social-btn { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
         .social-btn:hover { transform: translateY(-2px); }
 
-        /* شريط الأخبار المتحرك */
         .news-ticker { background: rgba(225, 29, 72, 0.12); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 6px 0; overflow: hidden; white-space: nowrap; margin-bottom: 8px; display: flex; align-items: center; }
         .news-ticker marquee { color: #fff; font-size: 11px; font-weight: 700; flex: 1; }
         .ticker-label { background: var(--main); color: #fff; padding: 2px 10px; border-radius: 4px; font-size: 9px; margin-right: 10px; font-weight: 900; z-index: 2; }
 
-        /* أقسام القنوات */
         .category-tabs { display: flex; gap: 10px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
         .category-tabs::-webkit-scrollbar { display: none; }
         .cat-item { min-width: 70px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 15px; cursor: pointer; text-align: center; transition: 0.4s; }
@@ -92,7 +86,6 @@ date_default_timezone_set('Asia/Riyadh');
         .cat-item img { width: 28px; height: 28px; object-fit: contain; margin-bottom: 4px; }
         .cat-item span { font-size: 9px; font-weight: 900; color: #fff; display: block; }
 
-        /* الشبكة والكروت */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; margin-top: -10px; }
         .channel-section { display: none; grid-column: 1/-1; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
         .channel-section.active { display: grid; animation: slideUp 0.6s ease-out; }
@@ -105,7 +98,6 @@ date_default_timezone_set('Asia/Riyadh');
         
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
-        @keyframes blink { 50% { opacity: 0.1; } }
         footer { text-align: center; padding: 50px; font-size: 11px; opacity: 0.5; }
     </style>
 </head>
@@ -120,9 +112,7 @@ date_default_timezone_set('Asia/Riyadh');
 
 <div class="header-fixed">
     <div class="online-badge"><span>● متواجد الآن: <span id="realtime-visitors"><?php echo $online_now; ?></span></span></div>
-    
     <div class="promo-text">للاشتراك في الباقة كاملة تواصل معنا عبر:</div>
-
     <div class="social-links">
         <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
         <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
