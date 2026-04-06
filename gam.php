@@ -1,174 +1,258 @@
 <?php
 session_start();
-// نظام متطور لحفظ السجل الشخصي
-$highScore = $_SESSION['high_score'] ?? 0;
+// في الألعاب الاحترافية، نستخدم PHP هنا للتحقق من الجلسة، وتأمين التوكنات، وتهيئة البيانات
+$highScore = $_SESSION['pro_high_score'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>Neon Warrior - Ultimate Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+    <title>Alien Hunter - Pro Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Orbitron', sans-serif; }
-        #game-wrapper {
-            position: relative; width: 100vw; height: 100vh;
-            display: flex; justify-content: center; align-items: center;
-        }
-        canvas { background: #050505; border: 2px solid #333; box-shadow: 0 0 50px rgba(0,0,0,1); }
+        body { margin: 0; background: #0a0a0a; color: white; overflow: hidden; font-family: 'Cairo', sans-serif; cursor: crosshair; }
+        #game-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        canvas { background: #141414; border: 4px solid #222; box-shadow: 0 0 100px #000; }
         
-        /* واجهة المستخدم */
-        .hud {
-            position: absolute; top: 20px; left: 20px; width: 300px;
-            pointer-events: none; z-index: 10;
-        }
-        .hp-bar-bg { width: 100%; height: 15px; background: #444; border-radius: 10px; overflow: hidden; }
-        .hp-bar-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ff0055, #ff7675); transition: 0.3s; }
-        
-        .score-box { color: #00d2ff; font-size: 24px; margin-top: 10px; text-shadow: 0 0 10px #00d2ff; }
+        /* واجهة المستخدم (HUD) الاحترافية */
+        .hud { position: absolute; padding: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0 #000; }
+        .top-left { top: 10px; left: 10px; color: #ff0055; }
+        .top-right { top: 10px; right: 10px; color: #00d2ff; }
+        .hp-bar { width: 250px; height: 10px; background: #333; border: 1px solid #ff0055; margin-bottom: 5px; }
+        .hp-fill { width: 100%; height: 100%; background: #ff0055; transition: 0.1s linear; }
 
-        /* شاشة البداية والنهاية */
-        .overlay {
-            position: absolute; background: rgba(0,0,0,0.9);
-            color: white; padding: 40px; text-align: center; border: 1px solid #00d2ff;
+        /* شاشة النهاية */
+        #game-over-screen {
+            position: absolute; display: none; text-align: center;
+            background: rgba(0,0,0,0.9); padding: 50px; border: 1px solid #ff0055;
         }
-        button {
-            background: transparent; color: #00d2ff; border: 2px solid #00d2ff;
-            padding: 10px 30px; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s;
-        }
-        button:hover { background: #00d2ff; color: black; box-shadow: 0 0 20px #00d2ff; }
-        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div id="game-wrapper">
-    <div class="hud">
-        <div class="hp-bar-bg"><div id="hp-fill" class="hp-bar-fill"></div></div>
-        <div class="score-box">SCORE: <span id="current-score">0</span></div>
+<div id="game-container">
+    <div class="hud top-left">
+        <div class="hp-bar"><div id="hp-fill" class="hp-fill"></div></div>
+        AMMO: INF
+    </div>
+    <div class="hud top-right">
+        SCORE: <span id="score">0</span>
     </div>
 
     <canvas id="gameCanvas"></canvas>
 
-    <div id="start-screen" class="overlay">
-        <h1 style="color:#00d2ff; font-size: 48px;">NEON WARRIOR</h1>
-        <p>استخدم المسافة (SPACE) للقفز فوق النيازك</p>
-        <button onclick="initGame()">إطلاق المحرك</button>
+    <div id="game-over-screen">
+        <h1 style="color:#ff0055; font-size:60px;">GAME OVER</h1>
+        <p>تصديك للهجوم فشل.</p>
+        <button onclick="location.reload()" style="padding:10px 20px; cursor:pointer;">إعادة المحاولة</button>
     </div>
 </div>
 
 <script>
+// --- إعدادات المحرك الاحترافي ---
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const hpFill = document.getElementById('hp-fill');
-const scoreText = document.getElementById('current-score');
+const scoreEl = document.getElementById('score');
 
-canvas.width = 1000;
-canvas.height = 400;
+// حجم الخريطة (كبيرة) - VIEWPORT
+canvas.width = window.innerWidth * 0.9;
+canvas.height = window.innerHeight * 0.9;
 
-// إعدادات اللعبة الاحترافية
-let gameState = 'START';
+const input = { left: false, right: false, up: false, down: false };
+const mouse = { x: 0, y: 0 };
+let gameState = 'PLAYING';
 let score = 0;
-let health = 100;
 let frame = 0;
 
-// كائن اللاعب (المحارب)
-const player = {
-    x: 100, y: 300, w: 40, h: 60,
-    dy: 0, jumpPower: -15, gravity: 0.8,
-    isGrounded: false,
-    color: '#00d2ff'
-};
+// --- الفئات (Classes) للأجسام - هيكلة احترافية ---
 
-// العقبات (النيازك)
-let obstacles = [];
-
-function initGame() {
-    document.getElementById('start-screen').classList.add('hidden');
-    gameState = 'PLAYING';
-    score = 0;
-    health = 100;
-    obstacles = [];
-    animate();
+// 1. اللاعب (Player)
+class Player {
+    constructor(x, y) {
+        this.x = x; this.y = y; this.radius = 15;
+        this.color = '#00d2ff'; this.speed = 5; this.health = 100;
+        this.angle = 0;
+    }
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        // جسم اللاعب
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 15; ctx.shadowColor = this.color;
+        ctx.beginPath(); ctx.arc(0, 0, this.radius, 0, Math.PI * 2); ctx.fill();
+        // سلاح اللاعب لتعيين الاتجاه
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, -3, this.radius + 10, 6);
+        ctx.restore();
+    }
+    update() {
+        if (input.left) this.x -= this.speed;
+        if (input.right) this.x += this.speed;
+        if (input.up) this.y -= this.speed;
+        if (input.down) this.y += this.speed;
+        
+        // تدوير اللاعب نحو الماوس
+        this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
+    }
 }
 
+// 2. الرصاص (Projectile)
+class Projectile {
+    constructor(x, y, angle) {
+        this.x = x; this.y = y; this.radius = 4; this.color = '#fff000';
+        this.speed = 12;
+        this.velocity = {
+            x: Math.cos(angle) * this.speed,
+            y: Math.sin(angle) * this.speed
+        };
+    }
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 10; ctx.shadowColor = this.color;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill();
+    }
+    update() {
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+    }
+}
+
+// 3. الكائنات الفضائية (Aliens)
+class Alien {
+    constructor(x, y, level) {
+        this.x = x; this.y = y; this.radius = 12 + level;
+        this.color = '#55ff55'; this.speed = 2 + (level/10);
+    }
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 10; ctx.shadowColor = this.color;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill();
+        // تأثير "عين" مرعب
+        ctx.fillStyle = 'red'; ctx.beginPath(); ctx.arc(this.x, this.y, 4, 0, Math.PI * 2); ctx.fill();
+    }
+    update(player) {
+        // AI بسيط: ملاحقة اللاعب
+        let angle = Math.atan2(player.y - this.y, player.x - this.x);
+        this.x += Math.cos(angle) * this.speed;
+        this.y += Math.sin(angle) * this.speed;
+    }
+}
+
+// 4. نظام الجسيمات (Particles/Blood)
+class Particle {
+    constructor(x, y, color) {
+        this.x = x; this.y = y; this.radius = Math.random() * 3;
+        this.color = color;
+        this.velocity = { x: (Math.random() - 0.5) * 6, y: (Math.random() - 0.5) * 6 };
+        this.alpha = 1; this.decay = Math.random() * 0.02 + 0.01;
+    }
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+    }
+    update() {
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        this.alpha -= this.decay;
+    }
+}
+
+// --- تهيئة الكائنات ---
+const player = new Player(canvas.width / 2, canvas.height / 2);
+let projectiles = [];
+let aliens = [];
+let particles = [];
+
+// --- نظام الإدخال ---
 window.addEventListener('keydown', e => {
-    if (e.code === 'Space' && player.isGrounded) {
-        player.dy = player.jumpPower;
-        player.isGrounded = false;
+    if (e.key === 'a' || e.key === 'ArrowLeft') input.left = true;
+    if (e.key === 'd' || e.key === 'ArrowRight') input.right = true;
+    if (e.key === 'w' || e.key === 'ArrowUp') input.up = true;
+    if (e.key === 's' || e.key === 'ArrowDown') input.down = true;
+});
+window.addEventListener('keyup', e => {
+    if (e.key === 'a' || e.key === 'ArrowLeft') input.left = false;
+    if (e.key === 'd' || e.key === 'ArrowRight') input.right = false;
+    if (e.key === 'w' || e.key === 'ArrowUp') input.up = false;
+    if (e.key === 's' || e.key === 'ArrowDown') input.down = false;
+});
+window.addEventListener('mousemove', e => {
+    let rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+});
+window.addEventListener('mousedown', () => {
+    if (gameState === 'PLAYING') {
+        projectiles.push(new Projectile(player.x, player.y, player.angle));
     }
 });
 
-function drawBackground() {
-    // تأثير Grid (شبكة) متحركة لتعطي شعور بالسرعة
-    ctx.strokeStyle = '#111';
-    for(let i=0; i<canvas.width; i+=40) {
-        ctx.beginPath();
-        ctx.moveTo(i - (frame % 40), 0);
-        ctx.lineTo(i - (frame % 40), canvas.height);
-        ctx.stroke();
-    }
-}
-
+// --- الحلقة الرئيسية (Game Loop) ---
 function animate() {
     if (gameState !== 'PLAYING') return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     frame++;
 
-    drawBackground();
+    // 1. تنظيف الشاشة (خلفية شبه شفافة لتأثير Trail)
+    ctx.fillStyle = 'rgba(20, 20, 20, 0.3)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // فيزياء اللاعب
-    player.dy += player.gravity;
-    player.y += player.dy;
+    // 2. تحديث ورسم اللاعب
+    player.update();
+    player.draw();
 
-    if (player.y + player.h > 350) { // الأرضية
-        player.y = 350 - player.h;
-        player.dy = 0;
-        player.isGrounded = true;
+    // 3. إدارة الرصاص
+    projectiles.forEach((p, i) => {
+        p.update(); p.draw();
+        // إزالة الرصاص خارج الشاشة
+        if (p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) {
+            projectiles.splice(i, 1);
+        }
+    });
+
+    // 4. إدارة الجسيمات (الدماء)
+    particles.forEach((part, i) => {
+        if (part.alpha <= 0) { particles.splice(i, 1); }
+        else { part.update(); part.draw(); }
+    });
+
+    // 5. إدارة الأعداء (AI)
+    // سباون عشوائي للأعداء خارج الشاشة
+    if (frame % 60 === 0) {
+        let x, y;
+        if (Math.random() < 0.5) { x = Math.random() < 0.5 ? -30 : canvas.width + 30; y = Math.random() * canvas.height; }
+        else { x = Math.random() * canvas.width; y = Math.random() < 0.5 ? -30 : canvas.height + 30; }
+        aliens.push(new Alien(x, y, score/100));
     }
 
-    // رسم المحارب (تأثير وهج النيون)
-    ctx.fillStyle = player.color;
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = player.color;
-    ctx.fillRect(player.x, player.y, player.w, player.h);
-    
-    // رسم "عين" المحارب لتعطيه شخصية
-    ctx.fillStyle = "white";
-    ctx.fillRect(player.x + 25, player.y + 15, 10, 5);
+    aliens.forEach((a, i) => {
+        a.update(player); a.draw();
 
-    // إدارة العقبات
-    if (frame % 70 === 0) {
-        obstacles.push({ x: canvas.width, y: 310, w: 30, h: 40, color: '#ff0055' });
-    }
-
-    obstacles.forEach((obs, i) => {
-        obs.x -= (7 + score/100); // تزداد السرعة مع السكور
-        
-        ctx.fillStyle = obs.color;
-        ctx.shadowColor = obs.color;
-        ctx.beginPath();
-        ctx.moveTo(obs.x, obs.y + obs.h);
-        ctx.lineTo(obs.x + obs.w/2, obs.y);
-        ctx.lineTo(obs.x + obs.w, obs.y + obs.h);
-        ctx.fill();
-
-        // تحقق التصادم
-        if (player.x < obs.x + obs.w && player.x + player.w > obs.x &&
-            player.y < obs.y + obs.h && player.y + player.h > obs.y) {
-            health -= 2;
-            hpFill.style.width = health + '%';
-            ctx.fillStyle = 'white'; // وميض عند الإصابة
-            ctx.fillRect(0,0, canvas.width, canvas.height);
-            if (health <= 0) gameOver();
+        // اصطدام العدو باللاعب
+        let distToPlayer = Math.hypot(player.x - a.x, player.y - a.y);
+        if (distToPlayer < a.radius + player.radius) {
+            player.health -= 0.5; // ضرر مستمر عند الملامسة
+            hpFill.style.width = player.health + '%';
+            if (player.health <= 0) gameOver();
         }
 
-        if (obs.x + obs.w < 0) {
-            obstacles.splice(i, 1);
-            score += 10;
-            scoreText.innerText = score;
-        }
+        // اصطدام الرصاص بالعدو
+        projectiles.forEach((p, pi) => {
+            let distToBullet = Math.hypot(p.x - a.x, p.y - a.y);
+            if (distToBullet < a.radius + p.radius) {
+                // توليد دماء ( Particles)
+                for (let k = 0; k < 10; k++) { particles.push(new Particle(a.x, a.y, '#55ff55')); }
+                
+                aliens.splice(i, 1);
+                projectiles.splice(pi, 1);
+                score += 10;
+                scoreEl.innerText = score;
+            }
+        });
     });
 
     requestAnimationFrame(animate);
@@ -176,13 +260,12 @@ function animate() {
 
 function gameOver() {
     gameState = 'END';
-    document.getElementById('start-screen').classList.remove('hidden');
-    document.getElementById('start-screen').innerHTML = `
-        <h1 style="color:#ff0055">MISSION FAILED</h1>
-        <p>Score: ${score}</p>
-        <button onclick="location.reload()">REBOOT SYSTEM</button>
-    `;
+    document.getElementById('game-over-screen').style.display = 'block';
+    canvas.style.filter = 'blur(10px)';
 }
+
+// البدء
+animate();
 </script>
 </body>
 </html>
