@@ -34,7 +34,7 @@ $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents(
 function getCloudFullData($bin, $key) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $KEY, "X-Bin-Meta: false"]);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
     $res = curl_exec($ch);
     curl_close($ch);
     return json_decode($res, true);
@@ -65,7 +65,7 @@ date_default_timezone_set('Asia/Riyadh');
 
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: max-width 0.4s; }
 
-        /* شاشة الدخول الاحترافية */
+        /* شاشة الدخول */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
         .loader-content { display: flex; flex-direction: column; align-items: center; }
@@ -81,11 +81,10 @@ date_default_timezone_set('Asia/Riyadh');
         /* الهيدر الثابت */
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: max-width 0.4s; }
         
-        /* أيقونات الجرس والمتواجدين العائمة عثمان */
+        /* الجرس وتحته المتواجدين عثمان */
         .notify-bell-btn { position: fixed; bottom: 85px; left: 25px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
         .notify-dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; }
         
-        /* المتواجدين أسفل الجرس عثمان */
         .visitors-badge-float { position: fixed; bottom: 25px; left: 25px; width: 45px; height: 45px; background: rgba(34, 197, 94, 0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1.5px solid #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.2); }
         .visitors-badge-float i { font-size: 14px; color: #22c55e; }
         .visitors-badge-float span { font-size: 11px; font-weight: 900; color: #fff; }
