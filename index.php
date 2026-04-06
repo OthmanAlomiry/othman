@@ -61,27 +61,26 @@ date_default_timezone_set('Asia/Riyadh');
     <style>
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); }
         
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 260px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: padding 0.3s; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 260px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; }
 
-        .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; }
+        /* الحاوية الذكية: تتمدد في العرض وتلم في الطول عثمان */
+        .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: max-width 0.4s; }
 
-        /* شاشة الدخول الاحترافية */
-        #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s cubic-bezier(0.65, 0, 0.35, 1); }
+        /* شاشة الدخول */
+        #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
         .loader-content { display: flex; flex-direction: column; align-items: center; }
         .intro-icon-box { width: 100px; height: 100px; background: var(--main); border-radius: 30%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(225, 29, 72, 0.5); animation: bounceIn 1s ease-out, glowPulse 2s infinite ease-in-out; }
         .intro-icon-box i { font-size: 50px; color: white; }
         .intro-title { margin-top: 25px; color: white; font-weight: 900; font-size: 24px; letter-spacing: 1px; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .intro-subtitle { color: #94a3b8; font-size: 14px; margin-top: 5px; }
         .loading-bar { width: 150px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 30px; overflow: hidden; position: relative; }
         .loading-bar::after { content: ""; position: absolute; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--main), transparent); animation: loadingMove 1.5s infinite; }
-
         @keyframes glowPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes loadingMove { 100% { left: 100%; } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
 
         /* الهيدر الثابت */
-        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; }
+        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 10px 0; text-align: center; transition: max-width 0.4s; }
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 14px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
         .promo-text { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 10px; }
         
@@ -97,7 +96,7 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
-        .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.4s; }
+        .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; }
         .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.03); }
         .cat-item img { width: 26px; height: 26px; object-fit: contain; margin-bottom: 4px; }
         .cat-item span { font-size: 8px; font-weight: 900; color: #fff; display: block; }
@@ -115,24 +114,21 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 77, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
 
         .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 13px; transition: 0.4s; }
-        .play-btn:hover { background: var(--main); border-color: var(--main); transform: scale(1.02); box-shadow: 0 0 20px rgba(225, 29, 72, 0.4); }
+        .play-btn:hover { background: var(--main); border-color: var(--main); }
 
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.png'); background-size: cover; background-position: center; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-        /* تعديلات وضع الإمالة (Landscape) عثمان */
-        @media screen and (orientation: landscape) and (max-height: 500px) {
-            body { padding-top: 150px; }
-            .header-fixed { padding: 5px 0; }
-            .online-badge, .promo-text, .social-links { display: none; } /* إخفاء العناصر غير الضرورية لتوفير مساحة */
-            .news-ticker { margin-bottom: 5px; }
-            .category-tabs { padding: 2px 0; }
-            .cat-item { padding: 4px 2px; min-width: 60px; }
-            .cat-item img { width: 20px; height: 20px; margin-bottom: 2px; }
-            .cat-item span { font-size: 7px; }
+        /* تعديلات وضع الإمالة (Landscape) - إصلاح التمدد والشريط عثمان */
+        @media screen and (orientation: landscape) {
+            .main-container { max-width: 95%; } /* يتمدد لملء الشاشة عثمان */
+            .header-fixed { max-width: 95%; padding: 5px 0; }
+            body { padding-top: 140px; } /* تقليل الفراغ العلوي ليناسب الميلان */
+            .promo-text { display: none; } /* إخفاء النص لفتح مساحة للشريط */
+            .social-links { margin-bottom: 5px; }
+            .social-btn { padding: 4px 5px; font-size: 8px; }
         }
 
-        /* الإشعارات */
         #notify-toast { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; background: rgba(14, 165, 233, 0.95); backdrop-filter: blur(10px); color: white; padding: 12px 18px; border-radius: 20px; z-index: 6000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: 0.6s; border: 1px solid rgba(255,255,255,0.2); }
         #notify-toast.show { top: 20px; }
         #notify-panel { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: 280px; max-height: 350px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid var(--glass-border); z-index: 5500; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
@@ -153,7 +149,6 @@ date_default_timezone_set('Asia/Riyadh');
     <div class="loader-content">
         <div class="intro-icon-box"><i class="fas fa-play-circle"></i></div>
         <h2 class="intro-title">الخدمة الرقمية</h2>
-        <span class="intro-subtitle">بوابتك لعالم الرياضة والترفيه</span>
         <div class="loading-bar"></div>
     </div>
 </div>
@@ -262,7 +257,7 @@ function checkNotifications() {
     });
 }
 
-setInterval(checkNotifications, 1000);
+setInterval(checkNotifications, 10000);
 window.addEventListener('load', () => { 
     setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 2000); 
     checkNotifications();
