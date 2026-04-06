@@ -63,7 +63,7 @@ date_default_timezone_set('Asia/Riyadh');
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 260px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; }
 
-        /* الحاوية الذكية: تتمدد في العرض وتلم في الطول عثمان */
+        /* الحاوية الذكية عثمان */
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: max-width 0.4s; }
 
         /* شاشة الدخول */
@@ -84,10 +84,12 @@ date_default_timezone_set('Asia/Riyadh');
         .online-badge { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); padding: 4px 14px; border-radius: 50px; color: #22c55e; font-size: 9px; font-weight: 900; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; }
         .promo-text { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 10px; }
         
+        /* أزرار التواصل الاجتماعي - حدود بيضاء عثمان */
         .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 12px; flex-wrap: nowrap; padding: 0 10px; }
         .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; transition: 0.3s; flex: 1; text-align: center; border: 1.5px solid #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .btn-wa { background: #25d366; } .btn-tg { background: #0088cc; } .btn-sn { background: #FFFC00; color: #000 !important; } .btn-tw { background: #000; }
 
+        /* الشريط الإخباري */
         .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
         .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; display: flex; align-items: center; }
@@ -95,12 +97,14 @@ date_default_timezone_set('Asia/Riyadh');
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
+        /* الأقسام */
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
         .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; }
         .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.03); }
         .cat-item img { width: 26px; height: 26px; object-fit: contain; margin-bottom: 4px; }
         .cat-item span { font-size: 8px; font-weight: 900; color: #fff; display: block; }
 
+        /* الشبكة والكروت */
         .grid { padding: 15px; }
         .channel-section { display: none; width: 100%; }
         .channel-section.active { display: block; animation: slideUp 0.6s ease-out; }
@@ -113,18 +117,26 @@ date_default_timezone_set('Asia/Riyadh');
         .live-dot { width: 6px; height: 6px; background: #ff4d4d; border-radius: 50%; animation: pulse-red 1.2s infinite; }
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 77, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
 
+        /* زر التشغيل عثمان */
         .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 13px; transition: 0.4s; }
         .play-btn:hover { background: var(--main); border-color: var(--main); }
+        
+        /* لون الزر عند نجاح الاتصال - مريح للعين عثمان */
+        .play-btn.connected { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; 
+            border-color: #38bdf8 !important; 
+            color: #38bdf8 !important;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2) !important;
+        }
 
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.png'); background-size: cover; background-position: center; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-        /* تعديلات وضع الإمالة (Landscape) - إصلاح التمدد والشريط عثمان */
         @media screen and (orientation: landscape) {
-            .main-container { max-width: 95%; } /* يتمدد لملء الشاشة عثمان */
+            .main-container { max-width: 95%; } 
             .header-fixed { max-width: 95%; padding: 5px 0; }
-            body { padding-top: 140px; } /* تقليل الفراغ العلوي ليناسب الميلان */
-            .promo-text { display: none; } /* إخفاء النص لفتح مساحة للشريط */
+            body { padding-top: 140px; } 
+            .promo-text { display: none; } 
             .social-links { margin-bottom: 5px; }
             .social-btn { padding: 4px 5px; font-size: 8px; }
         }
@@ -137,7 +149,6 @@ date_default_timezone_set('Asia/Riyadh');
         .notify-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 10px; margin-bottom: 6px; border-right: 3px solid #0ea5e9; font-size: 11px; }
         .notify-bell-btn { position: fixed; bottom: 25px; left: 20px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; }
         .notify-dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; }
-
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         footer { text-align: center; padding: 40px; font-size: 10px; opacity: 0.5; }
@@ -276,6 +287,7 @@ function startStream(boxId, file, btn) {
     vBox.style.backgroundImage = "none";
     vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
     btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الاتصال بالبث';
+    btn.classList.add('connected'); // إضافة الكلاس لتغيير اللون عثمان
 }
 
 setInterval(() => { 
