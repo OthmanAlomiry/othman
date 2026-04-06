@@ -1,187 +1,141 @@
 <?php
 session_start();
-
-// تهيئة أعلى نتيجة إذا لم تكن موجودة
-if (!isset($_SESSION['high_score'])) {
-    $_SESSION['high_score'] = 0;
-}
-
-// استقبال النتيجة الجديدة من JavaScript عبر طلب AJAX (اختياري لتطوير اللعبة)
+// افتراضاً أننا سنخزن أفضل سكور في الجلسة
+$highScore = isset($_SESSION['high_score']) ? $_SESSION['high_score'] : 0;
 ?>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة التحدي الاحترافية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>الهروب من العقبات - برو</title>
     <style>
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #a29bfe;
-            --bg: #2d3436;
-            --text: #ffffff;
-        }
-
         body {
-            font-family: 'Cairo', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0; background: #0f0c29; 
+            color: white; font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh;
         }
-
-        /* لوحة التحكم */
-        .stats-bar {
-            background: rgba(0, 0, 0, 0.5);
-            width: 100%;
-            padding: 15px;
-            display: flex;
-            justify-content: space-around;
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid var(--primary);
-            z-index: 10;
+        #gameContainer { position: relative; border: 4px solid #00d2ff; box-shadow: 0 0 20px #00d2ff; }
+        canvas { background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e); display: block; }
+        .ui {
+            position: absolute; top: 10px; left: 10px; font-size: 20px;
+            text-shadow: 2px 2px #000; pointer-events: none;
         }
-
-        .stat-box { font-size: 1.2rem; font-weight: bold; }
-
-        /* منطقة اللعب */
-        #game-canvas {
-            position: relative;
-            width: 100vw;
-            height: calc(100vh - 70px);
-            cursor: crosshair;
+        #menu {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; background: rgba(0,0,0,0.8); padding: 30px; border-radius: 15px;
         }
-
-        /* الهدف */
-        .target {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle, #ff7675, #d63031);
-            border-radius: 50%;
-            box-shadow: 0 0 15px #ff7675;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-
-        .target:active { transform: scale(0.8); }
-
-        /* شاشة البداية والنهاية */
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
         button {
-            padding: 15px 40px;
-            font-size: 1.5rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-family: 'Cairo';
-            transition: 0.3s;
+            padding: 10px 25px; font-size: 18px; cursor: pointer;
+            background: #00d2ff; border: none; border-radius: 5px; color: #000; font-weight: bold;
         }
-
-        button:hover { background: var(--secondary); transform: scale(1.05); }
-
-        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="stats-bar">
-    <div class="stat-box">النقاط: <span id="score">0</span></div>
-    <div class="stat-box">الوقت: <span id="timer">30</span></div>
-    <div class="stat-box">أعلى نتيجة: <span><?php echo $_SESSION['high_score']; ?></span></div>
-</div>
-
-<div id="game-canvas"></div>
-
-<div id="start-screen" class="overlay">
-    <h1>جاهز للتحدي؟</h1>
-    <p>اضغط على أكبر عدد من الأهداف قبل انتهاء الوقت!</p>
-    <button onclick="startGame()">ابدأ اللعب</button>
-</div>
-
-<div id="end-screen" class="overlay hidden">
-    <h1>انتهى الوقت!</h1>
-    <p>نتيجتك هي: <span id="final-score">0</span></p>
-    <button onclick="location.reload()">إعادة المحاولة</button>
+<div id="gameContainer">
+    <div class="ui">السكور: <span id="score">0</span> | أفضل نتيجة: <?php echo $highScore; ?></div>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    
+    <div id="menu">
+        <h1 id="title">مكعب النيون</h1>
+        <p id="desc">اضغط "مسافة" أو انقر للقفز</p>
+        <button onclick="startGame()">ابدأ التحدي</button>
+    </div>
 </div>
 
 <script>
-    let score = 0;
-    let timeLeft = 30;
-    let gameActive = false;
-    const canvas = document.getElementById('game-canvas');
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
     const scoreEl = document.getElementById('score');
-    const timerEl = document.getElementById('timer');
+    const menu = document.getElementById('menu');
+
+    // إعدادات اللعبة
+    let player = { x: 50, y: 300, w: 30, h: 30, dy: 0, jump: -12, gravity: 0.6 };
+    let obstacles = [];
+    let score = 0;
+    let isGameOver = true;
+    let gameSpeed = 5;
 
     function startGame() {
-        document.getElementById('start-screen').classList.add('hidden');
-        gameActive = true;
-        spawnTarget();
-        const countdown = setInterval(() => {
-            timeLeft--;
-            timerEl.innerText = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                endGame();
-            }
-        }, 1000);
+        isGameOver = false;
+        score = 0;
+        gameSpeed = 5;
+        obstacles = [];
+        player.y = 300;
+        menu.style.display = 'none';
+        update();
     }
 
-    function spawnTarget() {
-        if (!gameActive) return;
+    // التحكم
+    window.addEventListener('keydown', (e) => { if(e.code === 'Space') player.dy = player.jump; });
+    canvas.addEventListener('mousedown', () => { player.dy = player.jump; });
 
-        const target = document.createElement('div');
-        target.className = 'target';
-        
-        // حساب موقع عشوائي
-        const x = Math.random() * (window.innerWidth - 60);
-        const y = Math.random() * (canvas.offsetHeight - 60);
-        
-        target.style.left = x + 'px';
-        target.style.top = y + 'px';
+    function update() {
+        if(isGameOver) return;
 
-        target.onclick = () => {
-            score += 10;
-            scoreEl.innerText = score;
-            target.remove();
-            spawnTarget();
-        };
+        // فيزياء اللاعب
+        player.dy += player.gravity;
+        player.y += player.dy;
 
-        canvas.appendChild(target);
+        // اصطدام بالأرض
+        if(player.y + player.h > canvas.height) {
+            player.y = canvas.height - player.h;
+            player.dy = 0;
+        }
 
-        // اختفاء الهدف بعد ثانية إذا لم يُضغط عليه
-        setTimeout(() => {
-            if (target.parentElement) {
-                target.remove();
-                spawnTarget();
+        // توليد العقبات
+        if(Math.random() < 0.02) {
+            obstacles.push({ x: canvas.width, y: canvas.height - 40, w: 20, h: 40 });
+        }
+
+        // تحريك العقبات
+        obstacles.forEach((obs, index) => {
+            obs.x -= gameSpeed;
+            
+            // تحقق من الاصطدام
+            if (player.x < obs.x + obs.w && player.x + player.w > obs.x &&
+                player.y < obs.y + obs.h && player.y + player.h > obs.y) {
+                gameOver();
             }
-        }, 1200);
+
+            if(obs.x + obs.w < 0) {
+                obstacles.splice(index, 1);
+                score++;
+                scoreEl.innerText = score;
+                gameSpeed += 0.1; // زيادة الصعوبة تدريجياً
+            }
+        });
+
+        draw();
+        requestAnimationFrame(update);
     }
 
-    function endGame() {
-        gameActive = false;
-        document.getElementById('end-screen').classList.remove('hidden');
-        document.getElementById('final-score').innerText = score;
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // رسم اللاعب (تأثير نيون)
+        ctx.fillStyle = '#00d2ff';
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#00d2ff';
+        ctx.fillRect(player.x, player.y, player.w, player.h);
+
+        // رسم العقبات
+        ctx.fillStyle = '#ff0055';
+        ctx.shadowColor = '#ff0055';
+        obstacles.forEach(obs => {
+            ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+        });
+        ctx.shadowBlur = 0; // إعادة التصفير للأداء
+    }
+
+    function gameOver() {
+        isGameOver = true;
+        menu.style.display = 'block';
+        document.getElementById('title').innerText = "للأسف خسرت!";
+        document.getElementById('desc').innerText = "نتيجتك: " + score;
         
-        // إرسال النتيجة للسيرفر لحفظها (يمكنك استخدام fetch هنا لتحديث SESSION)
+        // إرسال النتيجة لـ PHP لحفظها (اختياري عبر AJAX)
     }
 </script>
-
 </body>
 </html>
