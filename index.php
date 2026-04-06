@@ -129,7 +129,7 @@ date_default_timezone_set('Asia/Riyadh');
             box-shadow: 0 0 15px rgba(56, 189, 248, 0.2) !important;
         }
 
-        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.png'); background-size: cover; background-position: center; position: relative; }
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background: #000; }
 
         @media screen and (orientation: landscape) {
