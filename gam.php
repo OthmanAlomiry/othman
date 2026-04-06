@@ -1,141 +1,188 @@
 <?php
 session_start();
-// افتراضاً أننا سنخزن أفضل سكور في الجلسة
-$highScore = isset($_SESSION['high_score']) ? $_SESSION['high_score'] : 0;
+// نظام متطور لحفظ السجل الشخصي
+$highScore = $_SESSION['high_score'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>الهروب من العقبات - برو</title>
+    <title>Neon Warrior - Ultimate Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            margin: 0; background: #0f0c29; 
-            color: white; font-family: 'Segoe UI', sans-serif;
-            overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh;
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Orbitron', sans-serif; }
+        #game-wrapper {
+            position: relative; width: 100vw; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
         }
-        #gameContainer { position: relative; border: 4px solid #00d2ff; box-shadow: 0 0 20px #00d2ff; }
-        canvas { background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e); display: block; }
-        .ui {
-            position: absolute; top: 10px; left: 10px; font-size: 20px;
-            text-shadow: 2px 2px #000; pointer-events: none;
+        canvas { background: #050505; border: 2px solid #333; box-shadow: 0 0 50px rgba(0,0,0,1); }
+        
+        /* واجهة المستخدم */
+        .hud {
+            position: absolute; top: 20px; left: 20px; width: 300px;
+            pointer-events: none; z-index: 10;
         }
-        #menu {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            text-align: center; background: rgba(0,0,0,0.8); padding: 30px; border-radius: 15px;
+        .hp-bar-bg { width: 100%; height: 15px; background: #444; border-radius: 10px; overflow: hidden; }
+        .hp-bar-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ff0055, #ff7675); transition: 0.3s; }
+        
+        .score-box { color: #00d2ff; font-size: 24px; margin-top: 10px; text-shadow: 0 0 10px #00d2ff; }
+
+        /* شاشة البداية والنهاية */
+        .overlay {
+            position: absolute; background: rgba(0,0,0,0.9);
+            color: white; padding: 40px; text-align: center; border: 1px solid #00d2ff;
         }
         button {
-            padding: 10px 25px; font-size: 18px; cursor: pointer;
-            background: #00d2ff; border: none; border-radius: 5px; color: #000; font-weight: bold;
+            background: transparent; color: #00d2ff; border: 2px solid #00d2ff;
+            padding: 10px 30px; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s;
         }
+        button:hover { background: #00d2ff; color: black; box-shadow: 0 0 20px #00d2ff; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div id="gameContainer">
-    <div class="ui">السكور: <span id="score">0</span> | أفضل نتيجة: <?php echo $highScore; ?></div>
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
-    
-    <div id="menu">
-        <h1 id="title">مكعب النيون</h1>
-        <p id="desc">اضغط "مسافة" أو انقر للقفز</p>
-        <button onclick="startGame()">ابدأ التحدي</button>
+<div id="game-wrapper">
+    <div class="hud">
+        <div class="hp-bar-bg"><div id="hp-fill" class="hp-bar-fill"></div></div>
+        <div class="score-box">SCORE: <span id="current-score">0</span></div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="start-screen" class="overlay">
+        <h1 style="color:#00d2ff; font-size: 48px;">NEON WARRIOR</h1>
+        <p>استخدم المسافة (SPACE) للقفز فوق النيازك</p>
+        <button onclick="initGame()">إطلاق المحرك</button>
     </div>
 </div>
 
 <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const scoreEl = document.getElementById('score');
-    const menu = document.getElementById('menu');
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const hpFill = document.getElementById('hp-fill');
+const scoreText = document.getElementById('current-score');
 
-    // إعدادات اللعبة
-    let player = { x: 50, y: 300, w: 30, h: 30, dy: 0, jump: -12, gravity: 0.6 };
-    let obstacles = [];
-    let score = 0;
-    let isGameOver = true;
-    let gameSpeed = 5;
+canvas.width = 1000;
+canvas.height = 400;
 
-    function startGame() {
-        isGameOver = false;
-        score = 0;
-        gameSpeed = 5;
-        obstacles = [];
-        player.y = 300;
-        menu.style.display = 'none';
-        update();
+// إعدادات اللعبة الاحترافية
+let gameState = 'START';
+let score = 0;
+let health = 100;
+let frame = 0;
+
+// كائن اللاعب (المحارب)
+const player = {
+    x: 100, y: 300, w: 40, h: 60,
+    dy: 0, jumpPower: -15, gravity: 0.8,
+    isGrounded: false,
+    color: '#00d2ff'
+};
+
+// العقبات (النيازك)
+let obstacles = [];
+
+function initGame() {
+    document.getElementById('start-screen').classList.add('hidden');
+    gameState = 'PLAYING';
+    score = 0;
+    health = 100;
+    obstacles = [];
+    animate();
+}
+
+window.addEventListener('keydown', e => {
+    if (e.code === 'Space' && player.isGrounded) {
+        player.dy = player.jumpPower;
+        player.isGrounded = false;
+    }
+});
+
+function drawBackground() {
+    // تأثير Grid (شبكة) متحركة لتعطي شعور بالسرعة
+    ctx.strokeStyle = '#111';
+    for(let i=0; i<canvas.width; i+=40) {
+        ctx.beginPath();
+        ctx.moveTo(i - (frame % 40), 0);
+        ctx.lineTo(i - (frame % 40), canvas.height);
+        ctx.stroke();
+    }
+}
+
+function animate() {
+    if (gameState !== 'PLAYING') return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame++;
+
+    drawBackground();
+
+    // فيزياء اللاعب
+    player.dy += player.gravity;
+    player.y += player.dy;
+
+    if (player.y + player.h > 350) { // الأرضية
+        player.y = 350 - player.h;
+        player.dy = 0;
+        player.isGrounded = true;
     }
 
-    // التحكم
-    window.addEventListener('keydown', (e) => { if(e.code === 'Space') player.dy = player.jump; });
-    canvas.addEventListener('mousedown', () => { player.dy = player.jump; });
+    // رسم المحارب (تأثير وهج النيون)
+    ctx.fillStyle = player.color;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = player.color;
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+    
+    // رسم "عين" المحارب لتعطيه شخصية
+    ctx.fillStyle = "white";
+    ctx.fillRect(player.x + 25, player.y + 15, 10, 5);
 
-    function update() {
-        if(isGameOver) return;
-
-        // فيزياء اللاعب
-        player.dy += player.gravity;
-        player.y += player.dy;
-
-        // اصطدام بالأرض
-        if(player.y + player.h > canvas.height) {
-            player.y = canvas.height - player.h;
-            player.dy = 0;
-        }
-
-        // توليد العقبات
-        if(Math.random() < 0.02) {
-            obstacles.push({ x: canvas.width, y: canvas.height - 40, w: 20, h: 40 });
-        }
-
-        // تحريك العقبات
-        obstacles.forEach((obs, index) => {
-            obs.x -= gameSpeed;
-            
-            // تحقق من الاصطدام
-            if (player.x < obs.x + obs.w && player.x + player.w > obs.x &&
-                player.y < obs.y + obs.h && player.y + player.h > obs.y) {
-                gameOver();
-            }
-
-            if(obs.x + obs.w < 0) {
-                obstacles.splice(index, 1);
-                score++;
-                scoreEl.innerText = score;
-                gameSpeed += 0.1; // زيادة الصعوبة تدريجياً
-            }
-        });
-
-        draw();
-        requestAnimationFrame(update);
+    // إدارة العقبات
+    if (frame % 70 === 0) {
+        obstacles.push({ x: canvas.width, y: 310, w: 30, h: 40, color: '#ff0055' });
     }
 
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // رسم اللاعب (تأثير نيون)
-        ctx.fillStyle = '#00d2ff';
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = '#00d2ff';
-        ctx.fillRect(player.x, player.y, player.w, player.h);
-
-        // رسم العقبات
-        ctx.fillStyle = '#ff0055';
-        ctx.shadowColor = '#ff0055';
-        obstacles.forEach(obs => {
-            ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
-        });
-        ctx.shadowBlur = 0; // إعادة التصفير للأداء
-    }
-
-    function gameOver() {
-        isGameOver = true;
-        menu.style.display = 'block';
-        document.getElementById('title').innerText = "للأسف خسرت!";
-        document.getElementById('desc').innerText = "نتيجتك: " + score;
+    obstacles.forEach((obs, i) => {
+        obs.x -= (7 + score/100); // تزداد السرعة مع السكور
         
-        // إرسال النتيجة لـ PHP لحفظها (اختياري عبر AJAX)
-    }
+        ctx.fillStyle = obs.color;
+        ctx.shadowColor = obs.color;
+        ctx.beginPath();
+        ctx.moveTo(obs.x, obs.y + obs.h);
+        ctx.lineTo(obs.x + obs.w/2, obs.y);
+        ctx.lineTo(obs.x + obs.w, obs.y + obs.h);
+        ctx.fill();
+
+        // تحقق التصادم
+        if (player.x < obs.x + obs.w && player.x + player.w > obs.x &&
+            player.y < obs.y + obs.h && player.y + player.h > obs.y) {
+            health -= 2;
+            hpFill.style.width = health + '%';
+            ctx.fillStyle = 'white'; // وميض عند الإصابة
+            ctx.fillRect(0,0, canvas.width, canvas.height);
+            if (health <= 0) gameOver();
+        }
+
+        if (obs.x + obs.w < 0) {
+            obstacles.splice(i, 1);
+            score += 10;
+            scoreText.innerText = score;
+        }
+    });
+
+    requestAnimationFrame(animate);
+}
+
+function gameOver() {
+    gameState = 'END';
+    document.getElementById('start-screen').classList.remove('hidden');
+    document.getElementById('start-screen').innerHTML = `
+        <h1 style="color:#ff0055">MISSION FAILED</h1>
+        <p>Score: ${score}</p>
+        <button onclick="location.reload()">REBOOT SYSTEM</button>
+    `;
+}
 </script>
 </body>
 </html>
