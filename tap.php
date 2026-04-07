@@ -2,7 +2,7 @@
 error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 
-// الحصول على التاريخ من الرابط أو وضع تاريخ اليوم عثمان
+// الحصول على التاريخ عثمان
 $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $display_date = date('d / m / Y', strtotime($date_get));
 
@@ -15,7 +15,7 @@ $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مباريات اليوم - الخدمة الرقمية</title>
+    <title>جدول المباريات - الخدمة الرقمية</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -28,7 +28,6 @@ $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
             padding: 0; 
             display: flex; 
             justify-content: center; 
-            overflow-x: hidden;
         }
         .container { 
             width: 100%; 
@@ -38,7 +37,7 @@ $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
             box-sizing: border-box;
         }
         
-        /* نظام الأسهم والتاريخ عثمان */
+        /* الأسهم عثمان */
         .date-navigation {
             display: flex;
             align-items: center;
@@ -62,22 +61,16 @@ $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
             border-radius: 50%;
             transition: 0.3s;
         }
-        .current-date-box { text-align: center; }
         .current-date-box h3 { margin: 0; font-size: 15px; font-weight: 900; color: #fff; }
 
-        /* حاوية الجدول عثمان */
-        .matches-frame-container {
+        /* حاوية الويجت الجديد عثمان */
+        .widget-wrapper {
             width: 100%;
-            height: 1200px; /* طول كافي لعرض كل الدوريات عثمان */
             border-radius: 20px;
             overflow: hidden;
             border: 1px solid var(--border);
-            background: #fff; /* المصدر خلفيته فاتحه لضمان وضوح الشعار */
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+            background: #111;
+            min-height: 600px;
         }
 
         footer { text-align: center; padding: 20px; font-size: 10px; opacity: 0.4; }
@@ -94,11 +87,18 @@ $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
         <a href="?d=<?= $next_date ?>"><i class="fas fa-chevron-left"></i></a>
     </div>
 
-    <div class="matches-frame-container">
-        <iframe src="https://www.scoreaxis.com/widget/live-scores?autoHeight=1&font=Tajawal&lang=ar&d=<?= $date_get ?>&bodyBackground=%23050c14&textColor=%23ffffff" scrolling="yes"></iframe>
+    <div class="widget-wrapper">
+        <div id="match-center-widget"></div>
+        <iframe src="https://mainsite-widget.api-itv.com/api/widget/matchcenter?language=ar&timezone=3&date=<?= $date_get ?>&theme=dark" 
+                width="100%" 
+                height="800px" 
+                frameborder="0" 
+                scrolling="yes" 
+                style="border:none;">
+        </iframe>
     </div>
 
-    <footer>تحديث تلقائي شامل - الخدمة الرقمية © 2026</footer>
+    <footer>تحديث لحظي ذكي - الخدمة الرقمية © 2026</footer>
 </div>
 
 </body>
