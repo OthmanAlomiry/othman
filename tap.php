@@ -9,17 +9,17 @@ $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 
-// القائمة المحدثة بالدوريات عثمان (إضافة الدوري الأوروبي ID: 3)
+// قائمة الدوريات مع أرقام القنوات الصحيحة - عثمان
 $my_leagues = [
-    307 => ['name' => 'الدوري السعودي', 'channels' => [['n' => 'ثمانية 1', 'no' => '101']]],
-    2   => ['name' => 'دوري أبطال أوروبا', 'channels' => [['n' => 'beIN 1', 'no' => '201'], ['n' => 'beIN 4K', 'no' => '200']]],
-    3   => ['name' => 'الدوري الأوروبي', 'channels' => [['n' => 'beIN 1 Premium', 'no' => '201'], ['n' => 'beIN 2', 'no' => '202']]],
-    5   => ['name' => 'دوري أبطال آسيا', 'channels' => [['n' => 'beIN AFC', 'no' => '224'], ['n' => 'ثمانية الرياضية', 'no' => '108']]],
-    39  => ['name' => 'الدوري الإنجليزي', 'channels' => [['n' => 'beIN Prem 1', 'no' => '201']]],
-    140 => ['name' => 'الدوري الإسباني', 'channels' => [['n' => 'beIN 1', 'no' => '211']]],
-    135 => ['name' => 'الدوري الإيطالي', 'channels' => [['n' => 'AD Premium 1', 'no' => 'Starz']]],
-    78  => ['name' => 'الدوري الألماني', 'channels' => [['n' => 'beIN 3', 'no' => '213']]],
-    61  => ['name' => 'الدوري الفرنسي', 'channels' => [['n' => 'beIN 4', 'no' => '214']]]
+    307 => ['name' => 'الدوري السعودي', 'channels' => [['n' => 'SSC Sports', 'no' => '1']]],
+    2   => ['name' => 'دوري أبطال أوروبا', 'channels' => [['n' => 'beIN Sports', 'no' => '1']]],
+    3   => ['name' => 'الدوري الأوروبي', 'channels' => [['n' => 'beIN Sports', 'no' => '2']]],
+    5   => ['name' => 'دوري أبطال آسيا', 'channels' => [['n' => 'beIN AFC', 'no' => '4']]],
+    39  => ['name' => 'الدوري الإنجليزي', 'channels' => [['n' => 'beIN Premium', 'no' => '1']]],
+    140 => ['name' => 'الدوري الإسباني', 'channels' => [['n' => 'beIN Sports', 'no' => '3']]],
+    135 => ['name' => 'الدوري الإيطالي', 'channels' => [['n' => 'AD Sports', 'no' => '1']]],
+    78  => ['name' => 'الدوري الألماني', 'channels' => [['n' => 'beIN Sports', 'no' => '5']]],
+    61  => ['name' => 'الدوري الفرنسي', 'channels' => [['n' => 'beIN Sports', 'no' => '6']]]
 ];
 
 function translateText($text) {
@@ -62,7 +62,7 @@ foreach ($fixtures as $f) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مباريات اليوم - دقة كاملة</title>
+    <title>مباريات اليوم</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -78,7 +78,7 @@ foreach ($fixtures as $f) {
         .team img { width: 38px; height: 38px; display: block; margin: 0 auto 8px; object-fit: contain; }
         .score { font-size: 26px; font-weight: 900; letter-spacing: 2px; }
         .match-bottom { border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-        .ch-item { display: flex; align-items: center; gap: 5px; background: rgba(56,189,248,0.1); padding: 4px 10px; border-radius: 50px; font-size: 10px; font-weight: bold; color: #38bdf8; }
+        .ch-item { display: flex; align-items: center; gap: 5px; background: rgba(56,189,248,0.1); padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: bold; color: #38bdf8; }
         .live { color: #22c55e; font-size: 9px; animation: blink 1s infinite; font-weight: 900; }
         @keyframes blink { 50% { opacity: 0.5; } }
     </style>
@@ -127,9 +127,10 @@ foreach ($fixtures as $f) {
             
             <div class="match-bottom">
                 <?php foreach($leagueData['channels'] as $ch): ?>
-                    <div class="ch-item"><i class="fas fa-tv"></i> <?= $ch['n'] ?> | #<?= $ch['no'] ?></div>
+                    <div class="ch-item">
+                        <i class="fas fa-tv"></i> <?= $ch['n'] ?> <?= $ch['no'] ?>
+                    </div>
                 <?php endforeach; ?>
-                <div class="ch-item" style="color:#fff"><i class="fas fa-microphone"></i> جاري التحديد</div>
             </div>
         </div>
     <?php endforeach; endif; endforeach; ?>
