@@ -8,7 +8,7 @@ $API_KEY_BIN = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69c4ad66c3097a1dd55f06d6';
 $FOOTBALL_API_KEY = 'ef02886bbd68ecb3bdfc630f4546eb97';
 
-// دالة جلب المباريات عثمان - مصححة
+// دالة جلب المباريات عثمان - مصححة بـ array()
 function getFixtures($date, $key) {
     $curl = curl_init();
     curl_setopt_array($curl, array(
@@ -24,7 +24,7 @@ function getFixtures($date, $key) {
     return $data['response'] ?: array();
 }
 
-// دالة الترجمة التلقائية عثمان
+// دالة الترجمة عثمان
 function translateText($text) {
     if(empty($text)) return $text;
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
@@ -33,7 +33,7 @@ function translateText($text) {
     return $text;
 }
 
-// دالة فحص الإشعارات عثمان
+// دالة فحص الإشعارات (AJAX)
 if(isset($_GET['check_notify'])) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $BIN_ID . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -55,7 +55,7 @@ if (isset($_GET['fetch_visitors'])) {
 }
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
 
-// جلب بيانات القنوات
+// جلب بيانات السحابة والقنوات
 function getCloudFullData($bin, $key) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -64,12 +64,13 @@ function getCloudFullData($bin, $key) {
     curl_close($ch);
     return json_decode($res, true);
 }
+
 $cloud = getCloudFullData($BIN_ID, $API_KEY_BIN);
 $all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : array();
 $active_sections = array_filter($cloud['sections'] ?: array(), function($s) { return $s['status'] == 'show'; });
 $news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : array('text' => '', 'status' => 'hide');
 
-// إعدادات الدوريات المحددة (نفس tap.php) عثمان
+// جلب مباريات اليوم والدوريات المحددة عثمان
 $fixtures = getFixtures(date('Y-m-d'), $FOOTBALL_API_KEY);
 $allowed_leagues = array(307, 2, 3, 39, 140, 135, 78, 61);
 
@@ -89,9 +90,9 @@ function filterSection($channels, $sec) {
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: max-width 0.4s; }
-        
+
         /* شريط المباريات الصغير عثمان */
-        .match-slider { display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; background: rgba(255,255,255,0.02); margin-bottom: 5px; }
+        .match-slider { display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; background: rgba(255,255,255,0.02); margin-bottom: 5px; -webkit-overflow-scrolling: touch; }
         .match-slider::-webkit-scrollbar { display: none; }
         .mini-card { min-width: 130px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 15px; padding: 8px; text-align: center; }
         .mini-teams { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
@@ -99,23 +100,26 @@ function filterSection($channels, $sec) {
         .mini-time { font-size: 11px; font-weight: 900; color: #0ea5e9; }
         .mini-league { font-size: 8px; opacity: 0.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* التصميم الأساسي عثمان */
+        /* ستايلاتك الأساسية عثمان */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
-        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
-        .notify-bell-btn { position: fixed; bottom: 85px; left: 25px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 5000; cursor: pointer; }
+        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: max-width 0.4s; }
+        .notify-bell-btn { position: fixed; bottom: 85px; left: 25px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; cursor: pointer; }
         .visitors-badge-float { position: fixed; bottom: 25px; left: 25px; width: 45px; height: 45px; background: rgba(34, 197, 94, 0.15); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1.5px solid #22c55e; }
-        .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; padding: 0 10px; }
-        .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; text-align: center; border: 1.5px solid #fff; }
+        .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; flex-wrap: nowrap; padding: 0 10px; }
+        .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; text-align: center; border: 1.5px solid #ffffff; }
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
         .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; }
-        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.03); }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
         .cat-item img { width: 26px; height: 26px; margin-bottom: 4px; }
         .cat-item span { font-size: 8px; font-weight: 900; }
+        .grid { padding: 15px; }
+        .channel-section { display: none; width: 100%; }
+        .channel-section.active { display: block; }
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); margin-bottom: 20px; }
         .c-head { padding: 12px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         .play-btn { width: 90%; margin: 15px auto; display: block; background: var(--main); color: #fff; border: none; padding: 14px; border-radius: 50px; font-weight: 900; cursor: pointer; }
-        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; }
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
         footer { text-align: center; padding: 40px; font-size: 10px; opacity: 0.5; }
     </style>
@@ -123,13 +127,15 @@ function filterSection($channels, $sec) {
 <body>
 
 <div id="pro-intro">
-    <div style="width:100px; height:100px; background:var(--main); border-radius:30%; display:flex; align-items:center; justify-content:center;"><i class="fas fa-play-circle" style="font-size:50px; color:#fff;"></i></div>
-    <h2 style="color:#fff; margin-top:25px;">الخدمة الرقمية</h2>
+    <div style="width:100px; height:100px; background:var(--main); border-radius:30%; display:flex; align-items:center; justify-content:center;"><i class="fas fa-play-circle" style="font-size:50px; color:white;"></i></div>
+    <h2 style="color:white; margin-top:25px;">الخدمة الرقمية</h2>
 </div>
 
 <div class="main-container">
     <div class="notify-bell-btn" onclick="toggleNotifyPanel()"><i class="fas fa-bell"></i></div>
     <div class="visitors-badge-float"><i class="fas fa-users"></i><span id="realtime-visitors" style="font-size:11px; font-weight:900; color:#fff;"><?php echo $online_now; ?></span></div>
+    <div class="bg-pattern"></div>
+
     <div class="header-fixed">
         <div class="social-links">
             <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366;">واتساب</a>
@@ -188,9 +194,7 @@ function switchSection(id, element) {
     element.classList.add('active');
 }
 function startStream(boxId, file, btn) {
-    let vBox = document.getElementById(boxId);
-    vBox.style.backgroundImage = "none";
-    vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allowfullscreen></iframe>`;
+    document.getElementById(boxId).innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allowfullscreen></iframe>`;
     btn.style.display = 'none';
 }
 window.addEventListener('load', () => { setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 2000); });
