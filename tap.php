@@ -5,29 +5,30 @@ ini_set('display_errors', 1);
 
 date_default_timezone_set('Asia/Riyadh');
 
-// تم وضع مفتاحك الجديد هنا يا عثمان
+// مفتاح الـ API الخاص بك عثمان
 $API_KEY = '2cec7a8f946f44cfb8918042417b0051'; 
 
+// جلب التاريخ من الرابط أو استخدام تاريخ اليوم
 $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 
-$league_settings = [
-    307 => ['name' => 'الدوري السعودي', 'ch_name' => 'ثمانية'],
-    2   => ['name' => 'دوري أبطال أوروبا', 'ch_name' => 'beIN Sports'],
-    3   => ['name' => 'الدوري الأوروبي', 'ch_name' => 'beIN Sports'],
-    5   => ['name' => 'دوري أبطال آسيا', 'ch_name' => 'beIN AFC'],
-    39  => ['name' => 'الدوري الإنجليزي', 'ch_name' => 'beIN Premium'],
-    140 => ['name' => 'الدوري الإسباني', 'ch_name' => 'beIN Sports'],
-    135 => ['name' => 'الدوري الإيطالي', 'ch_name' => 'AD Sports'],
-    78  => ['name' => 'الدوري الألماني', 'ch_name' => 'beIN Sports'],
-    61  => ['name' => 'الدوري الفرنسي', 'ch_name' => 'beIN Sports']
-];
+$league_settings = array(
+    307 => array('name' => 'الدوري السعودي', 'ch_name' => 'ثمانية'),
+    2   => array('name' => 'دوري أبطال أوروبا', 'ch_name' => 'beIN Sports'),
+    3   => array('name' => 'الدوري الأوروبي', 'ch_name' => 'beIN Sports'),
+    5   => array('name' => 'دوري أبطال آسيا', 'ch_name' => 'beIN AFC'),
+    39  => array('name' => 'الدوري الإنجليزي', 'ch_name' => 'beIN Premium'),
+    140 => array('name' => 'الدوري الإسباني', 'ch_name' => 'beIN Sports'),
+    135 => array('name' => 'الدوري الإيطالي', 'ch_name' => 'AD Sports'),
+    78  => array('name' => 'الدوري الألماني', 'ch_name' => 'beIN Sports'),
+    61  => array('name' => 'الدوري الفرنسي', 'ch_name' => 'beIN Sports')
+);
 
 function translateText($text) {
     if(empty($text)) return $text;
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
-    $ctx = stream_context_create(['http'=> ['timeout' => 2]]); 
+    $ctx = stream_context_create(array('http'=> array('timeout' => 2))); 
     $res = @file_get_contents($url, false, $ctx);
     if($res){
         $res = json_decode($res, true);
@@ -38,26 +39,26 @@ function translateText($text) {
 
 function getFixtures($date, $key) {
     $curl = curl_init();
-    curl_setopt_array($curl, [
+    curl_setopt_array($curl, array(
         CURLOPT_URL => "https://v3.football.api-sports.io/fixtures?date=$date",
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => ["x-apisports-key: $key"],
+        CURLOPT_HTTPHEADER => array("x-apisports-key: $key"),
         CURLOPT_TIMEOUT => 10,
         CURLOPT_SSL_VERIFYPEER => false
-    ]);
+    ));
     $response = curl_exec($curl);
     $err = curl_error($curl);
     curl_close($curl);
     
-    if ($err) return [];
+    if ($err) return array();
     
     $data = json_decode($response, true);
-    return (isset($data['response'])) ? $data['response'] : [];
+    return (isset($data['response'])) ? $data['response'] : array();
 }
 
 $fixtures = getFixtures($date_get, $API_KEY);
 
-$ordered_matches = [];
+$ordered_matches = array();
 if (!empty($fixtures)) {
     foreach ($fixtures as $f) {
         $id = (int)$f['league']['id'];
@@ -72,7 +73,7 @@ if (!empty($fixtures)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مباريات اليوم</title>
+    <title>مباريات اليوم - <?= $date_get ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -80,7 +81,9 @@ if (!empty($fixtures)) {
         body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; margin: 0; padding: 10px; }
         .container { max-width: 480px; margin: auto; }
         .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); }
-        .nav a { color: #fff; background: var(--main); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; }
+        /* تعديل روابط الأسهم عثمان */
+        .nav a { color: #fff; background: var(--main); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; transition: 0.3s; }
+        .nav a:hover { opacity: 0.8; transform: scale(1.1); }
         .league-row { background: linear-gradient(90deg, var(--main), transparent); padding: 10px 15px; border-radius: 10px; margin: 25px 0 10px; font-weight: 900; font-size: 13px; border-right: 4px solid #fff; }
         .match { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
         .match-top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; }
@@ -107,7 +110,7 @@ if (!empty($fixtures)) {
         <div class="no-matches">
             <i class="fas fa-info-circle"></i><br>
             لا توجد مباريات هامة لهذا اليوم <br>
-            <small>(تأكد من صلاحية مفتاح الـ API الجديد)</small>
+            <small>(تأكد من اختيار تاريخ آخر أو حد طلبات الـ API)</small>
         </div>
     <?php else:
         foreach($league_settings as $id => $setting): 
@@ -130,7 +133,7 @@ if (!empty($fixtures)) {
                         <b><?= $home_ar ?></b>
                     </div>
                     <div style="flex:1; text-align:center;">
-                        <?php if(in_array($status, ['1H','2H','HT','ET','P'])): ?>
+                        <?php if(in_array($status, array('1H','2H','HT','ET','P'))): ?>
                             <div class="score" style="color:var(--main)"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
                             <div class="live">مباشر</div>
                         <?php elseif($status == 'FT'): ?>
