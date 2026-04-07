@@ -2,46 +2,45 @@
 error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 
-// التوكن الخاص بك عثمان
-$API_KEY = '273aaeb61360452588653ffea820cc19'; 
+// تحديد التاريخ المختار من الأسهم عثمان
+$date = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
+$prev_date = date('Y-m-d', strtotime($date .' -1 day'));
+$next_date = date('Y-m-d', strtotime($date .' +1 day'));
 
-// مصفوفة تعريب المسميات عثمان
+// عرض التاريخ بشكل مقروء عثمان
+$display_date = date('d / m / Y', strtotime($date));
+
+// مصفوفة تعريب المسميات
 $translate = [
     'Premier League' => 'الدوري الإنجليزي',
     'La Liga' => 'الدوري الإسباني',
-    'Serie A' => 'الدوري الإيطالي',
-    'Bundesliga' => 'الدوري الألماني',
-    'Ligue 1' => 'الدوري الفرنسي',
-    'UEFA Champions League' => 'دوري أبطال أوروبا',
-    'Saudi Professional League' => 'الدوري السعودي للمحترفين',
-    'Egyptian Premier League' => 'الدوري المصري الممتاز',
-    'Champions League' => 'دوري الأبطال',
-    'World Cup' => 'كأس العالم',
-    'IN_PLAY' => 'مباشر الآن',
+    'Saudi Pro League' => 'الدوري السعودي',
+    'Egyptian Premier League' => 'الدوري المصري',
+    'Champions League' => 'دوري أبطال أوروبا',
+    'IN_PLAY' => 'مباشر',
     'FINISHED' => 'انتهت',
-    'TIMED' => 'لم تبدأ',
-    'PAUSED' => 'استراحة'
+    'TIMED' => 'انتظار'
 ];
 
-function getMatches($key) {
-    $url = "https://api.football-data.org/v4/matches";
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
+// دالة جلب البيانات (محدثة لدعم التاريخ) عثمان
+function getFootballData($targetDate) {
+    $token = '273aaeb61360452588653ffea820cc19';
+    // ملاحظة: الدوريات العربية تتطلب اشتراك مدفوع في هذا المصدر، 
+    // ولكن قمنا بتهيئة الكود لاستقبالها فور توفرها
+    $url = "https://api.football-data.org/v4/matches?dateFrom=$targetDate&dateTo=$targetDate";
+    $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $key"]);
-    $res = curl_exec($ch);
-    curl_close($ch);
-    return json_decode($res, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $token"]);
+    $res = json_decode(curl_exec($ch), true);
+    return $res['matches'] ?: [];
 }
 
-$data = getMatches($API_KEY);
-$matches = $data['matches'] ?: [];
+$matches = getFootballData($date);
 
 $grouped = [];
 foreach ($matches as $m) {
-    $leagueName = $m['competition']['name'];
-    // تعريب اسم الدوري إذا وجد في المصفوفة عثمان
-    $arLeague = isset($translate[$leagueName]) ? $translate[$leagueName] : $leagueName;
+    $league = $m['competition']['name'];
+    $arLeague = isset($translate[$league]) ? $translate[$league] : $league;
     $grouped[$arLeague][] = $m;
 }
 ?>
@@ -50,103 +49,92 @@ foreach ($matches as $m) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مباريات اليوم - الخدمة الرقمية</title>
+    <title>جدول المباريات - الخدمة الرقمية</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --main: #e11d48; --bg: #050c14; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.1); }
-        body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 500px; }
-        
-        .header { text-align: center; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-        .header h2 { margin: 0; font-weight: 900; color: var(--main); text-shadow: 0 0 15px rgba(225, 29, 72, 0.3); font-size: 1.3rem; }
+        body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; }
 
-        .league-title { 
-            background: linear-gradient(90deg, var(--main), transparent); 
-            padding: 10px 15px; border-radius: 12px; font-size: 14px; 
-            font-weight: 900; margin: 25px 0 15px; display: flex; 
-            align-items: center; gap: 10px; border-right: 4px solid #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
-        .match-card { 
-            background: var(--glass); border: 1px solid var(--border); 
-            border-radius: 18px; padding: 15px; margin-bottom: 12px; 
+        /* نظام الأسهم والتاريخ عثمان */
+        .date-picker { 
             display: flex; align-items: center; justify-content: space-between; 
-            transition: 0.3s; backdrop-filter: blur(10px);
+            background: var(--glass); border: 1px solid var(--border); 
+            padding: 15px; border-radius: 20px; margin-bottom: 20px;
+            backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
+        .date-picker a { color: #fff; text-decoration: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--main); border-radius: 50%; transition: 0.3s; }
+        .date-picker a:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--main); }
+        .current-date { text-align: center; }
+        .current-date h3 { margin: 0; font-size: 16px; font-weight: 900; color: var(--main); }
+        .current-date span { font-size: 11px; opacity: 0.6; }
+
+        .league-header { background: linear-gradient(90deg, var(--main), transparent); padding: 8px 15px; border-radius: 10px; font-size: 13px; font-weight: 900; margin: 20px 0 10px; border-right: 4px solid #fff; }
+
+        .match-card { background: var(--glass); border: 1px solid var(--border); border-radius: 18px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; position: relative; }
         
-        .team { flex: 1.2; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
-        .team img { width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
-        .team span { font-size: 11px; font-weight: 700; color: #e2e8f0; }
+        .team { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 5px; }
+        .team img { width: 32px; height: 32px; object-fit: contain; }
+        .team b { font-size: 10px; color: #eee; }
 
-        .match-info { flex: 1; text-align: center; display: flex; flex-direction: column; gap: 6px; }
-        .score { font-size: 22px; font-weight: 900; color: #fff; letter-spacing: 2px; }
-        .vs { font-size: 12px; color: var(--main); font-weight: 900; background: rgba(225, 29, 72, 0.1); padding: 2px 10px; border-radius: 50px; display: inline-block; margin: 0 auto; }
+        .info { flex: 1; text-align: center; display: flex; flex-direction: column; gap: 3px; }
+        .score { font-size: 20px; font-weight: 900; letter-spacing: 2px; }
         .time { font-size: 11px; color: #38bdf8; font-weight: bold; }
-        .status-label { font-size: 10px; padding: 2px 8px; border-radius: 5px; font-weight: 900; }
-        .live { background: #e11d48; color: #fff; animation: pulse 1.5s infinite; }
+        .live-tag { font-size: 9px; background: #e11d48; padding: 2px 8px; border-radius: 4px; animation: pulse 1s infinite; }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        .no-matches { text-align: center; padding: 60px; opacity: 0.5; font-size: 14px; border: 1px dashed var(--border); border-radius: 20px; }
+        @keyframes pulse { 50% { opacity: 0.5; } }
+        .empty { text-align: center; padding: 40px; opacity: 0.4; font-size: 13px; border: 1px dashed var(--border); border-radius: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h2><i class="fas fa-trophy"></i> مباريات اليوم المباشرة</h2>
+    <div class="date-picker">
+        <a href="?d=<?= $prev_date ?>"><i class="fas fa-chevron-right"></i></a>
+        <div class="current-date">
+            <span>تاريخ المباريات</span>
+            <h3><?= $display_date ?></h3>
+        </div>
+        <a href="?d=<?= $next_date ?>"><i class="fas fa-chevron-left"></i></a>
     </div>
 
     <?php if(empty($grouped)): ?>
-        <div class="no-matches">
-            <i class="fas fa-info-circle" style="display:block; font-size:30px; margin-bottom:10px;"></i>
-            لا توجد مباريات متاحة حالياً في قاعدة البيانات
-        </div>
+        <div class="empty">لا توجد مباريات مجدولة لهذا التاريخ</div>
     <?php else: ?>
         <?php foreach($grouped as $league => $matchList): ?>
-            <div class="league-title">
-                <i class="fas fa-star"></i> <?= $league ?>
-            </div>
-            
+            <div class="league-header"><?= $league ?></div>
             <?php foreach($matchList as $match): 
-                $time = date("H:i", strtotime($match['utcDate'] . " +3 hours")); 
+                $mTime = date("H:i", strtotime($match['utcDate'] . " +3 hours"));
                 $status = $match['status'];
-                $homeScore = $match['score']['fullTime']['home'] ?? 0;
-                $awayScore = $match['score']['fullTime']['away'] ?? 0;
             ?>
             <div class="match-card">
                 <div class="team">
                     <img src="<?= $match['homeTeam']['crest'] ?>" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
-                    <span><?= $match['homeTeam']['name'] ?></span>
+                    <b><?= $match['homeTeam']['name'] ?></b>
                 </div>
-
-                <div class="match-info">
-                    <?php if($status == 'IN_PLAY' || $status == 'PAUSED'): ?>
-                        <div class="score" style="color:var(--main);"><?= $homeScore ?> - <?= $awayScore ?></div>
-                        <span class="status-label live">مباشر الآن</span>
+                <div class="info">
+                    <?php if($status == 'IN_PLAY'): ?>
+                        <div class="score" style="color:var(--main)"><?= $match['score']['fullTime']['home'] ?> - <?= $match['score']['fullTime']['away'] ?></div>
+                        <div class="live-tag">مباشر</div>
                     <?php elseif($status == 'FINISHED'): ?>
-                        <div class="score"><?= $homeScore ?> - <?= $awayScore ?></div>
-                        <span class="status-label" style="background:#333;">انتهت</span>
+                        <div class="score"><?= $match['score']['fullTime']['home'] ?> - <?= $match['score']['fullTime']['away'] ?></div>
+                        <div style="font-size:9px; opacity:0.5;">انتهت</div>
                     <?php else: ?>
-                        <div class="vs">VS</div>
-                        <div class="time"><?= $time ?></div>
+                        <div style="font-size:12px; font-weight:900; opacity:0.3;">VS</div>
+                        <div class="time"><?= $mTime ?></div>
                     <?php endif; ?>
                 </div>
-
                 <div class="team">
                     <img src="<?= $match['awayTeam']['crest'] ?>" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
-                    <span><?= $match['awayTeam']['name'] ?></span>
+                    <b><?= $match['awayTeam']['name'] ?></b>
                 </div>
             </div>
             <?php endforeach; ?>
         <?php endforeach; ?>
     <?php endif; ?>
 
-    <footer style="text-align:center; padding:40px; font-size:10px; opacity:0.3; letter-spacing:1px;">
-        جميع الأوقات بتوقيت مكة المكرمة<br>
-        الخدمة الرقمية © 2026
-    </footer>
+    <footer style="text-align:center; padding:30px; font-size:10px; opacity:0.3;">الخدمة الرقمية © 2026</footer>
 </div>
 
 </body>
