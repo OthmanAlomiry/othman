@@ -2,24 +2,23 @@
 error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 
-// مفتاحك الرسمي يا عثمان
 $API_KEY = 'ef02886bbd68ecb3bdfc630f4546eb97'; 
 
 $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 
-// قائمة الدوريات مع أرقام القنوات الصحيحة - عثمان
-$my_leagues = [
-    307 => ['name' => 'الدوري السعودي', 'channels' => [['n' => 'SSC Sports', 'no' => '1']]],
-    2   => ['name' => 'دوري أبطال أوروبا', 'channels' => [['n' => 'beIN Sports', 'no' => '1']]],
-    3   => ['name' => 'الدوري الأوروبي', 'channels' => [['n' => 'beIN Sports', 'no' => '2']]],
-    5   => ['name' => 'دوري أبطال آسيا', 'channels' => [['n' => 'beIN AFC', 'no' => '4']]],
-    39  => ['name' => 'الدوري الإنجليزي', 'channels' => [['n' => 'beIN Premium', 'no' => '1']]],
-    140 => ['name' => 'الدوري الإسباني', 'channels' => [['n' => 'beIN Sports', 'no' => '3']]],
-    135 => ['name' => 'الدوري الإيطالي', 'channels' => [['n' => 'AD Sports', 'no' => '1']]],
-    78  => ['name' => 'الدوري الألماني', 'channels' => [['n' => 'beIN Sports', 'no' => '5']]],
-    61  => ['name' => 'الدوري الفرنسي', 'channels' => [['n' => 'beIN Sports', 'no' => '6']]]
+// إعدادات القنوات الأساسية لكل دوري عثمان
+$league_settings = [
+    307 => ['name' => 'الدوري السعودي', 'ch_name' => 'ثمانية'],
+    2   => ['name' => 'دوري أبطال أوروبا', 'ch_name' => 'beIN Sports'],
+    3   => ['name' => 'الدوري الأوروبي', 'ch_name' => 'beIN Sports'],
+    5   => ['name' => 'دوري أبطال آسيا', 'ch_name' => 'beIN AFC'],
+    39  => ['name' => 'الدوري الإنجليزي', 'ch_name' => 'beIN Premium'],
+    140 => ['name' => 'الدوري الإسباني', 'ch_name' => 'beIN Sports'],
+    135 => ['name' => 'الدوري الإيطالي', 'ch_name' => 'AD Sports'],
+    78  => ['name' => 'الدوري الألماني', 'ch_name' => 'beIN Sports'],
+    61  => ['name' => 'الدوري الفرنسي', 'ch_name' => 'beIN Sports']
 ];
 
 function translateText($text) {
@@ -51,9 +50,9 @@ $fixtures = getFixtures($date_get, $API_KEY);
 
 $ordered_matches = [];
 foreach ($fixtures as $f) {
-    $league_id = (int)$f['league']['id'];
-    if (array_key_exists($league_id, $my_leagues)) {
-        $ordered_matches[$league_id][] = $f;
+    $id = (int)$f['league']['id'];
+    if (isset($league_settings[$id])) {
+        $ordered_matches[$id][] = $f;
     }
 }
 ?>
@@ -77,8 +76,8 @@ foreach ($fixtures as $f) {
         .team { flex: 1.2; text-align: center; font-size: 11px; }
         .team img { width: 38px; height: 38px; display: block; margin: 0 auto 8px; object-fit: contain; }
         .score { font-size: 26px; font-weight: 900; letter-spacing: 2px; }
-        .match-bottom { border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-        .ch-item { display: flex; align-items: center; gap: 5px; background: rgba(56,189,248,0.1); padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: bold; color: #38bdf8; }
+        .match-bottom { border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; display: flex; justify-content: center; }
+        .ch-item { display: flex; align-items: center; gap: 5px; background: rgba(56,189,248,0.1); padding: 4px 15px; border-radius: 50px; font-size: 11px; font-weight: bold; color: #38bdf8; }
         .live { color: #22c55e; font-size: 9px; animation: blink 1s infinite; font-weight: 900; }
         @keyframes blink { 50% { opacity: 0.5; } }
     </style>
@@ -92,15 +91,20 @@ foreach ($fixtures as $f) {
     </div>
 
     <?php 
-    foreach($my_leagues as $id => $leagueData): 
+    foreach($league_settings as $id => $setting): 
         if(isset($ordered_matches[$id])):
+            $ch_counter = 1; // عداد القنوات لكل دوري عثمان
     ?>
-        <div class="league-row"><?= $leagueData['name'] ?></div>
+        <div class="league-row"><?= $setting['name'] ?></div>
         <?php foreach($ordered_matches[$id] as $m): 
             $status = $m['fixture']['status']['short'];
             $mTime = date("H:i", $m['fixture']['timestamp']);
             $home_ar = translateText($m['teams']['home']['name']);
             $away_ar = translateText($m['teams']['away']['name']);
+            
+            // تحديد رقم القناة تلقائياً عثمان لعدم التكرار
+            $current_ch = $setting['ch_name'] . " " . $ch_counter;
+            $ch_counter++; 
         ?>
         <div class="match">
             <div class="match-top">
@@ -126,11 +130,7 @@ foreach ($fixtures as $f) {
             </div>
             
             <div class="match-bottom">
-                <?php foreach($leagueData['channels'] as $ch): ?>
-                    <div class="ch-item">
-                        <i class="fas fa-tv"></i> <?= $ch['n'] ?> <?= $ch['no'] ?>
-                    </div>
-                <?php endforeach; ?>
+                <div class="ch-item"><i class="fas fa-tv"></i> <?= $current_ch ?></div>
             </div>
         </div>
     <?php endforeach; endif; endforeach; ?>
