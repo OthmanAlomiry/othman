@@ -2,32 +2,35 @@
 error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 
-// إعدادات التاريخ عثمان
+// إعداد التاريخ عثمان
 $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 $display_date = date('d / m / Y', strtotime($date_get));
 
-// دالة سحب البيانات من المصدر العربي المباشر عثمان
+// دالة جلب البيانات من المصدر الرياضي المباشر عثمان
 function fetchMatches($targetDate) {
-    // نستخدم مصدر قوي ومفتوح يدعم العربية عثمان
-    $url = "https://ls.sport-mobi.com/api/v2/matches?date=" . $targetDate . "&timezone=3";
+    // هذا الرابط مفتوح وسريع جداً عثمان
+    $url = "https://livescore-api.com/api-client/scores/history.json?key=52mS6A6I0S1m8t6c&date=" . $targetDate;
+    
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
     curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     $res = curl_exec($ch);
     curl_close($ch);
+    
     $all_data = json_decode($res, true);
-    return $all_data['data'] ?: [];
+    return $all_data['data']['match'] ?: [];
 }
 
 $raw_matches = fetchMatches($date_get);
 
-// ترتيب المباريات حسب الدوري
+// ترتيب المباريات حسب البطولة عثمان
 $leagues = [];
 foreach ($raw_matches as $m) {
-    $league_name = $m['league']['name_ar'] ?: $m['league']['name'];
+    $league_name = $m['competition_name'];
     $leagues[$league_name][] = $m;
 }
 ?>
@@ -61,7 +64,7 @@ foreach ($raw_matches as $m) {
         .info { flex: 1; text-align: center; display: flex; flex-direction: column; gap: 4px; }
         .score { font-size: 24px; font-weight: 900; color: #fff; letter-spacing: 2px; }
         .time { font-size: 11px; color: #38bdf8; font-weight: bold; }
-        .live-tag { font-size: 9px; background: #e11d48; padding: 2px 8px; border-radius: 5px; animation: blink 1.2s infinite; width: fit-content; margin: 0 auto; }
+        .live-tag { font-size: 9px; background: #e11d48; padding: 2px 8px; border-radius: 50px; animation: blink 1.2s infinite; width: fit-content; margin: 0 auto; }
         
         @keyframes blink { 50% { opacity: 0.4; } }
         .empty { text-align: center; padding: 60px; opacity: 0.4; font-size: 14px; border: 1px dashed var(--border); border-radius: 20px; }
@@ -73,14 +76,14 @@ foreach ($raw_matches as $m) {
     <div class="date-picker">
         <a href="?d=<?= $prev_date ?>"><i class="fas fa-chevron-right"></i></a>
         <div class="current-date">
-            <span>مباريات يوم</span>
+            <span>جدول مباريات</span>
             <h3><?= $display_date ?></h3>
         </div>
         <a href="?d=<?= $next_date ?>"><i class="fas fa-chevron-left"></i></a>
     </div>
 
     <?php if(empty($leagues)): ?>
-        <div class="empty">جاري تحديث المباريات.. تأكد من الاتصال</div>
+        <div class="empty">لا توجد مباريات متاحة لهذا التاريخ حالياً</div>
     <?php else: ?>
         <?php foreach($leagues as $name => $matchList): ?>
             <div class="league-title">
@@ -88,25 +91,21 @@ foreach ($raw_matches as $m) {
             </div>
             
             <?php foreach($matchList as $m): 
-                $mStatus = $m['status']['type']; // مباشر، منتهية، الخ
-                $homeTeam = $m['home_team']['name_ar'] ?: $m['home_team']['name'];
-                $awayTeam = $m['away_team']['name_ar'] ?: $m['away_team']['name'];
-                $homeLogo = $m['home_team']['logo'];
-                $awayLogo = $m['away_team']['logo'];
-                $score = $m['home_score'] . " - " . $m['away_score'];
-                $mTime = date("H:i", $m['start_at']);
+                $status = $m['status']; // IN PLAY, FINISHED, الخ
+                $score = $m['ft_score'] ?: ($m['score'] ?: 'VS');
+                $mTime = substr($m['scheduled'], 0, 5); // وقت المباراة عثمان
             ?>
             <div class="match-card">
                 <div class="team">
-                    <img src="<?= $homeLogo ?>" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
-                    <b><?= $homeTeam ?></b>
+                    <img src="https://ls.sport-mobi.com/api/v2/team/logo/<?= $m['home_id'] ?>" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
+                    <b><?= $m['home_name'] ?></b>
                 </div>
 
                 <div class="info">
-                    <?php if($mStatus == 'live'): ?>
+                    <?php if($status == 'IN PLAY'): ?>
                         <div class="score" style="color:var(--main);"><?= $score ?></div>
                         <div class="live-tag">مباشر</div>
-                    <?php elseif($mStatus == 'finished'): ?>
+                    <?php elseif($status == 'FINISHED'): ?>
                         <div class="score"><?= $score ?></div>
                         <div style="font-size:9px; opacity:0.5;">انتهت</div>
                     <?php else: ?>
@@ -116,15 +115,15 @@ foreach ($raw_matches as $m) {
                 </div>
 
                 <div class="team">
-                    <img src="<?= $awayLogo ?>" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
-                    <b><?= $awayTeam ?></b>
+                    <img src="https://ls.sport-mobi.com/api/v2/team/logo/<?= $m['away_id'] ?>" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
+                    <b><?= $m['away_name'] ?></b>
                 </div>
             </div>
             <?php endforeach; ?>
         <?php endforeach; ?>
     <?php endif; ?>
 
-    <footer style="text-align:center; padding:30px; font-size:10px; opacity:0.3;">الخدمة الرقمية © 2026</footer>
+    <footer style="text-align:center; padding:30px; font-size:10px; opacity:0.3;">تحديث تلقائي - الخدمة الرقمية © 2026</footer>
 </div>
 
 </body>
