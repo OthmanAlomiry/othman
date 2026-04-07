@@ -3,7 +3,7 @@ session_start();
 error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 
-// --- بيانات السحابة عثمان ---
+// --- بيانات السحابة والـ API عثمان ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69c4ad66c3097a1dd55f06d6';
 $FOOTBALL_API_KEY = 'ef02886bbd68ecb3bdfc630f4546eb97';
@@ -11,32 +11,35 @@ $FOOTBALL_API_KEY = 'ef02886bbd68ecb3bdfc630f4546eb97';
 // --- دوال جلب المباريات عثمان ---
 function getFixtures($date, $key) {
     $curl = curl_init();
-    curl_setopt_array($curl, [
+    curl_setopt_array($curl, array(
         CURLOPT_URL => "https://v3.football.api-sports.io/fixtures?date=$date",
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => ["x-apisports-key: $key"],
+        CURLOPT_HTTPHEADER => array("x-apisports-key: $key"),
         CURLOPT_TIMEOUT => 15,
         CURLOPT_SSL_VERIFYPEER => false
-    ]);
+    ));
     $response = curl_exec($curl);
     curl_close($curl);
     $data = json_decode($response, true);
-    return $data['response'] ?: [];
+    return $data['response'] ?: array();
 }
 
 function translateText($text) {
     if(empty($text)) return $text;
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
     $res = @file_get_contents($url);
-    $res = json_decode($res, true);
-    return $res[0][0][0] ?: $text;
+    if($res){
+        $res = json_decode($res, true);
+        return $res[0][0][0] ?: $text;
+    }
+    return $text;
 }
 
-// دالة فحص الإشعارات (AJAX)
+// دالة فحص الإشعارات (AJAX) عثمان
 if(isset($_GET['check_notify'])) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $BIN_ID . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER => ["X-Master-Key: " . $API_KEY, "X-Bin-Meta: false"]);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Master-Key: " . $API_KEY, "X-Bin-Meta: false"));
     $res = json_decode(curl_exec($ch), true);
     $notify = $res['notification'];
     if (isset($notify['time']) && (time() - $notify['time'] > 172800)) { echo json_encode(null); } 
@@ -48,7 +51,7 @@ if(isset($_GET['check_notify'])) {
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
     $session_id = session_id(); $time = time();
-    $data = file_exists($visitors_file) ? unserialize(file_get_contents($visitors_file)) : [];
+    $data = file_exists($visitors_file) ? unserialize(file_get_contents($visitors_file)) : array();
     $data[$session_id] = $time;
     foreach ($data as $id => $last_time) { if ($time - $last_time > 120) unset($data[$id]); }
     file_put_contents($visitors_file, serialize($data));
@@ -60,20 +63,20 @@ $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents(
 function getCloudFullData($bin, $key) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER => ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Master-Key: " . $key, "X-Bin-Meta: false"));
     $res = curl_exec($ch);
     curl_close($ch);
     return json_decode($res, true);
 }
 
 $cloud = getCloudFullData($BIN_ID, $API_KEY);
-$all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : [];
-$active_sections = array_filter($cloud['sections'] ?: [], function($s) { return $s['status'] == 'show'; });
-$news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : ['text' => '', 'status' => 'hide'];
+$all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : array();
+$active_sections = array_filter($cloud['sections'] ?: array(), function($s) { return $s['status'] == 'show'; });
+$news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : array('text' => '', 'status' => 'hide');
 
 // جلب المباريات عثمان
 $fixtures = getFixtures(date('Y-m-d'), $FOOTBALL_API_KEY);
-$my_leagues = [307 => 'الدوري السعودي', 2 => 'أبطال أوروبا', 3 => 'الدوري الأوروبي', 39 => 'الدوري الإنجليزي', 140 => 'الدوري الإسباني', 135 => 'الدوري الإيطالي'];
+$my_leagues = array(307 => 'الدوري السعودي', 2 => 'أبطال أوروبا', 3 => 'الدوري الأوروبي', 39 => 'الدوري الإنجليزي', 140 => 'الدوري الإسباني', 135 => 'الدوري الإيطالي');
 
 function filterSection($channels, $sec) {
     return array_filter($channels, function($c) use ($sec) { return (isset($c['section']) && trim(strtolower($c['section'])) == trim(strtolower($sec))); });
@@ -96,13 +99,13 @@ function filterSection($channels, $sec) {
         .schedule-btn { position: fixed; bottom: 145px; left: 25px; width: 45px; height: 45px; background: #0ea5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4); cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
         
         /* نافذة الجدول عثمان */
-        #schedule-panel { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; max-height: 70vh; background: #0f172a; border-radius: 20px; border: 1px solid var(--glass-border); z-index: 5500; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-        .league-title { background: linear-gradient(90deg, var(--main), transparent); padding: 8px 12px; font-size: 12px; font-weight: 900; margin: 15px 0 5px; border-right: 3px solid #fff; }
+        #schedule-panel { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px; max-height: 70vh; background: #0f172a; border-radius: 20px; border: 1px solid var(--glass-border); z-index: 5500; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        .league-title { background: linear-gradient(90deg, var(--main), transparent); padding: 8px 12px; font-size: 12px; font-weight: 900; margin: 15px 0 5px; border-right: 3px solid #fff; color: #fff; }
         .match-row { background: rgba(255,255,255,0.03); margin: 5px 10px; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05); }
-        .m-team { flex: 1; text-align: center; font-size: 10px; font-weight: 700; }
-        .m-team img { width: 25px; height: 25px; display: block; margin: 0 auto 5px; }
+        .m-team { flex: 1; text-align: center; font-size: 10px; font-weight: 700; color: #fff; }
+        .m-team img { width: 25px; height: 25px; display: block; margin: 0 auto 5px; object-fit: contain; }
 
-        /* بقية الستايل الخاص بك كما هو عثمان */
+        /* التصميم الأساسي الخاص بك عثمان */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
         .loader-content { display: flex; flex-direction: column; align-items: center; }
@@ -114,7 +117,7 @@ function filterSection($channels, $sec) {
         @keyframes glowPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes loadingMove { 100% { left: 100%; } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
-        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: max-width 0.4s; }
+        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
         .notify-bell-btn { position: fixed; bottom: 85px; left: 25px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
         .notify-dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; }
         .visitors-badge-float { position: fixed; bottom: 25px; left: 25px; width: 45px; height: 45px; background: rgba(34, 197, 94, 0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1.5px solid #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.2); }
@@ -149,7 +152,6 @@ function filterSection($channels, $sec) {
         .play-btn.connected { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; border-color: #38bdf8 !important; color: #38bdf8 !important; }
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background: #000; }
-        @media screen and (orientation: landscape) { .main-container { max-width: 95%; } .header-fixed { max-width: 95%; padding: 5px 0; } body { padding-top: 140px; } .social-links { margin-bottom: 5px; } .social-btn { padding: 4px 5px; font-size: 8px; } }
         #notify-toast { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; background: rgba(14, 165, 233, 0.95); backdrop-filter: blur(10px); color: white; padding: 12px 18px; border-radius: 20px; z-index: 6000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: 0.6s; border: 1px solid rgba(255,255,255,0.2); }
         #notify-toast.show { top: 20px; }
         #notify-panel { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: 280px; max-height: 350px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid var(--glass-border); z-index: 5500; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
@@ -180,7 +182,7 @@ function filterSection($channels, $sec) {
         <div class="panel-header"><span>📅 جدول مباريات اليوم</span><i class="fas fa-times" onclick="toggleSchedule()" style="cursor:pointer;"></i></div>
         <div class="panel-list">
             <?php 
-            $grouped = [];
+            $grouped = array();
             foreach($fixtures as $f) { if(isset($my_leagues[$f['league']['id']])) $grouped[$my_leagues[$f['league']['id']]][] = $f; }
             if(empty($grouped)) echo "<p style='text-align:center; padding:50px; opacity:0.5; font-size:12px;'>لا توجد مباريات هامة اليوم</p>";
             foreach($grouped as $league => $matches): ?>
@@ -188,7 +190,7 @@ function filterSection($channels, $sec) {
                 <?php foreach($matches as $m): ?>
                     <div class="match-row">
                         <div class="m-team"><img src="<?= $m['teams']['home']['logo'] ?>"><?= translateText($m['teams']['home']['name']) ?></div>
-                        <div style="text-align:center; flex:0.5;"><b style="font-size:14px;"><?= date("H:i", $m['fixture']['timestamp']) ?></b><br><small style="font-size:8px; opacity:0.5;">مكة</small></div>
+                        <div style="text-align:center; flex:0.5; color:#fff;"><b style="font-size:14px;"><?= date("H:i", $m['fixture']['timestamp']) ?></b><br><small style="font-size:8px; opacity:0.5;">مكة</small></div>
                         <div class="m-team"><img src="<?= $m['teams']['away']['logo'] ?>"><?= translateText($m['teams']['away']['name']) ?></div>
                     </div>
                 <?php endforeach; endforeach; ?>
@@ -223,7 +225,6 @@ function filterSection($channels, $sec) {
     <div class="grid">
         <?php $count = 0; foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
         <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($count == 0 ? 'active' : '') ?>">
-            <?php if(empty($channels)): ?><div style="text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div><?php endif; ?>
             <?php foreach($channels as $ch): ?>
             <div class="card">
                 <div class="c-head"><div class="name-badge"><?= $ch['name'] ?></div><div class="live-badge"><div class="live-dot"></div> مباشر</div></div>
@@ -234,70 +235,20 @@ function filterSection($channels, $sec) {
         </div>
         <?php $count++; endforeach; ?>
     </div>
-
     <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
 </div>
 
 <script>
 let lastNotifyId = localStorage.getItem('last_notify_id') || "";
 let notifyHistory = JSON.parse(localStorage.getItem('notify_history')) || [];
-
-function toggleSchedule() {
-    let panel = document.getElementById('schedule-panel');
-    panel.style.display = (panel.style.display === 'flex') ? 'none' : 'flex';
-}
-
-function toggleNotifyPanel() {
-    let panel = document.getElementById('notify-panel');
-    panel.style.display = (panel.style.display === 'flex') ? 'none' : 'flex';
-    document.getElementById('n-dot').style.display = 'none';
-    renderHistory();
-}
-
-function renderHistory() {
-    let list = document.getElementById('panel-list');
-    list.innerHTML = notifyHistory.length ? "" : "<p style='text-align:center; opacity:0.5; font-size:12px;'>لا توجد إشعارات سابقة</p>";
-    notifyHistory.slice().reverse().forEach(n => {
-        let date = new Date(n.time * 1000).toLocaleString('ar-SA', {hour:'2-digit', minute:'2-digit'});
-        list.innerHTML += `<div class="notify-item">${n.msg}<small>${date}</small></div>`;
-    });
-}
-
-function checkNotifications() {
-    fetch(window.location.pathname + '?check_notify=1').then(res => res.json()).then(data => {
-        if(data && data.id && data.id !== lastNotifyId) {
-            lastNotifyId = data.id;
-            localStorage.setItem('last_notify_id', data.id);
-            notifyHistory.push(data);
-            if(notifyHistory.length > 10) notifyHistory.shift();
-            localStorage.setItem('notify_history', JSON.stringify(notifyHistory));
-            document.getElementById('notify-txt').innerText = data.msg;
-            document.getElementById('notify-toast').classList.add('show');
-            document.getElementById('n-dot').style.display = 'block';
-            setTimeout(() => { document.getElementById('notify-toast').classList.remove('show'); }, 6000);
-            renderHistory();
-        }
-    });
-}
-
+function toggleSchedule() { let panel = document.getElementById('schedule-panel'); panel.style.display = (panel.style.display === 'flex') ? 'none' : 'flex'; }
+function toggleNotifyPanel() { let panel = document.getElementById('notify-panel'); panel.style.display = (panel.style.display === 'flex') ? 'none' : 'flex'; document.getElementById('n-dot').style.display = 'none'; renderHistory(); }
+function renderHistory() { let list = document.getElementById('panel-list'); list.innerHTML = notifyHistory.length ? "" : "<p style='text-align:center; opacity:0.5; font-size:12px;'>لا توجد إشعارات سابقة</p>"; notifyHistory.slice().reverse().forEach(n => { let date = new Date(n.time * 1000).toLocaleString('ar-SA', {hour:'2-digit', minute:'2-digit'}); list.innerHTML += `<div class="notify-item">${n.msg}<small>${date}</small></div>`; }); }
+function checkNotifications() { fetch(window.location.pathname + '?check_notify=1').then(res => res.json()).then(data => { if(data && data.id && data.id !== lastNotifyId) { lastNotifyId = data.id; localStorage.setItem('last_notify_id', data.id); notifyHistory.push(data); if(notifyHistory.length > 10) notifyHistory.shift(); localStorage.setItem('notify_history', JSON.stringify(notifyHistory)); document.getElementById('notify-txt').innerText = data.msg; document.getElementById('notify-toast').classList.add('show'); document.getElementById('n-dot').style.display = 'block'; setTimeout(() => { document.getElementById('notify-toast').classList.remove('show'); }, 6000); renderHistory(); } }); }
 setInterval(checkNotifications, 10000);
 window.addEventListener('load', () => { setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 2000); checkNotifications(); renderHistory(); });
-
-function switchSection(id, element) {
-    document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
-    document.getElementById('section-' + id).classList.add('active');
-    element.classList.add('active');
-}
-
-function startStream(boxId, file, btn) {
-    let vBox = document.getElementById(boxId);
-    vBox.style.backgroundImage = "none";
-    vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-    btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الاتصال بالبث';
-    btn.classList.add('connected');
-}
-
+function switchSection(id, element) { document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active')); document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active')); document.getElementById('section-' + id).classList.add('active'); element.classList.add('active'); }
+function startStream(boxId, file, btn) { let vBox = document.getElementById(boxId); vBox.style.backgroundImage = "none"; vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الاتصال بالبث'; btn.classList.add('connected'); }
 setInterval(() => { fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(count => { document.getElementById('realtime-visitors').innerText = count; }); }, 4000);
 </script>
 </body>
