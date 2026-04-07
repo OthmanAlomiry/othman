@@ -2,17 +2,19 @@
 error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 
+// مفتاحك الرسمي يا عثمان
 $API_KEY = 'ef02886bbd68ecb3bdfc630f4546eb97'; 
 
 $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 
-// المصفوفة المحدثة بدون الدوري المصري عثمان
+// القائمة المحدثة بالدوريات عثمان (إضافة الدوري الأوروبي ID: 3)
 $my_leagues = [
     307 => ['name' => 'الدوري السعودي', 'channels' => [['n' => 'ثمانية 1', 'no' => '101']]],
     2   => ['name' => 'دوري أبطال أوروبا', 'channels' => [['n' => 'beIN 1', 'no' => '201'], ['n' => 'beIN 4K', 'no' => '200']]],
-    3   => ['name' => 'دوري أبطال آسيا', 'channels' => [['n' => 'beIN AFC', 'no' => '224'], ['n' => 'ثمانية الرياضية', 'no' => '108']]],
+    3   => ['name' => 'الدوري الأوروبي', 'channels' => [['n' => 'beIN 1 Premium', 'no' => '201'], ['n' => 'beIN 2', 'no' => '202']]],
+    5   => ['name' => 'دوري أبطال آسيا', 'channels' => [['n' => 'beIN AFC', 'no' => '224'], ['n' => 'ثمانية الرياضية', 'no' => '108']]],
     39  => ['name' => 'الدوري الإنجليزي', 'channels' => [['n' => 'beIN Prem 1', 'no' => '201']]],
     140 => ['name' => 'الدوري الإسباني', 'channels' => [['n' => 'beIN 1', 'no' => '211']]],
     135 => ['name' => 'الدوري الإيطالي', 'channels' => [['n' => 'AD Premium 1', 'no' => 'Starz']]],
@@ -49,9 +51,9 @@ $fixtures = getFixtures($date_get, $API_KEY);
 
 $ordered_matches = [];
 foreach ($fixtures as $f) {
-    $current_league_id = $f['league']['id'];
-    if (array_key_exists($current_league_id, $my_leagues)) {
-        $ordered_matches[$current_league_id][] = $f;
+    $league_id = (int)$f['league']['id'];
+    if (array_key_exists($league_id, $my_leagues)) {
+        $ordered_matches[$league_id][] = $f;
     }
 }
 ?>
@@ -59,8 +61,8 @@ foreach ($fixtures as $f) {
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مباريات اليوم - الخدمة الرقمية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مباريات اليوم - دقة كاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -73,9 +75,9 @@ foreach ($fixtures as $f) {
         .match { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
         .match-top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; }
         .team { flex: 1.2; text-align: center; font-size: 11px; }
-        .team img { width: 38px; height: 38px; display: block; margin: 0 auto 8px; }
+        .team img { width: 38px; height: 38px; display: block; margin: 0 auto 8px; object-fit: contain; }
         .score { font-size: 26px; font-weight: 900; letter-spacing: 2px; }
-        .match-bottom { border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .match-bottom { border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
         .ch-item { display: flex; align-items: center; gap: 5px; background: rgba(56,189,248,0.1); padding: 4px 10px; border-radius: 50px; font-size: 10px; font-weight: bold; color: #38bdf8; }
         .live { color: #22c55e; font-size: 9px; animation: blink 1s infinite; font-weight: 900; }
         @keyframes blink { 50% { opacity: 0.5; } }
