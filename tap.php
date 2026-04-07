@@ -2,25 +2,34 @@
 error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 
-// إعداد التاريخ عثمان
+// إعدادات التاريخ عثمان
 $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 $display_date = date('d / m / Y', strtotime($date_get));
 
-// دالة جلب البيانات من المصدر العربي عثمان
-function getArabicMatches($targetDate) {
-    // نستخدم API وسيط أو سحب مباشر لضمان استقرار الخدمة عثمان
-    $url = "https://kooora-api.vercel.app/api/matches?date=$targetDate"; 
+// دالة سحب البيانات من المصدر العربي المباشر عثمان
+function fetchMatches($targetDate) {
+    // نستخدم مصدر قوي ومفتوح يدعم العربية عثمان
+    $url = "https://ls.sport-mobi.com/api/v2/matches?date=" . $targetDate . "&timezone=3";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0");
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
     $res = curl_exec($ch);
     curl_close($ch);
-    return json_decode($res, true) ?: [];
+    $all_data = json_decode($res, true);
+    return $all_data['data'] ?: [];
 }
 
-$data = getArabicMatches($date_get);
+$raw_matches = fetchMatches($date_get);
+
+// ترتيب المباريات حسب الدوري
+$leagues = [];
+foreach ($raw_matches as $m) {
+    $league_name = $m['league']['name_ar'] ?: $m['league']['name'];
+    $leagues[$league_name][] = $m;
+}
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -35,37 +44,24 @@ $data = getArabicMatches($date_get);
         body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; margin: 0; padding: 10px; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 480px; }
 
-        /* نظام التنقل عثمان */
-        .date-picker { 
-            display: flex; align-items: center; justify-content: space-between; 
-            background: var(--glass); border: 1px solid var(--border); 
-            padding: 12px; border-radius: 20px; margin-bottom: 20px;
-            backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+        .date-picker { display: flex; align-items: center; justify-content: space-between; background: var(--glass); border: 1px solid var(--border); padding: 12px; border-radius: 20px; margin-bottom: 20px; backdrop-filter: blur(10px); }
         .date-picker a { color: #fff; text-decoration: none; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; background: var(--main); border-radius: 50%; transition: 0.3s; }
-        .date-picker a:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--main); }
         .current-date { text-align: center; }
         .current-date h3 { margin: 0; font-size: 15px; font-weight: 900; color: var(--main); }
         .current-date span { font-size: 10px; opacity: 0.6; }
 
-        .league-title { 
-            background: linear-gradient(90deg, var(--main), transparent); 
-            padding: 8px 15px; border-radius: 10px; font-size: 13px; 
-            font-weight: 900; margin: 25px 0 10px; border-right: 4px solid #fff;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .league-title { background: linear-gradient(90deg, var(--main), transparent); padding: 10px 15px; border-radius: 10px; font-size: 13px; font-weight: 900; margin: 25px 0 10px; border-right: 4px solid #fff; display: flex; align-items: center; gap: 8px; }
 
-        .match-card { background: var(--glass); border: 1px solid var(--border); border-radius: 18px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; position: relative; transition: 0.3s; }
-        .match-card:hover { border-color: rgba(225, 29, 72, 0.5); }
+        .match-card { background: var(--glass); border: 1px solid var(--border); border-radius: 18px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; position: relative; }
         
         .team { flex: 1.2; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; }
-        .team img { width: 38px; height: 38px; object-fit: contain; }
-        .team b { font-size: 11px; color: #eee; }
+        .team img { width: 35px; height: 35px; object-fit: contain; }
+        .team b { font-size: 10px; color: #eee; }
 
         .info { flex: 1; text-align: center; display: flex; flex-direction: column; gap: 4px; }
-        .score { font-size: 24px; font-weight: 900; color: #fff; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .score { font-size: 24px; font-weight: 900; color: #fff; letter-spacing: 2px; }
         .time { font-size: 11px; color: #38bdf8; font-weight: bold; }
-        .live-tag { font-size: 9px; background: #e11d48; padding: 2px 8px; border-radius: 5px; animation: blink 1s infinite; width: fit-content; margin: 0 auto; }
+        .live-tag { font-size: 9px; background: #e11d48; padding: 2px 8px; border-radius: 5px; animation: blink 1.2s infinite; width: fit-content; margin: 0 auto; }
         
         @keyframes blink { 50% { opacity: 0.4; } }
         .empty { text-align: center; padding: 60px; opacity: 0.4; font-size: 14px; border: 1px dashed var(--border); border-radius: 20px; }
@@ -83,37 +79,45 @@ $data = getArabicMatches($date_get);
         <a href="?d=<?= $next_date ?>"><i class="fas fa-chevron-left"></i></a>
     </div>
 
-    <?php if(empty($data['leagues'])): ?>
-        <div class="empty">لا توجد مباريات متاحة لهذا اليوم</div>
+    <?php if(empty($leagues)): ?>
+        <div class="empty">جاري تحديث المباريات.. تأكد من الاتصال</div>
     <?php else: ?>
-        <?php foreach($data['leagues'] as $league): ?>
+        <?php foreach($leagues as $name => $matchList): ?>
             <div class="league-title">
-                <i class="fas fa-futbol"></i> <?= $league['name'] ?>
+                <i class="fas fa-futbol"></i> <?= $name ?>
             </div>
             
-            <?php foreach($league['matches'] as $match): ?>
+            <?php foreach($matchList as $m): 
+                $mStatus = $m['status']['type']; // مباشر، منتهية، الخ
+                $homeTeam = $m['home_team']['name_ar'] ?: $m['home_team']['name'];
+                $awayTeam = $m['away_team']['name_ar'] ?: $m['away_team']['name'];
+                $homeLogo = $m['home_team']['logo'];
+                $awayLogo = $m['away_team']['logo'];
+                $score = $m['home_score'] . " - " . $m['away_score'];
+                $mTime = date("H:i", $m['start_at']);
+            ?>
             <div class="match-card">
                 <div class="team">
-                    <img src="<?= $match['home_logo'] ?>" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
-                    <b><?= $match['home_name'] ?></b>
+                    <img src="<?= $homeLogo ?>" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
+                    <b><?= $homeTeam ?></b>
                 </div>
 
                 <div class="info">
-                    <?php if($match['is_live']): ?>
-                        <div class="score" style="color:var(--main);"><?= $match['score'] ?></div>
+                    <?php if($mStatus == 'live'): ?>
+                        <div class="score" style="color:var(--main);"><?= $score ?></div>
                         <div class="live-tag">مباشر</div>
-                    <?php elseif($match['score'] !== "VS"): ?>
-                        <div class="score"><?= $match['score'] ?></div>
+                    <?php elseif($mStatus == 'finished'): ?>
+                        <div class="score"><?= $score ?></div>
                         <div style="font-size:9px; opacity:0.5;">انتهت</div>
                     <?php else: ?>
                         <div style="font-size:12px; font-weight:900; opacity:0.3;">VS</div>
-                        <div class="time"><?= $match['time'] ?></div>
+                        <div class="time"><?= $mTime ?></div>
                     <?php endif; ?>
                 </div>
 
                 <div class="team">
-                    <img src="<?= $match['away_logo'] ?>" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
-                    <b><?= $match['away_name'] ?></b>
+                    <img src="<?= $awayLogo ?>" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
+                    <b><?= $awayTeam ?></b>
                 </div>
             </div>
             <?php endforeach; ?>
