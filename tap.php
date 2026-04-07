@@ -20,10 +20,9 @@ $display_date = date('d / m / Y', strtotime($date_get));
         .container { width: 100%; max-width: 480px; min-height: 100vh; }
         .date-picker { display: flex; align-items: center; justify-content: space-between; background: var(--glass); border: 1px solid var(--border); padding: 12px; border-radius: 20px; margin-bottom: 20px; backdrop-filter: blur(10px); }
         .date-picker a { color: #fff; text-decoration: none; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; background: var(--main); border-radius: 50%; transition: 0.3s; }
-        .current-date { text-align: center; }
-        .current-date h3 { margin: 0; font-size: 15px; font-weight: 900; color: var(--main); }
+        .current-date h3 { margin: 0; font-size: 15px; font-weight: 900; color: var(--main); text-align: center;}
         .league-title { background: linear-gradient(90deg, var(--main), transparent); padding: 10px 15px; border-radius: 10px; font-size: 13px; font-weight: 900; margin: 25px 0 10px; border-right: 4px solid #fff; display: flex; align-items: center; gap: 8px; }
-        .match-card { background: var(--glass); border: 1px solid var(--border); border-radius: 18px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .match-card { background: var(--glass); border: 1px solid var(--border); border-radius: 18px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
         .team { flex: 1.2; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; }
         .team img { width: 35px; height: 35px; object-fit: contain; }
         .team b { font-size: 10px; color: #eee; }
@@ -40,13 +39,11 @@ $display_date = date('d / m / Y', strtotime($date_get));
 <div class="container">
     <div class="date-picker">
         <a href="?d=<?= $prev_date ?>"><i class="fas fa-chevron-right"></i></a>
-        <div class="current-date">
-            <h3><?= $display_date ?></h3>
-        </div>
+        <div class="current-date"><h3><?= $display_date ?></h3></div>
         <a href="?d=<?= $next_date ?>"><i class="fas fa-chevron-left"></i></a>
     </div>
 
-    <div id="loader"><i class="fas fa-spinner fa-spin"></i> جاري جلب المباريات...</div>
+    <div id="loader"><i class="fas fa-spinner fa-spin"></i> جاري جلب المباريات المباشرة...</div>
     <div id="matches-container"></div>
 
     <footer style="text-align:center; padding:30px; font-size:10px; opacity:0.3;">تحديث لحظي - الخدمة الرقمية © 2026</footer>
@@ -59,45 +56,54 @@ async function loadMatches() {
     const loader = document.getElementById('loader');
 
     try {
-        // سحب البيانات من المصدر مباشرة من المتصفح عثمان
-        const response = await fetch(`https://web-api.livescore.com/wrapper/api/w/en/matches/soccer/${date}?timezone=3`);
-        const data = await response.json();
+        // نستخدم وسيط خارجي موثوق لتخطي الحماية عثمان
+        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://ls.sport-mobi.com/api/v2/matches?date=' + date + '&timezone=3')}`);
+        const rawData = await response.json();
+        const data = JSON.parse(rawData.contents);
         
         loader.style.display = 'none';
-        if (!data.Stages || data.Stages.length === 0) {
-            container.innerHTML = '<div style="text-align:center; opacity:0.5;">لا توجد مباريات متاحة لهذا التاريخ</div>';
+        if (!data.data || data.data.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:50px; opacity:0.5;">لا توجد مباريات متاحة لهذا اليوم</div>';
             return;
         }
 
-        data.Stages.forEach(stage => {
-            let html = `<div class="league-title"><i class="fas fa-trophy"></i> ${stage.Sn}</div>`;
-            stage.Events.forEach(m => {
-                const isLive = m.Esid === 2;
-                const isFinished = m.Esid === 3;
-                const score = (m.Tr1 !== undefined) ? `${m.Tr1} - ${m.Tr2}` : 'VS';
-                const time = m.Esd.toString().substring(8, 10) + ":" + m.Esd.toString().substring(10, 12);
+        // تجميع المباريات حسب الدوري عثمان
+        const leagues = {};
+        data.data.forEach(m => {
+            const leagueName = m.league.name_ar || m.league.name;
+            if (!leagues[leagueName]) leagues[leagueName] = [];
+            leagues[leagueName].push(m);
+        });
+
+        for (const [name, matches] of Object.entries(leagues)) {
+            let html = `<div class="league-title"><i class="fas fa-futbol"></i> ${name}</div>`;
+            matches.forEach(m => {
+                const isLive = m.status.type === 'live';
+                const isFinished = m.status.type === 'finished';
+                const time = new Date(m.start_at * 1000).toLocaleTimeString('ar-SA', {hour: '2-digit', minute:'2-digit', hour12:false});
 
                 html += `
                 <div class="match-card">
                     <div class="team">
-                        <img src="https://api.sofascore.app/api/v1/team/${m.T1[0].ID}/image" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
-                        <b>${m.T1[0].Nm}</b>
+                        <img src="${m.home_team.logo}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
+                        <b>${m.home_team.name_ar || m.home_team.name}</b>
                     </div>
                     <div class="info">
-                        ${isLive ? `<div class="score" style="color:#e11d48">${score}</div><div class="live-tag">مباشر ${m.Ep}'</div>` : 
-                          isFinished ? `<div class="score">${score}</div><div style="font-size:9px; opacity:0.5;">انتهت</div>` : 
+                        ${isLive ? `<div class="score" style="color:#e11d48">${m.home_score} - ${m.away_score}</div><div class="live-tag">مباشر</div>` : 
+                          isFinished ? `<div class="score">${m.home_score} - ${m.away_score}</div><div style="font-size:9px; opacity:0.5;">انتهت</div>` : 
                           `<div style="font-size:12px; font-weight:900; opacity:0.3;">VS</div><div class="time">${time}</div>`}
                     </div>
                     <div class="team">
-                        <img src="https://api.sofascore.app/api/v1/team/${m.T2[0].ID}/image" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
-                        <b>${m.T2[0].Nm}</b>
+                        <img src="${m.away_team.logo}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/53/53251.png'">
+                        <b>${m.away_team.name_ar || m.away_team.name}</b>
                     </div>
                 </div>`;
             });
             container.innerHTML += html;
-        });
+        }
     } catch (error) {
-        loader.innerHTML = "فشل الاتصال بالمصدر، جرب تحديث الصفحة.";
+        loader.innerHTML = "<i class='fas fa-exclamation-triangle'></i> عذراً، جاري المحاولة مرة أخرى...";
+        setTimeout(loadMatches, 3000); // إعادة محاولة تلقائية في حال الفشل عثمان
     }
 }
 loadMatches();
