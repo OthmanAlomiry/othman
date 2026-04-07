@@ -2,7 +2,7 @@
 error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 
-// المفتاح الخاص بك يا عثمان
+// المفتاح الخاص بك عثمان
 $API_KEY = 'ef02886bbd68ecb3bdfc630f4546eb97'; 
 
 $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
@@ -10,18 +10,30 @@ $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 $display_date = date('Y / m / d', strtotime($date_get));
 
+// قائمة الدوريات المحددة عثمان (الأسماء كما تأتي من الـ API)
+$allowed_leagues = [
+    'Premier League',           // الإنجليزي
+    'La Liga',                 // الإسباني
+    'Serie A',                 // الإيطالي
+    'Bundesliga',              // الألماني
+    'Ligue 1',                 // الفرنسي
+    'UEFA Champions League',    // أبطال أوروبا
+    'Saudi Pro League',         // السعودي
+    'Egyptian Premier League',  // المصري
+    'AFC Champions League',     // أبطال آسيا
+    'AFC Champions League Two'  // آسيا 2
+];
+
 function getFixtures($date, $key) {
     $curl = curl_init();
     curl_setopt_array($curl, [
         CURLOPT_URL => "https://v3.football.api-sports.io/fixtures?date=$date",
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => [
-            "x-apisports-key: $key"
-        ],
-        CURLOPT_TIMEOUT => 10
+        CURLOPT_HTTPHEADER => ["x-apisports-key: $key"],
+        CURLOPT_TIMEOUT => 15
     ]);
     $response = curl_exec($curl);
-    curl_close($curl);
+    curl_close($ch);
     $data = json_decode($response, true);
     return $data['response'] ?: [];
 }
@@ -32,25 +44,25 @@ $fixtures = getFixtures($date_get, $API_KEY);
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مباريات اليوم - <?= $display_date ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مباريات اليوم - الخدمة الرقمية</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --main: #e11d48; --bg: #050c14; --glass: rgba(255, 255, 255, 0.05); --border: rgba(255, 255, 255, 0.1); }
         body { margin: 0; padding: 10px; background-color: var(--bg); font-family: 'Tajawal', sans-serif; color: #fff; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; min-height: 100vh; }
-        .date-nav { display: flex; align-items: center; justify-content: space-between; background: var(--glass); border: 1px solid var(--border); padding: 12px; border-radius: 20px; margin-bottom: 20px; backdrop-filter: blur(10px); }
-        .date-nav a { width: 35px; height: 35px; background: var(--main); color: #fff; display: flex; align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; box-shadow: 0 5px 15px rgba(225, 29, 72, 0.3); }
+        .container { width: 100%; max-width: 480px; }
+        .date-nav { display: flex; align-items: center; justify-content: space-between; background: var(--glass); border: 1px solid var(--border); padding: 12px; border-radius: 20px; margin-bottom: 20px; }
+        .date-nav a { width: 35px; height: 35px; background: var(--main); color: #fff; display: flex; align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; }
         .league-title { background: linear-gradient(90deg, var(--main), transparent); padding: 10px 15px; border-radius: 12px; font-size: 13px; font-weight: 900; margin: 25px 0 12px; border-right: 4px solid #fff; display: flex; align-items: center; gap: 10px; }
-        .match-card { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
+        .card { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
         .team { flex: 1.2; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
         .team img { width: 35px; height: 35px; object-fit: contain; }
-        .team b { font-size: 10px; color: #eee; line-height: 1.2; }
+        .team b { font-size: 10px; color: #eee; }
         .info { flex: 1; text-align: center; }
-        .score { font-size: 24px; font-weight: 900; color: #fff; letter-spacing: 2px; }
-        .time { font-size: 11px; color: #38bdf8; font-weight: bold; background: rgba(56, 189, 248, 0.1); padding: 2px 10px; border-radius: 50px; }
-        .live { font-size: 9px; background: #e11d48; color: #fff; padding: 2px 8px; border-radius: 5px; animation: blink 1s infinite; font-weight: 900; margin: 5px auto; width: fit-content; }
+        .score { font-size: 22px; font-weight: 900; letter-spacing: 2px; }
+        .time { font-size: 11px; color: #38bdf8; font-weight: bold; }
+        .live { color: #e11d48; font-size: 10px; font-weight: 900; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
     </style>
 </head>
@@ -62,11 +74,20 @@ $fixtures = getFixtures($date_get, $API_KEY);
         <a href="?d=<?= $next_date ?>"><i class="fas fa-chevron-left"></i></a>
     </div>
 
-    <?php if(empty($fixtures)): ?>
-        <div style="text-align:center; padding:80px; opacity:0.4;">لا توجد مباريات متاحة حالياً</div>
+    <?php 
+    $found = false;
+    $grouped = [];
+    foreach($fixtures as $f) {
+        // فحص إذا كان الدوري ضمن القائمة المسموحة عثمان
+        if (in_array($f['league']['name'], $allowed_leagues)) {
+            $grouped[$f['league']['name']][] = $f;
+            $found = true;
+        }
+    }
+
+    if(!$found): ?>
+        <div style="text-align:center; padding:80px; opacity:0.4;">لا توجد مباريات للدوريات المحددة اليوم</div>
     <?php else: 
-        $grouped = [];
-        foreach($fixtures as $f) { $grouped[$f['league']['name']][] = $f; }
         foreach($grouped as $leagueName => $matches):
     ?>
         <div class="league-title"><i class="fas fa-trophy"></i> <?= $leagueName ?></div>
@@ -74,7 +95,7 @@ $fixtures = getFixtures($date_get, $API_KEY);
             $status = $m['fixture']['status']['short'];
             $mTime = date("H:i", $m['fixture']['timestamp']);
         ?>
-        <div class="match-card">
+        <div class="card">
             <div class="team">
                 <img src="<?= $m['teams']['home']['logo'] ?>">
                 <b><?= $m['teams']['home']['name'] ?></b>
@@ -97,7 +118,6 @@ $fixtures = getFixtures($date_get, $API_KEY);
             </div>
         </div>
         <?php endforeach; endforeach; endif; ?>
-    <footer style="text-align:center; padding:30px; font-size:10px; opacity:0.3;">الخدمة الرقمية © 2026</footer>
 </div>
 </body>
 </html>
