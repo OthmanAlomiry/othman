@@ -5,8 +5,8 @@ ini_set('display_errors', 1);
 
 date_default_timezone_set('Asia/Riyadh');
 
-// مفتاحك الحالي - إذا استمرت المشكلة جرب مفتاح جديد عثمان
-$API_KEY = 'ef02886bbd68ecb3bdfc630f4546eb97'; 
+// تم وضع مفتاحك الجديد هنا يا عثمان
+$API_KEY = '2cec7a8f946f44cfb8918042417b0051'; 
 
 $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
@@ -26,7 +26,6 @@ $league_settings = [
 
 function translateText($text) {
     if(empty($text)) return $text;
-    // إضافة timeout للترجمة لكي لا يعلق الموقع عثمان
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
     $ctx = stream_context_create(['http'=> ['timeout' => 2]]); 
     $res = @file_get_contents($url, false, $ctx);
@@ -108,7 +107,7 @@ if (!empty($fixtures)) {
         <div class="no-matches">
             <i class="fas fa-info-circle"></i><br>
             لا توجد مباريات هامة لهذا اليوم <br>
-            <small>(أو استنفدت حد طلبات الـ API)</small>
+            <small>(تأكد من صلاحية مفتاح الـ API الجديد)</small>
         </div>
     <?php else:
         foreach($league_settings as $id => $setting): 
