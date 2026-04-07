@@ -3,12 +3,22 @@ session_start();
 error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 
-// --- بيانات السحابة الخاصة بك عثمان ---
+// --- بيانات السحابة والـ API عثمان ---
 $API_KEY_BIN = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69c4ad66c3097a1dd55f06d6';
-$FOOTBALL_API_KEY = 'ef02886bbd68ecb3bdfc630f4546eb97'; // مفتاح المباريات عثمان
+$FOOTBALL_API_KEY = 'ef02886bbd68ecb3bdfc630f4546eb97';
 
-// --- نظام جلب مباريات اليوم (الشغل السابق) ---
+// دالة جلب بيانات القنوات عثمان
+function getCloudFullData($bin, $key) {
+    $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER => ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
+    $res = curl_exec($ch);
+    curl_close($ch);
+    return json_decode($res, true);
+}
+
+// دالة جلب المباريات عثمان
 function getFixtures($date, $key) {
     $curl = curl_init();
     curl_setopt_array($curl, [
@@ -24,7 +34,7 @@ function getFixtures($date, $key) {
     return $data['response'] ?: [];
 }
 
-// دالة الترجمة التلقائية عثمان
+// دالة الترجمة عثمان
 function translateText($text) {
     if(empty($text)) return $text;
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
@@ -33,30 +43,13 @@ function translateText($text) {
     return $res[0][0][0] ?: $text;
 }
 
-// حصر الدوريات المطلوبة عثمان
-$my_leagues = [
-    307 => 'الدوري السعودي', 2 => 'أبطال أوروبا', 3 => 'الدوري الأوروبي', 
-    39 => 'الدوري الإنجليزي', 140 => 'الدوري الإسباني', 135 => 'الدوري الإيطالي'
-];
-
-// جلب المباريات فقط عند طلب صفحة الجدول لتوفير الجهد عثمان
-$fixtures = getFixtures(date('Y-m-d'), $FOOTBALL_API_KEY);
-
-// --- نظام القنوات (JSONBIN) ---
-function getCloudFullData($bin, $key) {
-    $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER => true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER => ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
-    $res = curl_exec($ch);
-    curl_close($ch);
-    return json_decode($res, true);
-}
-
+// جلب كافة البيانات
 $cloud = getCloudFullData($BIN_ID, $API_KEY_BIN);
 $all_channels = $cloud['custom_channels'] ?: [];
-$active_sections = array_filter($cloud['sections'] ?: [], function($s) { return $s['status'] == 'show'; });
-?>
+$fixtures = getFixtures(date('Y-m-d'), $FOOTBALL_API_KEY);
 
+$my_leagues = [307 => 'الدوري السعودي', 2 => 'أبطال أوروبا', 3 => 'الدوري الأوروبي', 39 => 'الدوري الإنجليزي', 140 => 'الدوري الإسباني', 135 => 'الدوري الإيطالي'];
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -68,126 +61,85 @@ $active_sections = array_filter($cloud['sections'] ?: [], function($s) { return 
     <style>
         :root { --main: #e11d48; --bg: #050c14; --card: rgba(255, 255, 255, 0.05); --border: rgba(255, 255, 255, 0.1); }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--bg); color: #fff; padding-bottom: 80px; }
-        
-        /* شريط التنقل السفلي - عثمان */
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; height: 70px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 9000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; text-decoration: none; font-size: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; }
-        .nav-item.active { color: var(--main); }
-        .nav-item.active i { transform: translateY(-5px); text-shadow: 0 0 15px var(--main); }
-
-        /* حاويات الصفحات عثمان */
-        .page { display: none; padding: 15px; animation: fadeIn 0.4s ease-in-out; }
+        .container { width: 100%; max-width: 500px; margin: auto; }
+        .header { text-align: center; padding: 20px 0; background: rgba(225, 29, 72, 0.05); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
+        .page { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* استايل الجدول عثمان */
-        .league-title { background: linear-gradient(90deg, var(--main), transparent); padding: 8px 15px; border-radius: 10px; font-size: 13px; font-weight: 900; margin: 20px 0 10px; border-right: 4px solid #fff; }
-        .match-card { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-        .m-team { flex: 1; text-align: center; font-size: 11px; font-weight: 700; }
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; height: 70px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 9000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; text-decoration: none; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .nav-item.active { color: var(--main); }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        .league-title { background: linear-gradient(90deg, var(--main), transparent); padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 900; margin: 20px 0 10px; border-right: 4px solid #fff; }
+        .match-card { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .m-team { flex: 1; text-align: center; font-size: 11px; }
         .m-team img { width: 30px; height: 30px; display: block; margin: 0 auto 5px; }
-        .m-info { flex: 1; text-align: center; }
-        .m-score { font-size: 20px; font-weight: 900; }
-
-        /* الهيدر عثمان */
-        .header { text-align: center; padding: 20px 0; background: rgba(225, 29, 72, 0.05); border-bottom: 1px solid var(--border); }
-        .header h1 { font-size: 18px; font-weight: 900; margin: 0; color: var(--main); }
-
-        /* قسم من نحن عثمان */
-        .about-box { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--border); text-align: center; line-height: 1.8; }
-        .about-box i { font-size: 40px; color: var(--main); margin-bottom: 15px; }
+        .btn-play { background: var(--main); border: none; color: #fff; padding: 8px 15px; border-radius: 10px; font-family: inherit; font-weight: 900; cursor: pointer; }
+        .about-box { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); text-align: center; line-height: 1.6; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1 id="page-title">بث القنوات</h1>
-    </div>
+<div class="container">
+    <div class="header"><h1 id="page-title" style="margin:0; font-size:18px;">القنوات المباشرة</h1></div>
 
     <div id="page-channels" class="page active">
-        <div class="grid">
-            <?php foreach($all_channels as $ch): ?>
-            <div class="match-card">
-                 <div style="font-weight:900;"><?= $ch['name'] ?></div>
-                 <button onclick="alert('سيتم فتح البث: <?= $ch['name'] ?>')" style="background:var(--main); border:none; color:white; padding:5px 15px; border-radius:10px; font-family:'Tajawal';">مشاهدة</button>
-            </div>
-            <?php endforeach; ?>
+        <?php foreach($all_channels as $ch): ?>
+        <div class="match-card">
+            <span style="font-weight:900;"><?= $ch['name'] ?></span>
+            <button class="btn-play" onclick="location.href='<?= $ch['file'] ?>'"><i class="fas fa-play"></i> تشغيل</button>
         </div>
+        <?php endforeach; ?>
     </div>
 
     <div id="page-schedule" class="page">
         <?php 
         $grouped = [];
         foreach($fixtures as $f) { if(isset($my_leagues[$f['league']['id']])) $grouped[$my_leagues[$f['league']['id']]][] = $f; }
-        if(empty($grouped)) echo "<p style='text-align:center; opacity:0.5;'>لا توجد مباريات هامة اليوم</p>";
+        if(empty($grouped)) echo "<p style='text-align:center; padding:50px; opacity:0.5;'>لا توجد مباريات هامة اليوم</p>";
         foreach($grouped as $league => $matches): ?>
-            <div class="league-title"><?= $league ?></div>
+            <div class="league-row league-title"><?= $league ?></div>
             <?php foreach($matches as $m): ?>
-                <div class="match-card">
-                    <div class="m-team"><img src="<?= $m['teams']['home']['logo'] ?>"><?= translateText($m['teams']['home']['name']) ?></div>
-                    <div class="m-info">
-                        <div class="m-score"><?= date("H:i", $m['fixture']['timestamp']) ?></div>
-                        <div style="font-size:9px; opacity:0.5;">بتوقيت مكة</div>
-                    </div>
-                    <div class="m-team"><img src="<?= $m['teams']['away']['logo'] ?>"><?= translateText($m['teams']['away']['name']) ?></div>
+            <div class="match-card">
+                <div class="m-team"><img src="<?= $m['teams']['home']['logo'] ?>"><?= translateText($m['teams']['home']['name']) ?></div>
+                <div style="text-align:center; flex:1;">
+                    <div style="font-size:18px; font-weight:900;"><?= date("H:i", $m['fixture']['timestamp']) ?></div>
+                    <div style="font-size:9px; opacity:0.4;">بتوقيت مكة</div>
                 </div>
-            <?php endforeach; ?>
-        <?php endforeach; ?>
+                <div class="m-team"><img src="<?= $m['teams']['away']['logo'] ?>"><?= translateText($m['teams']['away']['name']) ?></div>
+            </div>
+            <?php endforeach; endforeach; ?>
     </div>
 
     <div id="page-news" class="page">
-        <div class="about-box">
-            <i class="fas fa-newspaper"></i>
-            <h2>آخر الأخبار</h2>
-            <p>ترقبوا قريباً تغطية حصرية لآخر أخبار الانتقالات والنتائج العالمية والمحلية في هذا القسم.</p>
-        </div>
+        <div class="about-box"><i class="fas fa-bullhorn" style="font-size:40px; color:var(--main); margin-bottom:15px;"></i><h2>قسم الأخبار</h2><p>انتظرونا قريباً في تغطية شاملة لأهم الأحداث الرياضية.</p></div>
     </div>
 
     <div id="page-about" class="page">
         <div class="about-box">
-            <i class="fas fa-info-circle"></i>
-            <h2>من نحن</h2>
-            <p>بوابة <b>الخدمة الرقمية</b> هي منصة رياضية متكاملة تهدف لتوفير أفضل تجربة لمتابعة مباريات كرة القدم والنتائج المباشرة. نحن نسعى دائماً لتوفير المعلومة بسرعة ودقة عالية لمتابعينا في الوطن العربي.</p>
-            <p style="margin-top:20px; font-size:12px; color:var(--main);">تواصل معنا عبر الواتساب للاقتراحات</p>
+            <i class="fas fa-info-circle" style="font-size:40px; color:var(--main); margin-bottom:15px;"></i>
+            <h2>عن الخدمة الرقمية</h2>
+            <p>نحن منصة متخصصة في توفير حلول البث المباشر وجداول المباريات بأحدث التقنيات لضمان أفضل تجربة للمشاهد العربي.</p>
         </div>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="showPage('channels', 'بث القنوات', this)">
-            <i class="fas fa-tv"></i>
-            <span>القنوات</span>
-        </div>
-        <div class="nav-item" onclick="showPage('schedule', 'جدول المباريات', this)">
-            <i class="far fa-calendar-alt"></i>
-            <span>الجدول</span>
-        </div>
-        <div class="nav-item" onclick="showPage('news', 'الأخبار الرياضية', this)">
-            <i class="fas fa-bullhorn"></i>
-            <span>الأخبار</span>
-        </div>
-        <div class="nav-item" onclick="showPage('about', 'عن المنصة', this)">
-            <i class="fas fa-user-shield"></i>
-            <span>من نحن</span>
-        </div>
+        <div class="nav-item active" onclick="showP('channels', 'القنوات المباشرة', this)"><i class="fas fa-tv"></i><span>القنوات</span></div>
+        <div class="nav-item" onclick="showP('schedule', 'جدول المباريات', this)"><i class="far fa-calendar-alt"></i><span>الجدول</span></div>
+        <div class="nav-item" onclick="showP('news', 'الأخبار', this)"><i class="fas fa-newspaper"></i><span>الأخبار</span></div>
+        <div class="nav-item" onclick="showP('about', 'من نحن', this)"><i class="fas fa-user-circle"></i><span>من نحن</span></div>
     </div>
+</div>
 
-    <script>
-        function showPage(pageId, title, element) {
-            // إخفاء كل الصفحات عثمان
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // إظهار الصفحة المطلوبة
-            document.getElementById('page-' + pageId).classList.add('active');
-            
-            // تغيير العنوان عثمان
-            document.getElementById('page-title').innerText = title;
-            
-            // تغيير الحالة النشطة في الشريط عثمان
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            element.classList.add('active');
-
-            // العودة لأعلى الصفحة عند التبديل
-            window.scrollTo(0, 0);
-        }
-    </script>
+<script>
+function showP(id, title, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.getElementById('page-title').innerText = title;
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    window.scrollTo(0,0);
+}
+</script>
 </body>
 </html>
