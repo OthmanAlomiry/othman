@@ -12,7 +12,8 @@ $BIN_ID = '69c4ad66c3097a1dd55f06d6';
 function translateText($text) {
     if(empty($text)) return $text;
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
-    $res = @file_get_contents($url);
+    $ctx = stream_context_create(array('http'=> array('timeout' => 2))); 
+    $res = @file_get_contents($url, false, $ctx);
     if($res){
         $res = json_decode($res, true);
         return $res[0][0][0] ?: $text;
@@ -20,10 +21,10 @@ function translateText($text) {
     return $text;
 }
 
-// --- نظام الكاش وجلب المباريات عثمان ---
+// --- نظام الكاش وجلب المباريات عثمان (تم تصحيح السطر 68) ---
 function getFixturesWithCache($key) {
     $cache_file = 'matches_cache.json';
-    $cache_time = 3600; // ساعة واحدة بالثواني
+    $cache_time = 3600; 
 
     if (file_exists($cache_file) && (time() - filemtime($cache_file) < $cache_time)) {
         return json_decode(file_get_contents($cache_file), true);
@@ -31,72 +32,56 @@ function getFixturesWithCache($key) {
 
     $date = date('Y-m-d');
     $ch = curl_init("https://v3.football.api-sports.io/fixtures?date=$date");
-    curl_setopt_array($ch, [
+    
+    // تصحيح المصفوفة هنا عثمان (السطر 68)
+    curl_setopt_array($ch, array(
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => ["x-apisports-key: $key"],
+        CURLOPT_HTTPHEADER => array("x-apisports-key: " . $key),
         CURLOPT_TIMEOUT => 15,
         CURLOPT_SSL_VERIFYPEER => false
-    ]);
+    ));
+    
     $response = curl_exec($ch);
     curl_close($ch);
     
-    $data = json_decode($response, true)['response'] ?: [];
-    file_put_contents($cache_file, json_encode($data));
-    return $data;
+    $data = json_decode($response, true);
+    $final_res = (isset($data['response'])) ? $data['response'] : array();
+    file_put_contents($cache_file, json_encode($final_res));
+    return $final_res;
 }
 
-// الدوريات المطلوبة فقط عثمان
-$allowed_leagues = [
-    307, // الدوري السعودي
-    140, // الدوري الإسباني
-    39,  // الدوري الإنجليزي
-    135, // الدوري الإيطالي
-    78,  // الدوري الألماني
-    61,  // الدوري الفرنسي
-    17,  // دوري أبطال آسيا
-    19,  // دوري أبطال آسيا 2 (AFC Cup)
-    2,   // دوري أبطال أوروبا
-    3    // الدوري الأوروبي
-];
-
+// الدوريات المطلوبة عثمان
+$allowed_leagues = array(307, 140, 39, 135, 78, 61, 17, 19, 2, 3);
 $fixtures = getFixturesWithCache($FOOTBALL_API_KEY);
 
-// --- بقية دوال السحابة كما هي عثمان ---
-if(isset($_GET['check_notify'])) {
-    $ch = curl_init("https://api.jsonbin.io/v3/b/" . $BIN_ID . "/latest");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER => ["X-Master-Key: " . $API_KEY_BIN, "X-Bin-Meta: false"]);
-    $res = json_decode(curl_exec($ch), true);
-    $notify = $res['notification'];
-    if (isset($notify['time']) && (time() - $notify['time'] > 172800)) { echo json_encode(null); } 
-    else { echo json_encode($notify); }
-    exit;
-}
-
-$visitors_file = 'online_visitors.txt';
-if (isset($_GET['fetch_visitors'])) {
-    $session_id = session_id(); $time = time();
-    $data = file_exists($visitors_file) ? unserialize(file_get_contents($visitors_file)) : [];
-    $data[$session_id] = $time;
-    foreach ($data as $id => $last_time) { if ($time - $last_time > 120) unset($data[$id]); }
-    file_put_contents($visitors_file, serialize($data));
-    echo count($data); exit; 
-}
-$online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
-
+// --- جلب بيانات السحابة والقنوات عثمان ---
 function getCloudFullData($bin, $key) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER => ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
+    curl_setopt_array($ch, array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => array("X-Master-Key: " . $key, "X-Bin-Meta: false")
+    ));
     $res = curl_exec($ch);
     curl_close($ch);
     return json_decode($res, true);
 }
 
 $cloud = getCloudFullData($BIN_ID, $API_KEY_BIN);
-$all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : [];
-$active_sections = array_filter($cloud['sections'] ?: [], function($s) { return $s['status'] == 'show'; });
-$news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : ['text' => '', 'status' => 'hide'];
+$all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : array();
+$active_sections = array_filter($cloud['sections'] ?: array(), function($s) { return $s['status'] == 'show'; });
+$news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : array('text' => '', 'status' => 'hide');
+
+// نظام الزوار عثمان
+$visitors_file = 'online_visitors.txt';
+if (isset($_GET['fetch_visitors'])) {
+    $session_id = session_id(); $time = time();
+    $data = file_exists($visitors_file) ? unserialize(file_get_contents($visitors_file)) : array();
+    $data[$session_id] = $time;
+    foreach ($data as $id => $lt) { if ($time - $lt > 120) unset($data[$id]); }
+    file_put_contents($visitors_file, serialize($data));
+    echo count($data); exit; 
+}
+$online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
 
 function filterSection($channels, $sec) {
     return array_filter($channels, function($c) use ($sec) { return (isset($c['section']) && trim(strtolower($c['section'])) == trim(strtolower($sec))); });
@@ -112,21 +97,14 @@ function filterSection($channels, $sec) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
-        .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: max-width 0.4s; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #fff; overflow-x: hidden; display: flex; justify-content: center; }
+        .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; }
         
-        /* شاشة الدخول */
-        #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
-        .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
-        .intro-icon-box { width: 100px; height: 100px; background: var(--main); border-radius: 30%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(225, 29, 72, 0.5); animation: bounceIn 1s ease-out; }
-        .intro-icon-box i { font-size: 50px; color: white; }
-        .intro-title { margin-top: 25px; color: white; font-weight: 900; font-size: 24px; }
-        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
+        #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050c14; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
+        .intro-hide { opacity: 0; visibility: hidden; }
 
-        /* الهيدر عثمان */
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
         
-        /* شريط المباريات الأفقي عثمان */
         .match-slider { display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; background: rgba(255,255,255,0.02); margin-bottom: 10px; }
         .match-slider::-webkit-scrollbar { display: none; }
         .mini-match-card { min-width: 140px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 15px; padding: 8px; text-align: center; flex-shrink: 0; }
@@ -139,39 +117,34 @@ function filterSection($channels, $sec) {
         .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; }
         .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
         .cat-item img { width: 26px; height: 26px; margin-bottom: 4px; }
-        .cat-item span { font-size: 8px; font-weight: 900; color: #fff; display: block; }
+        .cat-item span { font-size: 8px; font-weight: 900; }
 
-        /* الأيقونات الجانبية عثمان */
         .notify-bell-btn { position: fixed; bottom: 85px; left: 25px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; }
         .visitors-badge-float { position: fixed; bottom: 25px; left: 25px; width: 45px; height: 45px; background: rgba(34, 197, 94, 0.15); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1.5px solid #22c55e; }
         .visitors-badge-float span { font-size: 11px; font-weight: 900; color: #fff; }
 
         .grid { padding: 15px; }
         .channel-section { display: none; width: 100%; }
-        .channel-section.active { display: block; animation: slideUp 0.6s ease-out; }
+        .channel-section.active { display: block; }
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); margin-bottom: 20px; }
         .c-head { padding: 12px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
-        .name-badge { padding: 5px 12px; border-radius: 10px; font-size: 10px; font-weight: 900; color: #000; background: var(--blue-grad); }
-        .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--main); color: #fff; border: none; padding: 14px; border-radius: 50px; font-weight: 900; cursor: pointer; }
-        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; }
+        .play-btn { width: 90%; margin: 15px auto; display: block; background: var(--main); color: #fff; border: none; padding: 14px; border-radius: 50px; font-weight: 900; cursor: pointer; }
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
         .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; padding: 0 10px; }
         .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; text-align: center; border: 1.5px solid #fff; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         footer { text-align: center; padding: 40px; font-size: 10px; opacity: 0.5; }
     </style>
 </head>
 <body>
 
 <div id="pro-intro">
-    <div class="loader-content">
-        <div class="intro-icon-box"><i class="fas fa-play-circle"></i></div>
-        <h2 class="intro-title">الخدمة الرقمية</h2>
-    </div>
+    <div style="width:100px; height:100px; background:var(--main); border-radius:30%; display:flex; align-items:center; justify-content:center;"><i class="fas fa-play-circle" style="font-size:50px; color:#fff;"></i></div>
+    <h2 style="color:#fff; margin-top:25px;">الخدمة الرقمية</h2>
 </div>
 
 <div class="main-container">
-    <div class="notify-bell-btn" onclick="toggleNotifyPanel()"><i class="fas fa-bell"></i><div class="notify-dot" id="n-dot" style="display:none; position:absolute; top:2px; right:2px; width:10px; height:10px; background:#22c55e; border-radius:50%;"></div></div>
+    <div class="notify-bell-btn"><i class="fas fa-bell"></i></div>
     <div class="visitors-badge-float"><i class="fas fa-users" style="color:#22c55e; font-size:12px;"></i><span id="realtime-visitors"><?php echo $online_now; ?></span></div>
 
     <div class="header-fixed">
@@ -190,7 +163,7 @@ function filterSection($channels, $sec) {
             <?php 
             $count_m = 0;
             foreach($fixtures as $f) {
-                if(in_array($f['league']['id'], $allowed_leagues)) {
+                if(in_array((int)$f['league']['id'], $allowed_leagues)) {
                     $count_m++;
                     echo '<div class="mini-match-card">
                             <span class="m-league">'.translateText($f['league']['name']).'</span>
@@ -218,16 +191,14 @@ function filterSection($channels, $sec) {
         <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($count == 0 ? 'active' : '') ?>">
             <?php foreach($channels as $ch): ?>
             <div class="card">
-                <div class="c-head"><div class="name-badge"><?= $ch['name'] ?></div><div style="color:#ff4d4d; font-size:10px; font-weight:900;"><i class="fas fa-circle" style="font-size:7px;"></i> مباشر</div></div>
+                <div class="c-head"><div style="background:var(--blue-grad); color:#000; padding:4px 10px; border-radius:8px; font-size:10px; font-weight:900;"><?= $ch['name'] ?></div><div style="color:#ff4d4d; font-size:10px; font-weight:900;">مباشر</div></div>
                 <div class="video-box" id="vid-<?= $ch['id'] ?>"></div>
-                <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)"><i class="fas fa-play"></i> تشغيل البث المباشر</button>
+                <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">تشغيل البث المباشر</button>
             </div>
             <?php endforeach; ?>
         </div>
         <?php $count++; endforeach; ?>
     </div>
-
-    <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
 </div>
 
 <script>
@@ -237,21 +208,12 @@ function switchSection(id, element) {
     document.getElementById('section-' + id).classList.add('active');
     element.classList.add('active');
 }
-
 function startStream(boxId, file, btn) {
     document.getElementById(boxId).innerHTML = `<iframe src="${file}?autoplay=1&muted=1" allowfullscreen></iframe>`;
-    btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الاتصال بالبث';
+    btn.style.display = 'none';
 }
-
-window.addEventListener('load', () => { 
-    setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 2000); 
-});
-
-setInterval(() => { 
-    fetch(window.location.pathname + '?fetch_visitors=1')
-    .then(res => res.text())
-    .then(count => { document.getElementById('realtime-visitors').innerText = count; }); 
-}, 5000);
+window.addEventListener('load', () => { setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 2000); });
+setInterval(() => { fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(count => { document.getElementById('realtime-visitors').innerText = count; }); }, 5000);
 </script>
 </body>
 </html>
