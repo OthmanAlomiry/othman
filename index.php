@@ -61,7 +61,7 @@ date_default_timezone_set('Asia/Riyadh');
     <style>
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); }
         
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 130px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
 
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: max-width 0.4s; }
 
@@ -81,7 +81,7 @@ date_default_timezone_set('Asia/Riyadh');
         /* الهيدر الثابت */
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: max-width 0.4s; }
         
-        /* الجرس وتحته المتواجدين */
+        /* الجرس وتحته المتواجدين عثمان */
         .notify-bell-btn { position: fixed; bottom: 85px; left: 25px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
         .notify-dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; }
         
@@ -100,12 +100,16 @@ date_default_timezone_set('Asia/Riyadh');
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
-        /* تعديل الأقسام لتظهر تحت بعضها عثمان */
-        .section-header { background: linear-gradient(90deg, var(--main), transparent); padding: 12px 15px; margin: 30px 15px 15px; border-radius: 12px; border-right: 4px solid #fff; display: flex; align-items: center; gap: 10px; }
-        .section-header img { width: 30px; height: 30px; object-fit: contain; }
-        .section-header span { font-weight: 900; font-size: 16px; color: #fff; }
+        .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
+        .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.03); }
+        .cat-item img { width: 26px; height: 26px; object-fit: contain; margin-bottom: 4px; }
+        .cat-item span { font-size: 8px; font-weight: 900; color: #fff; display: block; }
 
-        .grid { padding: 0 15px 15px; }
+        .grid { padding: 15px; }
+        .channel-section { display: none; width: 100%; }
+        .channel-section.active { display: block; animation: slideUp 0.6s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 20px; width: 100%; }
         .c-head { padding: 12px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
@@ -121,6 +125,14 @@ date_default_timezone_set('Asia/Riyadh');
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background: #000; }
 
+        @media screen and (orientation: landscape) {
+            .main-container { max-width: 95%; } 
+            .header-fixed { max-width: 95%; padding: 5px 0; }
+            body { padding-top: 140px; } 
+            .social-links { margin-bottom: 5px; }
+            .social-btn { padding: 4px 5px; font-size: 8px; }
+        }
+
         #notify-toast { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; background: rgba(14, 165, 233, 0.95); backdrop-filter: blur(10px); color: white; padding: 12px 18px; border-radius: 20px; z-index: 6000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: 0.6s; border: 1px solid rgba(255,255,255,0.2); }
         #notify-toast.show { top: 20px; }
         #notify-panel { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: 280px; max-height: 350px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid var(--glass-border); z-index: 5500; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
@@ -129,6 +141,7 @@ date_default_timezone_set('Asia/Riyadh');
         .notify-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 10px; margin-bottom: 6px; border-right: 3px solid #0ea5e9; font-size: 11px; }
 
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
+        .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         footer { text-align: center; padding: 40px; font-size: 10px; opacity: 0.5; }
     </style>
 </head>
@@ -180,18 +193,18 @@ date_default_timezone_set('Asia/Riyadh');
             </div></div>
         </div>
         <?php endif; ?>
+
+        <div class="category-tabs">
+            <?php $count = 0; foreach($active_sections as $s): ?>
+                <div class="cat-item <?= ($count == 0 ? 'active' : '') ?>" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
+            <?php $count++; endforeach; ?>
+        </div>
     </div>
 
-    <?php foreach($active_sections as $s): 
-        $channels = filterSection($all_channels, $s['key']); 
-        if(!empty($channels)):
-    ?>
-        <div class="section-header">
-            <img src="<?= $s['img'] ?>" alt="">
-            <span><?= $s['name'] ?></span>
-        </div>
-
-        <div class="grid">
+    <div class="grid">
+        <?php $count = 0; foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
+        <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($count == 0 ? 'active' : '') ?>">
+            <?php if(empty($channels)): ?><div style="text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div><?php endif; ?>
             <?php foreach($channels as $ch): ?>
             <div class="card">
                 <div class="c-head">
@@ -205,7 +218,8 @@ date_default_timezone_set('Asia/Riyadh');
             </div>
             <?php endforeach; ?>
         </div>
-    <?php endif; endforeach; ?>
+        <?php $count++; endforeach; ?>
+    </div>
 
     <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
 </div>
@@ -253,6 +267,13 @@ window.addEventListener('load', () => {
     checkNotifications();
     renderHistory();
 });
+
+function switchSection(id, element) {
+    document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
+    document.getElementById('section-' + id).classList.add('active');
+    element.classList.add('active');
+}
 
 function startStream(boxId, file, btn) {
     let vBox = document.getElementById(boxId);
