@@ -70,7 +70,7 @@ $news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : ['text' => '', 's
 
 // جلب المباريات عثمان
 $all_fixtures = getTodayMatches($FOOTBALL_API_KEY, $cache_file, $cache_time);
-$important_leagues = [307, 2, 3, 5, 39, 140, 135, 78, 61]; // أرقام الدوريات الكبرى
+$important_leagues = [307, 2, 3, 5, 39, 140, 135, 78, 61]; 
 $my_matches = array_filter($all_fixtures, function($m) use ($important_leagues) {
     return in_array($m['league']['id'], $important_leagues);
 });
@@ -89,22 +89,23 @@ date_default_timezone_set('Asia/Riyadh');
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); }
+        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); --sky: #0ea5e9; }
         
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 210px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
 
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: max-width 0.4s; }
 
-        /* ستايل قسم المباريات الجديد عثمان */
-        .matches-container { padding: 0 15px; margin-bottom: 20px; }
-        .match-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 15px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; position: relative; }
-        .m-league { position: absolute; top: -8px; right: 15px; background: var(--main); font-size: 8px; padding: 2px 8px; border-radius: 5px; font-weight: 900; }
-        .m-team { flex: 1; text-align: center; font-size: 11px; font-weight: 700; }
-        .m-team img { width: 25px; height: 25px; display: block; margin: 0 auto 5px; }
-        .m-info { flex: 1; text-align: center; }
-        .m-score { font-size: 18px; font-weight: 900; letter-spacing: 2px; }
-        .m-time { font-size: 12px; font-weight: 900; color: var(--main); }
-        .m-live { font-size: 8px; color: #22c55e; animation: blink 1s infinite; font-weight: 900; }
+        /* ستايل جدول المباريات المطور عثمان */
+        .matches-container { padding: 0 12px; margin-bottom: 30px; }
+        .match-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 15px 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; position: relative; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .match-card:hover { border-color: var(--sky); background: rgba(14, 165, 233, 0.05); }
+        .m-league { position: absolute; top: -10px; right: 15px; background: var(--sky); font-size: 9px; padding: 3px 10px; border-radius: 50px; font-weight: 900; color: #fff; box-shadow: 0 4px 8px rgba(14, 165, 233, 0.3); }
+        .m-team { flex: 1.2; text-align: center; font-size: 11px; font-weight: 900; }
+        .m-team img { width: 30px; height: 30px; display: block; margin: 0 auto 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .m-info { flex: 0.8; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); margin: 0 5px; }
+        .m-score { font-size: 20px; font-weight: 900; letter-spacing: 3px; font-family: sans-serif; }
+        .m-time { font-size: 13px; font-weight: 900; color: var(--sky); font-family: sans-serif; }
+        .m-live { font-size: 9px; color: #22c55e; animation: blink 1s infinite; font-weight: 900; margin-top: 4px; }
 
         /* شاشة الدخول */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
@@ -119,10 +120,9 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes loadingMove { 100% { left: 100%; } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* الهيدر الثابت */
-        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: max-width 0.4s; }
+        /* الهيدر الثابت عثمان */
+        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.98); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: max-width 0.4s; }
         
-        /* الجرس وتحته المتواجدين عثمان */
         .notify-bell-btn { position: fixed; bottom: 85px; left: 25px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
         .notify-dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-deep); display: none; }
         
@@ -247,28 +247,34 @@ date_default_timezone_set('Asia/Riyadh');
     <div class="grid">
         <div id="section-matches" class="channel-section active">
             <div class="matches-container">
-                <div style="margin-bottom: 10px; font-weight: 900; font-size: 13px; color: var(--main); border-right: 3px solid var(--main); padding-right: 10px;">أهم مباريات اليوم</div>
+                <div style="margin-bottom: 20px; font-weight: 900; font-size: 14px; color: var(--sky); border-right: 3px solid var(--sky); padding-right: 12px;">مباريات اليوم الهامة</div>
                 <?php if(empty($my_matches)): ?>
-                    <div style="text-align:center; padding:30px; opacity:0.3; font-size:12px;">لا توجد مباريات هامة حالياً</div>
+                    <div style="text-align:center; padding:40px; background:var(--glass); border-radius:20px; opacity:0.3; font-size:12px;">لا توجد مباريات مجدولة حالياً</div>
                 <?php else: foreach($my_matches as $m): 
                     $status = $m['fixture']['status']['short'];
                 ?>
                 <div class="match-card">
                     <div class="m-league"><?= $m['league']['name'] ?></div>
-                    <div class="m-team"><img src="<?= $m['teams']['home']['logo'] ?>"><?= $m['teams']['home']['name'] ?></div>
+                    <div class="m-team">
+                        <img src="<?= $m['teams']['home']['logo'] ?>">
+                        <span><?= $m['teams']['home']['name'] ?></span>
+                    </div>
                     <div class="m-info">
                         <?php if(in_array($status, ['1H','2H','HT','ET','P'])): ?>
-                            <div class="m-score" style="color:var(--main)"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
-                            <div class="m-live">مباشر الآن</div>
+                            <div class="m-score notranslate" style="color:var(--main)"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
+                            <div class="m-live">مباشر</div>
                         <?php elseif($status == 'FT'): ?>
-                            <div class="m-score"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
-                            <div style="font-size:8px; opacity:0.5;">انتهت</div>
+                            <div class="m-score notranslate" style="opacity:0.8"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
+                            <div style="font-size:9px; font-weight:900; opacity:0.4;">انتهت</div>
                         <?php else: ?>
-                            <div class="m-time"><?= date("H:i", $m['fixture']['timestamp']) ?></div>
-                            <div style="font-size:8px; opacity:0.5;">توقيت مكة</div>
+                            <div class="m-time notranslate"><?= date("H:i", $m['fixture']['timestamp']) ?></div>
+                            <div style="font-size:8px; font-weight:900; opacity:0.4;">قريباً</div>
                         <?php endif; ?>
                     </div>
-                    <div class="m-team"><img src="<?= $m['teams']['away']['logo'] ?>"><?= $m['teams']['away']['name'] ?></div>
+                    <div class="m-team">
+                        <img src="<?= $m['teams']['away']['logo'] ?>">
+                        <span><?= $m['teams']['away']['name'] ?></span>
+                    </div>
                 </div>
                 <?php endforeach; endif; ?>
             </div>
