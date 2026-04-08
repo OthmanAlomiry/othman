@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>تجربة جدول المباريات - عثمان</title>
+    <title>اختبار المفتاح الجديد - عثمان</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -31,50 +31,47 @@
 <body>
 
 <div class="container">
-    <div class="header"><i class="fas fa-futbol"></i> جدول المباريات (تجريبي)</div>
+    <div class="header"><i class="fas fa-check-circle"></i> فحص المفتاح الجديد</div>
     <div id="matches-display">
         <div id="loader">
             <i class="fas fa-spinner fa-spin fa-2x" style="color:var(--sky);"></i>
-            <p style="margin-top:15px;">جاري جلب البيانات من المصدر...</p>
+            <p style="margin-top:15px;">جاري الاتصال بالمصدر باستخدام المفتاح الجديد...</p>
         </div>
     </div>
 </div>
 
 <script>
-const API_KEY = '895397d292e24b08cf4b107b68f52524';
+// المفتاح الجديد كلياً الخاص بك يا عثمان
+const API_KEY = '1e8894c7e946b851b36fea7f3a3c4d98';
 
 async function getMatches() {
     const display = document.getElementById('matches-display');
-    const today = new Date().toISOString().split('T')[0];
-
+    
     try {
-        // الطلب المباشر من المتصفح عثمان
-        const response = await fetch(`https://v3.football.api-sports.io/fixtures?date=${today}&timezone=Asia/Riyadh`, {
+        // جلب أقرب 20 مباراة قادمة لضمان امتلاء الجدول فوراً عثمان
+        const response = await fetch(`https://v3.football.api-sports.io/fixtures?next=20&timezone=Asia/Riyadh`, {
             method: 'GET',
             headers: { 'x-apisports-key': API_KEY }
         });
         
         const data = await response.json();
-        let matches = data.response || [];
-
-        // إذا كان اليوم فارغاً، اجلب مباريات قادمة لضمان أن الكود يعمل عثمان
-        if (matches.length === 0) {
-            const nextRes = await fetch(`https://v3.football.api-sports.io/fixtures?next=15&timezone=Asia/Riyadh`, {
-                method: 'GET',
-                headers: { 'x-apisports-key': API_KEY }
-            });
-            const nextData = await nextRes.json();
-            matches = nextData.response || [];
+        
+        // التحقق من وجود أخطاء في المفتاح عثمان
+        if (data.errors && Object.keys(data.errors).length > 0) {
+            display.innerHTML = `<div style="text-align:center; padding:30px; color:red;">خطأ من المصدر: ${JSON.stringify(data.errors)}</div>`;
+            return;
         }
 
+        const matches = data.response || [];
+
         if (matches.length === 0) {
-            display.innerHTML = '<div style="text-align:center; padding:40px;">لا توجد مباريات متاحة حالياً.</div>';
+            display.innerHTML = '<div style="text-align:center; padding:40px;">المفتاح شغال لكن لا توجد مباريات حالياً.</div>';
             return;
         }
 
         display.innerHTML = '';
         
-        // ترتيب الدوري السعودي أولاً عثمان
+        // ترتيب الدوري السعودي (307) ليكون في المقدمة عثمان
         matches.sort((a, b) => (a.league.id === 307 ? -1 : 1));
 
         matches.forEach(m => {
@@ -104,7 +101,7 @@ async function getMatches() {
                 </div>`;
         });
     } catch (err) {
-        display.innerHTML = '<div style="text-align:center; padding:40px;">فشل الاتصال بالمصدر.</div>';
+        display.innerHTML = '<div style="text-align:center; padding:40px;">فشل الاتصال بالمصدر. تأكد من جودة الإنترنت.</div>';
     }
 }
 
