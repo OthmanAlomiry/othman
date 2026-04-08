@@ -8,13 +8,13 @@ $BIN_ID = '69c4ad66c3097a1dd55f06d6';
 
 // --- إعدادات API المباريات (عثمان) ---
 $FOOTBALL_API_KEY = 'd6c1b4f231cf6d72aacf0c6cfe61efa5'; 
-$cache_file = "matches_cache.json";
-$cache_time = 900; // تحديث كل 15 دقيقة لتوفير الطلبات
+$cache_file = "matches_v2.json"; // تم تغيير الاسم لتحديث البيانات فوراً
+$cache_time = 900; 
 
-// دالة جلب المباريات بنظام التخزين المؤقت عثمان
 function getTodayMatches($key, $file, $time) {
     if (file_exists($file) && (time() - filemtime($file) < $time)) {
-        return json_decode(file_get_contents($file), true);
+        $cached_data = json_decode(file_get_contents($file), true);
+        if (!empty($cached_data)) return $cached_data;
     }
     $date = date('Y-m-d');
     $ch = curl_init("https://v3.football.api-sports.io/fixtures?date=$date");
@@ -29,7 +29,6 @@ function getTodayMatches($key, $file, $time) {
     return file_exists($file) ? json_decode(file_get_contents($file), true) : [];
 }
 
-// دالة فحص الإشعارات (AJAX)
 if(isset($_GET['check_notify'])) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $BIN_ID . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -41,7 +40,6 @@ if(isset($_GET['check_notify'])) {
     exit;
 }
 
-// --- نظام عداد المتواجدين ---
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
     $session_id = session_id(); $time = time();
@@ -53,7 +51,6 @@ if (isset($_GET['fetch_visitors'])) {
 }
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
 
-// --- دالة جلب البيانات السحابية الكاملة ---
 function getCloudFullData($bin, $key) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -68,7 +65,6 @@ $all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : [
 $active_sections = array_filter($cloud['sections'] ?: [], function($s) { return $s['status'] == 'show'; });
 $news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : ['text' => '', 'status' => 'hide'];
 
-// جلب المباريات عثمان
 $all_fixtures = getTodayMatches($FOOTBALL_API_KEY, $cache_file, $cache_time);
 $important_leagues = [307, 2, 3, 5, 39, 140, 135, 78, 61]; 
 $my_matches = array_filter($all_fixtures, function($m) use ($important_leagues) {
@@ -91,20 +87,20 @@ date_default_timezone_set('Asia/Riyadh');
     <style>
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); --sky: #0ea5e9; }
         
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 210px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 230px; /* زيادة الإزاحة عثمان */ color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
 
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: max-width 0.4s; }
 
         /* ستايل جدول المباريات المطور عثمان */
         .matches-container { padding: 0 12px; margin-bottom: 30px; }
-        .match-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 15px 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; position: relative; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .match-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 18px 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; position: relative; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .match-card:hover { border-color: var(--sky); background: rgba(14, 165, 233, 0.05); }
-        .m-league { position: absolute; top: -10px; right: 15px; background: var(--sky); font-size: 9px; padding: 3px 10px; border-radius: 50px; font-weight: 900; color: #fff; box-shadow: 0 4px 8px rgba(14, 165, 233, 0.3); }
+        .m-league { position: absolute; top: -10px; right: 15px; background: var(--sky); font-size: 9px; padding: 3px 12px; border-radius: 50px; font-weight: 900; color: #fff; box-shadow: 0 4px 8px rgba(14, 165, 233, 0.3); }
         .m-team { flex: 1.2; text-align: center; font-size: 11px; font-weight: 900; }
-        .m-team img { width: 30px; height: 30px; display: block; margin: 0 auto 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-        .m-info { flex: 0.8; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); margin: 0 5px; }
-        .m-score { font-size: 20px; font-weight: 900; letter-spacing: 3px; font-family: sans-serif; }
-        .m-time { font-size: 13px; font-weight: 900; color: var(--sky); font-family: sans-serif; }
+        .m-team img { width: 32px; height: 32px; display: block; margin: 0 auto 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .m-info { flex: 0.9; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 1px solid rgba(255,255,255,0.08); border-right: 1px solid rgba(255,255,255,0.08); margin: 0 5px; }
+        .m-score { font-size: 22px; font-weight: 900; letter-spacing: 2px; font-family: sans-serif; }
+        .m-time { font-size: 14px; font-weight: 900; color: var(--sky); font-family: sans-serif; }
         .m-live { font-size: 9px; color: #22c55e; animation: blink 1s infinite; font-weight: 900; margin-top: 4px; }
 
         /* شاشة الدخول */
@@ -120,7 +116,7 @@ date_default_timezone_set('Asia/Riyadh');
         @keyframes loadingMove { 100% { left: 100%; } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* الهيدر الثابت عثمان */
+        /* الهيدر الثابت */
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.98); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: max-width 0.4s; }
         
         .notify-bell-btn { position: fixed; bottom: 85px; left: 25px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
@@ -247,9 +243,9 @@ date_default_timezone_set('Asia/Riyadh');
     <div class="grid">
         <div id="section-matches" class="channel-section active">
             <div class="matches-container">
-                <div style="margin-bottom: 20px; font-weight: 900; font-size: 14px; color: var(--sky); border-right: 3px solid var(--sky); padding-right: 12px;">مباريات اليوم الهامة</div>
+                <div style="margin-bottom: 25px; font-weight: 900; font-size: 15px; color: var(--sky); border-right: 4px solid var(--sky); padding-right: 12px;">أهم مباريات اليوم</div>
                 <?php if(empty($my_matches)): ?>
-                    <div style="text-align:center; padding:40px; background:var(--glass); border-radius:20px; opacity:0.3; font-size:12px;">لا توجد مباريات مجدولة حالياً</div>
+                    <div style="text-align:center; padding:50px; background:var(--glass); border-radius:20px; opacity:0.3; font-size:12px;">لا توجد مباريات هامة حالياً</div>
                 <?php else: foreach($my_matches as $m): 
                     $status = $m['fixture']['status']['short'];
                 ?>
@@ -264,11 +260,11 @@ date_default_timezone_set('Asia/Riyadh');
                             <div class="m-score notranslate" style="color:var(--main)"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
                             <div class="m-live">مباشر</div>
                         <?php elseif($status == 'FT'): ?>
-                            <div class="m-score notranslate" style="opacity:0.8"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
-                            <div style="font-size:9px; font-weight:900; opacity:0.4;">انتهت</div>
+                            <div class="m-score notranslate" style="opacity:0.9"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
+                            <div style="font-size:10px; font-weight:900; opacity:0.5;">انتهت</div>
                         <?php else: ?>
                             <div class="m-time notranslate"><?= date("H:i", $m['fixture']['timestamp']) ?></div>
-                            <div style="font-size:8px; font-weight:900; opacity:0.4;">قريباً</div>
+                            <div style="font-size:9px; font-weight:900; opacity:0.5;">قريباً</div>
                         <?php endif; ?>
                     </div>
                     <div class="m-team">
