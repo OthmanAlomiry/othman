@@ -2,44 +2,15 @@
 session_start();
 error_reporting(0);
 
-// --- بيانات السحابة والـ API عثمان ---
+// --- بيانات السحابة الخاصة بك عثمان ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69c4ad66c3097a1dd55f06d6';
-$FOOTBALL_API_KEY = '2fa3bae3383927c794a34cd72089383cef96aec2af30afaa8b7b093f64a91142';
-
-// دالة جلب المباريات عثمان - تم استخدام array()
-function getFixtures($date, $key) {
-    $curl = curl_init();
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://v3.football.api-sports.io/fixtures?date=$date",
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => array("x-apisports-key: $key"),
-        CURLOPT_TIMEOUT => 15,
-        CURLOPT_SSL_VERIFYPEER => false
-    ));
-    $response = curl_exec($curl);
-    curl_close($curl);
-    $data = json_decode($response, true);
-    return (isset($data['response'])) ? $data['response'] : array();
-}
-
-// دالة الترجمة عثمان
-function translateText($text) {
-    if(empty($text)) return $text;
-    $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
-    $res = @file_get_contents($url);
-    if($res){
-        $res = json_decode($res, true);
-        return $res[0][0][0] ?: $text;
-    }
-    return $text;
-}
 
 // دالة فحص الإشعارات (AJAX)
 if(isset($_GET['check_notify'])) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $BIN_ID . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Master-Key: " . $API_KEY, "X-Bin-Meta: false"));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $API_KEY, "X-Bin-Meta: false"]);
     $res = json_decode(curl_exec($ch), true);
     $notify = $res['notification'];
     if (isset($notify['time']) && (time() - $notify['time'] > 172800)) { echo json_encode(null); } 
@@ -51,7 +22,7 @@ if(isset($_GET['check_notify'])) {
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
     $session_id = session_id(); $time = time();
-    $data = file_exists($visitors_file) ? unserialize(file_get_contents($visitors_file)) : array();
+    $data = file_exists($visitors_file) ? unserialize(file_get_contents($visitors_file)) : [];
     $data[$session_id] = $time;
     foreach ($data as $id => $last_time) { if ($time - $last_time > 120) unset($data[$id]); }
     file_put_contents($visitors_file, serialize($data));
@@ -63,20 +34,16 @@ $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents(
 function getCloudFullData($bin, $key) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Master-Key: " . $key, "X-Bin-Meta: false"));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
     $res = curl_exec($ch);
     curl_close($ch);
     return json_decode($res, true);
 }
 
 $cloud = getCloudFullData($BIN_ID, $API_KEY);
-$all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : array();
-$active_sections = array_filter($cloud['sections'] ?: array(), function($s) { return $s['status'] == 'show'; });
-$news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : array('text' => '', 'status' => 'hide');
-
-// جلب مباريات اليوم والدوريات المحددة عثمان
-$fixtures = getFixtures(date('Y-m-d'), $FOOTBALL_API_KEY);
-$allowed_leagues = array(307, 2, 3, 39, 140, 135, 78, 61);
+$all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : [];
+$active_sections = array_filter($cloud['sections'] ?: [], function($s) { return $s['status'] == 'show'; });
+$news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : ['text' => '', 'status' => 'hide'];
 
 function filterSection($channels, $sec) {
     return array_filter($channels, function($c) use ($sec) { return (isset($c['section']) && trim(strtolower($c['section'])) == trim(strtolower($sec))); });
@@ -132,15 +99,6 @@ date_default_timezone_set('Asia/Riyadh');
         .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 60s linear infinite; width: max-content; }
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
-
-        /* شريط المباريات الصغير عثمان */
-        .match-slider { display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; background: rgba(255,255,255,0.02); margin-bottom: 5px; -webkit-overflow-scrolling: touch; }
-        .match-slider::-webkit-scrollbar { display: none; }
-        .mini-card { min-width: 130px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 12px; padding: 6px; text-align: center; }
-        .mini-teams { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 3px; }
-        .mini-teams img { width: 18px; height: 18px; object-fit: contain; }
-        .mini-time { font-size: 10px; font-weight: 900; color: #0ea5e9; }
-        .mini-league { font-size: 8px; opacity: 0.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
         .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; }
@@ -235,26 +193,6 @@ date_default_timezone_set('Asia/Riyadh');
             </div></div>
         </div>
         <?php endif; ?>
-
-        <div class="match-slider">
-            <?php 
-            $f_found = false;
-            foreach($fixtures as $f) {
-                if(in_array((int)$f['league']['id'], $allowed_leagues)) {
-                    $f_found = true;
-                    echo '<div class="mini-card">
-                            <div class="mini-league">'.translateText($f['league']['name']).'</div>
-                            <div class="mini-teams">
-                                <img src="'.$f['teams']['home']['logo'].'">
-                                <span class="mini-time">'.date("H:i", $f['fixture']['timestamp']).'</span>
-                                <img src="'.$f['teams']['away']['logo'].'">
-                            </div>
-                          </div>';
-                }
-            }
-            if(!$f_found) echo '<p style="font-size:10px; opacity:0.3; width:100%; text-align:center;">لا توجد مباريات هامة اليوم</p>';
-            ?>
-        </div>
 
         <div class="category-tabs">
             <?php $count = 0; foreach($active_sections as $s): ?>
