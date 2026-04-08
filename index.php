@@ -3,14 +3,37 @@ session_start();
 error_reporting(0);
 
 // --- بيانات السحابة الخاصة بك عثمان ---
-$API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
+$API_KEY_BIN = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69c4ad66c3097a1dd55f06d6';
+
+// --- إعدادات API المباريات (عثمان) ---
+$FOOTBALL_API_KEY = 'd6c1b4f231cf6d72aacf0c6cfe61efa5'; 
+$cache_file = "matches_cache.json";
+$cache_time = 900; // تحديث كل 15 دقيقة لتوفير الطلبات
+
+// دالة جلب المباريات بنظام التخزين المؤقت عثمان
+function getTodayMatches($key, $file, $time) {
+    if (file_exists($file) && (time() - filemtime($file) < $time)) {
+        return json_decode(file_get_contents($file), true);
+    }
+    $date = date('Y-m-d');
+    $ch = curl_init("https://v3.football.api-sports.io/fixtures?date=$date");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["x-apisports-key: " . $key]);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    $res = json_decode(curl_exec($ch), true);
+    if (isset($res['response']) && !empty($res['response'])) {
+        file_put_contents($file, json_encode($res['response']));
+        return $res['response'];
+    }
+    return file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+}
 
 // دالة فحص الإشعارات (AJAX)
 if(isset($_GET['check_notify'])) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $BIN_ID . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $API_KEY, "X-Bin-Meta: false"]);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $API_KEY_BIN, "X-Bin-Meta: false"]);
     $res = json_decode(curl_exec($ch), true);
     $notify = $res['notification'];
     if (isset($notify['time']) && (time() - $notify['time'] > 172800)) { echo json_encode(null); } 
@@ -40,10 +63,17 @@ function getCloudFullData($bin, $key) {
     return json_decode($res, true);
 }
 
-$cloud = getCloudFullData($BIN_ID, $API_KEY);
+$cloud = getCloudFullData($BIN_ID, $API_KEY_BIN);
 $all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : [];
 $active_sections = array_filter($cloud['sections'] ?: [], function($s) { return $s['status'] == 'show'; });
 $news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : ['text' => '', 'status' => 'hide'];
+
+// جلب المباريات عثمان
+$all_fixtures = getTodayMatches($FOOTBALL_API_KEY, $cache_file, $cache_time);
+$important_leagues = [307, 2, 3, 5, 39, 140, 135, 78, 61]; // أرقام الدوريات الكبرى
+$my_matches = array_filter($all_fixtures, function($m) use ($important_leagues) {
+    return in_array($m['league']['id'], $important_leagues);
+});
 
 function filterSection($channels, $sec) {
     return array_filter($channels, function($c) use ($sec) { return (isset($c['section']) && trim(strtolower($c['section'])) == trim(strtolower($sec))); });
@@ -64,6 +94,17 @@ date_default_timezone_set('Asia/Riyadh');
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
 
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: max-width 0.4s; }
+
+        /* ستايل قسم المباريات الجديد عثمان */
+        .matches-container { padding: 0 15px; margin-bottom: 20px; }
+        .match-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 15px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .m-league { position: absolute; top: -8px; right: 15px; background: var(--main); font-size: 8px; padding: 2px 8px; border-radius: 5px; font-weight: 900; }
+        .m-team { flex: 1; text-align: center; font-size: 11px; font-weight: 700; }
+        .m-team img { width: 25px; height: 25px; display: block; margin: 0 auto 5px; }
+        .m-info { flex: 1; text-align: center; }
+        .m-score { font-size: 18px; font-weight: 900; letter-spacing: 2px; }
+        .m-time { font-size: 12px; font-weight: 900; color: var(--main); }
+        .m-live { font-size: 8px; color: #22c55e; animation: blink 1s infinite; font-weight: 900; }
 
         /* شاشة الدخول */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
@@ -143,6 +184,7 @@ date_default_timezone_set('Asia/Riyadh');
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         footer { text-align: center; padding: 40px; font-size: 10px; opacity: 0.5; }
+        @keyframes blink { 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -195,15 +237,45 @@ date_default_timezone_set('Asia/Riyadh');
         <?php endif; ?>
 
         <div class="category-tabs">
-            <?php $count = 0; foreach($active_sections as $s): ?>
-                <div class="cat-item <?= ($count == 0 ? 'active' : '') ?>" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
-            <?php $count++; endforeach; ?>
+            <div class="cat-item active" onclick="switchSection('matches', this)"><img src="https://cdn-icons-png.flaticon.com/512/33/33736.png"><span>المباريات</span></div>
+            <?php foreach($active_sections as $s): ?>
+                <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
+            <?php endforeach; ?>
         </div>
     </div>
 
     <div class="grid">
-        <?php $count = 0; foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
-        <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($count == 0 ? 'active' : '') ?>">
+        <div id="section-matches" class="channel-section active">
+            <div class="matches-container">
+                <div style="margin-bottom: 10px; font-weight: 900; font-size: 13px; color: var(--main); border-right: 3px solid var(--main); padding-right: 10px;">أهم مباريات اليوم</div>
+                <?php if(empty($my_matches)): ?>
+                    <div style="text-align:center; padding:30px; opacity:0.3; font-size:12px;">لا توجد مباريات هامة حالياً</div>
+                <?php else: foreach($my_matches as $m): 
+                    $status = $m['fixture']['status']['short'];
+                ?>
+                <div class="match-card">
+                    <div class="m-league"><?= $m['league']['name'] ?></div>
+                    <div class="m-team"><img src="<?= $m['teams']['home']['logo'] ?>"><?= $m['teams']['home']['name'] ?></div>
+                    <div class="m-info">
+                        <?php if(in_array($status, ['1H','2H','HT','ET','P'])): ?>
+                            <div class="m-score" style="color:var(--main)"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
+                            <div class="m-live">مباشر الآن</div>
+                        <?php elseif($status == 'FT'): ?>
+                            <div class="m-score"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
+                            <div style="font-size:8px; opacity:0.5;">انتهت</div>
+                        <?php else: ?>
+                            <div class="m-time"><?= date("H:i", $m['fixture']['timestamp']) ?></div>
+                            <div style="font-size:8px; opacity:0.5;">توقيت مكة</div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="m-team"><img src="<?= $m['teams']['away']['logo'] ?>"><?= $m['teams']['away']['name'] ?></div>
+                </div>
+                <?php endforeach; endif; ?>
+            </div>
+        </div>
+
+        <?php foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
+        <div id="section-<?= $s['key'] ?>" class="channel-section">
             <?php if(empty($channels)): ?><div style="text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div><?php endif; ?>
             <?php foreach($channels as $ch): ?>
             <div class="card">
@@ -218,7 +290,7 @@ date_default_timezone_set('Asia/Riyadh');
             </div>
             <?php endforeach; ?>
         </div>
-        <?php $count++; endforeach; ?>
+        <?php endforeach; ?>
     </div>
 
     <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
