@@ -4,7 +4,7 @@ error_reporting(0);
 
 // --- بيانات السحابة الخاصة بك عثمان ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
-$BIN_ID = '69c4ad66c3097a1dd55f06d6';
+$BIN_ID = '69d6f03436566621a891c500';
 
 // دالة فحص الإشعارات (AJAX)
 if(isset($_GET['check_notify'])) {
