@@ -1,16 +1,15 @@
 <?php
-// إعدادات التوقيت لتناسب منطقتنا
+// إعدادات الوقت لضمان مطابقة توقيت المباريات مع توقيتك في السعودية
 date_default_timezone_set('Asia/Riyadh');
 
-// المفتاح الخاص بك من RapidAPI
+// مفتاحك السري من RapidAPI (تأكد من بقائه سرياً)
 $api_key = "49e271c73amsh02ca0a4d3f5b237p145598jsn7c1cee0f8ec9"; 
 
 $curl = curl_init();
 
-// الرابط الجديد لجلب جدول مباريات اليوم بالكامل حسب التاريخ
-$today = date("Ymd");
 curl_setopt_array($curl, [
-    CURLOPT_URL => "https://free-api-live-football-data.p.rapidapi.com/api/v1/get-fixtures-by-date?date=" . $today,
+    // هذا الرابط (get-all-matches) هو الأضمن لجلب البيانات الشاملة
+    CURLOPT_URL => "https://free-api-live-football-data.p.rapidapi.com/api/v1/get-all-matches",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
     CURLOPT_MAXREDIRS => 10,
@@ -27,7 +26,11 @@ $response = curl_exec($curl);
 $err = curl_error($curl);
 curl_close($curl);
 
-$data = json_decode($response, true);
+// تحويل البيانات من JSON إلى مصفوفة PHP
+$result = json_decode($response, true);
+
+// استخراج المباريات من المصفوفة (API-specific structure)
+$matches = $result['data'] ?? [];
 ?>
 
 <!DOCTYPE html>
@@ -35,72 +38,58 @@ $data = json_decode($response, true);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جدول مباريات اليوم - d-service</title>
+    <title>مباريات اليوم - d-service</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <meta http-equiv="refresh" content="120"> 
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        :root { --main-bg: #f4f7f6; --card-bg: #ffffff; --accent-color: #198754; }
+        body { background-color: var(--main-bg); font-family: 'Segoe UI', Tahoma, sans-serif; }
         .match-card { 
-            background: white; 
-            border-radius: 15px; 
-            padding: 20px; 
-            margin-bottom: 15px; 
-            border: none; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: 0.3s;
+            background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 12px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: none; transition: 0.3s;
         }
-        .match-card:hover { transform: translateY(-3px); }
-        .league-badge { 
-            background: #eef2f7; 
-            color: #555; 
-            font-size: 0.75rem; 
-            padding: 4px 12px; 
-            border-radius: 20px; 
-            margin-bottom: 15px; 
-            display: inline-block;
-        }
-        .score { 
-            font-size: 1.8rem; 
-            font-weight: bold; 
-            color: #198754; 
-            min-width: 80px;
-            display: inline-block;
-        }
-        .team-name { font-weight: 600; font-size: 1.1rem; flex: 1; }
-        .status { font-size: 0.8rem; font-weight: bold; }
-        .live { color: red; animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        .match-card:hover { transform: scale(1.01); }
+        .league-header { font-size: 0.8rem; color: #777; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
+        .score-box { background: #f8f9fa; border-radius: 8px; padding: 5px 15px; font-weight: bold; font-size: 1.4rem; color: var(--accent-color); min-width: 70px; }
+        .team-name { font-weight: 600; width: 40%; }
+        .status-badge { font-size: 0.75rem; font-weight: bold; margin-top: 5px; }
+        .live { color: #dc3545; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="container py-5 text-center">
-    <h2 class="mb-2">⚽ جدول مباريات اليوم</h2>
-    <p class="text-muted mb-5"><?php echo date("Y-m-d"); ?></p>
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">⚽ جدول مباريات اليوم</h2>
+        <p class="text-muted"><?php echo date("l, d F Y"); ?></p>
+    </div>
 
     <?php if ($err): ?>
-        <div class="alert alert-danger">حدث خطأ في الاتصال بالسيرفر.</div>
-    <?php elseif (isset($data['status']) && $data['status'] == 'success' && !empty($data['data'])): ?>
+        <div class="alert alert-danger text-center">خطأ في الاتصال بالسيرفر: <?php echo $err; ?></div>
+    <?php elseif (!empty($matches)): ?>
         
         <div class="row justify-content-center">
-            <?php foreach ($data['data'] as $match): ?>
+            <?php foreach ($matches as $match): ?>
                 <div class="col-md-8 col-lg-6">
                     <div class="match-card">
-                        <span class="league-badge"><?php echo htmlspecialchars($match['league_name']); ?></span>
+                        <div class="league-header d-flex justify-content-between">
+                            <span><?php echo htmlspecialchars($match['league_name']); ?></span>
+                            <span><?php echo htmlspecialchars($match['start_time'] ?? ''); ?></span>
+                        </div>
                         
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div class="team-name text-end"><?php echo htmlspecialchars($match['home_team_name']); ?></div>
+                        <div class="d-flex align-items-center text-center">
+                            <div class="team-name text-end px-2"><?php echo htmlspecialchars($match['home_team_name']); ?></div>
                             
-                            <div class="text-center px-3">
-                                <div class="score">
-                                    <?php echo $match['score'] ?? 'VS'; ?>
+                            <div class="d-flex flex-column align-items-center flex-grow-1">
+                                <div class="score-box">
+                                    <?php echo $match['score'] ?? 'vs'; ?>
                                 </div>
-                                <div class="status mt-1 <?php echo ($match['status_name'] == 'Live') ? 'live' : ''; ?>">
+                                <div class="status-badge <?php echo ($match['status_name'] == 'Live') ? 'live' : ''; ?>">
                                     <?php echo htmlspecialchars($match['status_name']); ?>
                                 </div>
                             </div>
                             
-                            <div class="team-name text-start"><?php echo htmlspecialchars($match['away_team_name']); ?></div>
+                            <div class="team-name text-start px-2"><?php echo htmlspecialchars($match['away_team_name']); ?></div>
                         </div>
                     </div>
                 </div>
@@ -108,16 +97,20 @@ $data = json_decode($response, true);
         </div>
 
     <?php else: ?>
-        <div class="card p-5 shadow-sm mx-auto" style="max-width: 500px; border-radius: 20px;">
-            <h4 class="text-muted">لا توجد مباريات مجدولة حالياً</h4>
-            <p class="small text-secondary">تأكد من العودة في أوقات الذروة للمباريات.</p>
+        <div class="text-center py-5">
+            <div class="card shadow-sm p-5 border-0 rounded-4 mx-auto" style="max-width: 500px;">
+                <h4 class="text-secondary">لا توجد مباريات حالياً</h4>
+                <p class="text-muted small">يرجى المحاولة مرة أخرى لاحقاً أو في أوقات ذروة المباريات.</p>
+                <button onclick="window.location.reload();" class="btn btn-outline-success btn-sm mt-3">تحديث الصفحة</button>
+            </div>
         </div>
     <?php endif; ?>
 
-    <footer class="mt-5 text-muted small">
-        &copy; <?php echo date("Y"); ?> d-service.pro - بوابة الرياضة
+    <footer class="text-center mt-5 text-muted small">
+        تم الجلب بواسطة d-service.pro &copy; <?php echo date("Y"); ?>
     </footer>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
