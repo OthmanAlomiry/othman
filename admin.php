@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 
 // --- بيانات السحابة ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
-$BIN_ID = '69c4ad66c3097a1dd55f06d6';
+$BIN_ID = '69d6f03436566621a891c500';
 $user_admin = "othman"; $pass_admin = "1405";
 
 if(isset($_GET['out'])){ session_destroy(); header("Location: admin.php"); exit; }
