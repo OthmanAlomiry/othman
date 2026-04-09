@@ -1,13 +1,19 @@
 <?php
-// --- إعدادات الـ API الخاصة بك من الصورة ---
+// إعداداتك الصحيحة
 $api_key    = "FW8Nmn0WFMJw1CmG";
 $api_secret = "hB90Qeyx73QRd1CTYLGk8HhOu1kwDGcU";
 
-// رابط جلب المباريات المباشرة (يمكنك تغيير الأندبوينت لاحقاً لجلب جدول الدوري السعودي)
-$url = "https://live-score-api.com/api-client/scores/live.json?key=" . $api_key . "&secret=" . $api_secret;
+// رابط جلب المباريات المباشرة
+$url = "https://live-score-api.com/api-client/scores/live.json?key={$api_key}&secret={$api_secret}";
 
-// جلب البيانات
-$response = file_get_contents($url);
+// استخدام cURL بدلاً من file_get_contents لتفادي مشاكل الحماية
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // لتجاوز مشاكل شهادة الأمان
+$response = curl_exec($ch);
+curl_close($ch);
+
 $data = json_decode($response, true);
 ?>
 
@@ -19,54 +25,43 @@ $data = json_decode($response, true);
     <title>مباريات اليوم - d-service</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .match-card { background: white; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; transition: 0.3s; }
-        .match-card:hover { transform: translateY(-5px); }
-        .score { font-weight: bold; font-size: 1.5rem; color: #0d6efd; }
-        .league-name { font-size: 0.8rem; color: #6c757d; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .live-badge { animation: blinker 1.5s linear infinite; color: red; font-weight: bold; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        body { background-color: #f8f9fa; font-family: sans-serif; }
+        .match-card { background: #fff; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; }
+        .score { font-size: 1.8rem; font-weight: bold; color: #007bff; }
+        .live-dot { height: 10px; width: 10px; background-color: red; border-radius: 50%; display: inline-block; margin-left: 5px; animation: blink 1s infinite; }
+        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0;} 100% {opacity: 1;} }
     </style>
 </head>
 <body>
 
-<div class="container py-4">
-    <h2 class="text-center mb-4">⚽ مباريات مباشرة</h2>
+<div class="container py-5 text-center">
+    <h2 class="mb-4">⚽ النتائج المباشرة</h2>
 
-    <div class="row justify-content-center">
-        <?php if (isset($data['data']['match']) && !empty($data['data']['match'])): ?>
+    <?php if (isset($data['success']) && $data['success'] == true): ?>
+        <?php if (!empty($data['data']['match'])): ?>
             <?php foreach ($data['data']['match'] as $match): ?>
-                <div class="col-md-8">
-                    <div class="match-card p-3 text-center">
-                        <div class="league-name mb-2"><?php echo $match['league_name']; ?></div>
-                        <div class="row align-items-center">
-                            <div class="col-4">
-                                <h6><?php echo $match['home_name']; ?></h6>
-                            </div>
-                            <div class="col-4">
-                                <div class="score">
-                                    <?php echo $match['score']; ?>
-                                </div>
-                                <div class="small text-muted"><?php echo $match['time']; ?></div>
-                                <span class="live-badge small">● مباشر</span>
-                            </div>
-                            <div class="col-4">
-                                <h6><?php echo $match['away_name']; ?></h6>
-                            </div>
+                <div class="match-card p-3 shadow-sm mx-auto" style="max-width: 600px;">
+                    <div class="text-muted small mb-2"><?php echo $match['league_name']; ?></div>
+                    <div class="row align-items-center">
+                        <div class="col-4"><strong><?php echo $match['home_name']; ?></strong></div>
+                        <div class="col-4">
+                            <div class="score"><?php echo $match['score']; ?></div>
+                            <div class="badge bg-light text-danger"><span class="live-dot"></span> مباشر</div>
                         </div>
+                        <div class="col-4"><strong><?php echo $match['away_name']; ?></strong></div>
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <div class="col-md-8">
-                <div class="alert alert-warning text-center">
-                    لا توجد مباريات جارية حالياً أو انتهت حصة الـ API. تأكد من تفعيل "Start Free Trial" في حسابك.
-                </div>
-            </div>
+            <div class="alert alert-info">لا توجد مباريات جارية حالياً.</div>
         <?php endif; ?>
-    </div>
+    <?php else: ?>
+        <div class="alert alert-danger">
+            <strong>خطأ من الـ API:</strong> <?php echo $data['error'] ?? 'تأكد من تفعيل الباقة المجانية (Free Trial) في حسابك.'; ?>
+            <br><small>تأكد أنك ضغطت على "Start Free Trial" في موقع live-score-api.com</small>
+        </div>
+    <?php endif; ?>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
