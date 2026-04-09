@@ -3,11 +3,10 @@ session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// --- بيانات السحابة الجديدة عثمان ---
+// --- بيانات السحابة ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
-$BIN_ID = '69d6f03436566621a891c500'; // الكود الجديد
-$user_admin = "othman"; 
-$pass_admin = "1405";
+$BIN_ID = '69d6f6b636566621a891e6c1';
+$user_admin = "othman"; $pass_admin = "1405";
 
 if(isset($_GET['out'])){ session_destroy(); header("Location: admin.php"); exit; }
 if(isset($_POST['login'])){
@@ -18,8 +17,7 @@ function callCloud($method, $bin, $key, $data = null) {
     $url = "https://api.jsonbin.io/v3/b/" . $bin . ($method == "GET" ? "/latest" : "");
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    // إضافة X-Bin-Meta لضمان الحصول على البيانات الصافية
-    $headers = ["X-Master-Key: " . $key, "X-Bin-Meta: false"];
+    $headers = ["X-Master-Key: " . $key];
     if($method == "PUT") {
         $headers[] = "Content-Type: application/json";
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
@@ -33,8 +31,7 @@ function callCloud($method, $bin, $key, $data = null) {
 
 if(isset($_SESSION['ok'])){
     $res = callCloud("GET", $BIN_ID, $API_KEY);
-    // التوافق مع بنية السحابة الجديدة
-    $record = isset($res['record']) ? $res['record'] : $res;
+    $record = isset($res['record']) ? $res['record'] : [];
     $channels = isset($record['custom_channels']) ? $record['custom_channels'] : [];
     $sections = isset($record['sections']) ? $record['sections'] : [];
     $news_ticker = isset($record['news_ticker']) ? $record['news_ticker'] : ['text' => 'مرحباً بكم', 'status' => 'hide'];
