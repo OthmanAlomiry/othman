@@ -130,14 +130,14 @@ date_default_timezone_set('Asia/Riyadh');
         .dual-screen-v { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
         .dual-btn-select { width: 100%; padding: 12px; background: #111827; border: none; color: #38bdf8; font-family: 'Tajawal'; font-weight: 700; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         
-        /* قائمة اختيار القنوات المحدثة عثمان */
+        /* قائمة اختيار القنوات المحدثة والمكبرة عثمان */
         .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 7000; display: none; align-items: center; justify-content: center; }
-        .ch-picker-window { width: 95%; max-width: 450px; background: #0f172a; border-radius: 25px; border: 1px solid var(--glass-border); max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
-        .ch-picker-header { padding: 20px; background: var(--main); color: white; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .ch-picker-list { padding: 15px; overflow-y: auto; display: grid; grid-template-columns: 1fr; gap: 10px; }
-        .ch-pick-item { background: rgba(255,255,255,0.07); padding: 18px; border-radius: 15px; font-size: 14px; font-weight: 700; text-align: right; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; color: #fff; transition: 0.2s; display: flex; align-items: center; gap: 12px; }
-        .ch-pick-item::before { content: "\f105"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: var(--main); font-size: 12px; }
-        .ch-pick-item:active { background: var(--main); transform: scale(0.98); }
+        .ch-picker-window { width: 95%; max-width: 480px; background: #0f172a; border-radius: 25px; border: 1px solid var(--glass-border); max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        .ch-picker-header { padding: 22px; background: var(--main); color: white; font-weight: 900; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+        .ch-picker-list { padding: 15px; overflow-y: auto; display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .ch-pick-item { background: rgba(255,255,255,0.08); padding: 20px; border-radius: 18px; font-size: 15px; font-weight: 700; text-align: right; border: 1.5px solid rgba(255,255,255,0.1); cursor: pointer; color: #fff; transition: 0.2s; display: flex; align-items: center; gap: 15px; }
+        .ch-pick-item::before { content: "\f105"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: var(--main); font-size: 14px; }
+        .ch-pick-item:active { background: var(--main); transform: scale(0.97); border-color: #fff; }
 
         @media screen and (orientation: landscape) {
             .main-container { max-width: 95%; } 
@@ -172,7 +172,7 @@ date_default_timezone_set('Asia/Riyadh');
 <div class="ch-picker-overlay" id="ch-picker">
     <div class="ch-picker-window">
         <div class="ch-picker-header">
-            <span>📺 اختر القناة</span>
+            <span>📺 قائمة القنوات</span>
             <i class="fas fa-times" onclick="closePicker()" style="cursor:pointer;"></i>
         </div>
         <div class="ch-picker-list">
@@ -241,7 +241,7 @@ date_default_timezone_set('Asia/Riyadh');
     <div class="grid">
         <div id="section-dual_player" class="channel-section">
             <div style="background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9; border-radius: 12px; padding: 10px; margin-bottom: 15px; text-align: center;">
-                <p style="font-size: 11px; font-weight: 700; color: #38bdf8; margin: 0;">أكتم صوت القناة بالضغط على ( ضع علامة كتم الصوت ) لتشغيل القناة الاخرى</p>
+                <p style="font-size: 11px; font-weight: 700; color: #38bdf8; margin: 0;">أكتم صوت القناة بالضغط على ( <i class="fas fa-volume-mute"></i> ) لتشغيل القناة الاخرى</p>
             </div>
 
             <div class="dual-container">
