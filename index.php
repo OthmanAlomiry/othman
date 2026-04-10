@@ -119,7 +119,12 @@ date_default_timezone_set('Asia/Riyadh');
         /* ستايل المشغل المزدوج المصغر عثمان */
         .dual-container { padding: 5px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .dual-slot { background: rgba(0,0,0,0.3); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); width: 85%; }
-        .dual-screen-v { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
+        .dual-screen-v { width: 100%; aspect-ratio: 16/9; background-color: #000; position: relative; background-size: cover; background-position: center; }
+        
+        /* صور خلفية المشغل المزدوج عثمان */
+        #dual-screen-1 { background-image: url('mg/chn1.png'); }
+        #dual-screen-2 { background-image: url('mg/chn2.png'); }
+
         .dual-btn-select { width: 100%; padding: 10px; background: #111827; border: none; color: #38bdf8; font-family: 'Tajawal'; font-weight: 700; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
         
         /* قائمة اختيار القنوات عثمان */
@@ -226,7 +231,9 @@ function openPicker(slot) { activeSlot = slot; document.getElementById('ch-picke
 function closePicker() { document.getElementById('ch-picker').style.display = 'none'; }
 function confirmPick(url, name) {
     if(!url) return;
-    document.getElementById('dual-screen-' + activeSlot).innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allowfullscreen></iframe>`;
+    let screen = document.getElementById('dual-screen-' + activeSlot);
+    screen.style.backgroundImage = "none"; // إزالة الصورة عند التشغيل
+    screen.innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allowfullscreen></iframe>`;
     document.getElementById('btn-text-' + activeSlot).innerText = name;
     closePicker();
 }
