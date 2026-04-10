@@ -118,7 +118,7 @@ date_default_timezone_set('Asia/Riyadh');
 
         /* ستايل المشغل المزدوج المصغر عثمان */
         .dual-container { padding: 5px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .dual-slot { background: rgba(0,0,0,0.3); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); width: 85%; } /* تصغير الحجم عثمان */
+        .dual-slot { background: rgba(0,0,0,0.3); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); width: 85%; }
         .dual-screen-v { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
         .dual-btn-select { width: 100%; padding: 10px; background: #111827; border: none; color: #38bdf8; font-family: 'Tajawal'; font-weight: 700; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
         
@@ -191,7 +191,7 @@ date_default_timezone_set('Asia/Riyadh');
 
     <div class="grid">
         <div id="section-dual_player" class="channel-section">
-            <div style="background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9; border-radius: 12px; padding: 10px; margin: 0 auto 15px; text-align: center; width: 85%;">
+            <div style="background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9; border-radius: 12px; padding: 10px; margin: 35px auto 15px; text-align: center; width: 85%;">
                 <p style="font-size: 10px; font-weight: 700; color: #38bdf8; margin: 0;">أكتم صوت القناة بالضغط على ( <i class="fas fa-volume-mute"></i> ) لتشغيل القناة الاخرى</p>
             </div>
 
