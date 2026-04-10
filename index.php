@@ -6,18 +6,6 @@ error_reporting(0);
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69d6f6b636566621a891e6c1';
 
-// دالة فحص الإشعارات (AJAX)
-if(isset($_GET['check_notify'])) {
-    $ch = curl_init("https://api.jsonbin.io/v3/b/" . $BIN_ID . "/latest");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $API_KEY, "X-Bin-Meta: false"]);
-    $res = json_decode(curl_exec($ch), true);
-    $notify = $res['notification'];
-    if (isset($notify['time']) && (time() - $notify['time'] > 172800)) { echo json_encode(null); } 
-    else { echo json_encode($notify); }
-    exit;
-}
-
 // --- نظام عداد المتواجدين ---
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
@@ -81,7 +69,6 @@ date_default_timezone_set('Asia/Riyadh');
         /* الهيدر الثابت */
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: max-width 0.4s; }
         
-        .notify-bell-btn { position: fixed; bottom: 85px; left: 25px; width: 45px; height: 45px; background: var(--main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 5000; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4); cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
         .visitors-badge-float { position: fixed; bottom: 25px; left: 25px; width: 45px; height: 45px; background: rgba(34, 197, 94, 0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1.5px solid #22c55e; }
 
         .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; flex-wrap: nowrap; padding: 0 10px; }
@@ -160,12 +147,6 @@ date_default_timezone_set('Asia/Riyadh');
 </div>
 
 <div class="main-container">
-    <div id="notify-panel" style="position:fixed; bottom:85px; left:50%; transform:translateX(-50%); width:280px; max-height:350px; background:rgba(15,23,42,0.95); border-radius:20px; z-index:5500; display:none; flex-direction:column; border:1px solid var(--glass-border);">
-        <div style="padding:12px; background:var(--main); color:white; border-radius:20px 20px 0 0; display:flex; justify-content:space-between;"><span>🔔 الإشعارات</span><i class="fas fa-times" onclick="toggleNotifyPanel()"></i></div>
-        <div id="panel-list" style="overflow-y:auto; padding:10px;"></div>
-    </div>
-
-    <div class="notify-bell-btn" onclick="toggleNotifyPanel()"><i class="fas fa-bell"></i><div class="notify-dot" id="n-dot"></div></div>
     <div class="visitors-badge-float"><i class="fas fa-users" style="color:#22c55e;"></i> <span id="realtime-visitors"><?php echo $online_now; ?></span></div>
 
     <div class="bg-pattern"></div>
@@ -224,15 +205,13 @@ date_default_timezone_set('Asia/Riyadh');
 </div>
 
 <script>
-let lastNotifyId = localStorage.getItem('last_id') || "";
 let activeSlot = 0; 
-function toggleNotifyPanel() { let p = document.getElementById('notify-panel'); p.style.display = (p.style.display === 'flex') ? 'none' : 'flex'; }
 function openPicker(slot) { activeSlot = slot; document.getElementById('ch-picker').style.display = 'flex'; }
 function closePicker() { document.getElementById('ch-picker').style.display = 'none'; }
 function confirmPick(url, name) {
     if(!url) return;
     let screen = document.getElementById('dual-screen-' + activeSlot);
-    screen.style.backgroundImage = "none"; // إزالة الصورة عند التشغيل
+    screen.style.backgroundImage = "none";
     screen.innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allowfullscreen></iframe>`;
     document.getElementById('btn-text-' + activeSlot).innerText = name;
     closePicker();
@@ -249,7 +228,7 @@ function startStream(boxId, file, btn) {
     btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الاتصال'; btn.style.background = "#1e293b";
 }
 window.addEventListener('load', () => { setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 1500); });
-setInterval(() => { fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(c => { document.getElementById('realtime-visitors').innerText = c; }); }, 5000);
+setInterval(() => { fetch(window.location.pathname + '?fetch_visitors=1') .then(res => res.text()) .then(c => { document.getElementById('realtime-visitors').innerText = c; }); }, 5000);
 </script>
 </body>
 </html>
