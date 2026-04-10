@@ -124,12 +124,19 @@ date_default_timezone_set('Asia/Riyadh');
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-        /* ستايل المشغل المزدوج الجديد عثمان */
-        .dual-layout { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: rgba(0,0,0,0.2); }
-        .dual-screen-item { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); position: relative; }
-        .dual-controls-area { display: flex; flex-direction: column; gap: 8px; padding: 15px; }
-        .dual-select-custom { width: 100%; padding: 12px; border-radius: 12px; background: #111827; color: white; border: 1px solid var(--glass-border); font-family: 'Tajawal'; font-size: 12px; font-weight: 700; outline: none; transition: 0.3s; }
-        .dual-select-custom:focus { border-color: var(--main); }
+        /* ستايل المشغل المزدوج الاحترافي عثمان */
+        .dual-container { padding: 10px; display: flex; flex-direction: column; gap: 15px; }
+        .dual-slot { background: rgba(0,0,0,0.3); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .dual-screen-v { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
+        .dual-btn-select { width: 100%; padding: 12px; background: #111827; border: none; color: #38bdf8; font-family: 'Tajawal'; font-weight: 700; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        /* قائمة اختيار القنوات السريعة */
+        .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 7000; display: none; align-items: center; justify-content: center; }
+        .ch-picker-window { width: 90%; max-width: 400px; background: #0f172a; border-radius: 20px; border: 1px solid var(--glass-border); max-height: 70vh; overflow: hidden; display: flex; flex-direction: column; }
+        .ch-picker-header { padding: 15px; background: var(--main); color: white; font-weight: 900; font-size: 14px; display: flex; justify-content: space-between; }
+        .ch-picker-list { padding: 10px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .ch-pick-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 700; text-align: center; border: 1px solid transparent; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ch-pick-item:hover { border-color: var(--main); background: rgba(225, 29, 72, 0.1); }
 
         @media screen and (orientation: landscape) {
             .main-container { max-width: 95%; } 
@@ -147,6 +154,7 @@ date_default_timezone_set('Asia/Riyadh');
         .notify-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 10px; margin-bottom: 6px; border-right: 3px solid #0ea5e9; font-size: 11px; }
 
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
+        .bg-pattern::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         footer { text-align: center; padding: 40px; font-size: 10px; opacity: 0.5; }
     </style>
 </head>
@@ -157,6 +165,20 @@ date_default_timezone_set('Asia/Riyadh');
         <div class="intro-icon-box"><i class="fas fa-play-circle"></i></div>
         <h2 class="intro-title">الخدمة الرقمية</h2>
         <div class="loading-bar"></div>
+    </div>
+</div>
+
+<div class="ch-picker-overlay" id="ch-picker">
+    <div class="ch-picker-window">
+        <div class="ch-picker-header">
+            <span>📺 اختر القناة</span>
+            <i class="fas fa-times" onclick="closePicker()" style="cursor:pointer;"></i>
+        </div>
+        <div class="ch-picker-list">
+            <?php foreach($all_channels as $ch): ?>
+                <div class="ch-pick-item" onclick="confirmPick('<?= $ch['file'] ?>', '<?= $ch['name'] ?>')"><?= $ch['name'] ?></div>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
 
@@ -217,32 +239,22 @@ date_default_timezone_set('Asia/Riyadh');
 
     <div class="grid">
         <div id="section-dual_player" class="channel-section">
-            <div class="card">
-                <div class="c-head">
-                    <div class="name-badge">المشغل المزدوج</div>
-                    <div class="live-badge"><div class="live-dot"></div> مباشر</div>
+            <div class="dual-container">
+                
+                <div class="dual-slot">
+                    <div class="dual-screen-v" id="dual-screen-1"></div>
+                    <button class="dual-btn-select" onclick="openPicker(1)">
+                        <i class="fas fa-tv"></i> <span id="btn-text-1">اختر القناة الأولى</span>
+                    </button>
                 </div>
-                <div class="dual-layout">
-                    <div class="dual-screen-item" id="dual-slot-1"></div>
-                    <div class="dual-screen-item" id="dual-slot-2"></div>
+
+                <div class="dual-slot">
+                    <div class="dual-screen-v" id="dual-screen-2"></div>
+                    <button class="dual-btn-select" onclick="openPicker(2)">
+                        <i class="fas fa-tv"></i> <span id="btn-text-2">اختر القناة الثانية</span>
+                    </button>
                 </div>
-                <div class="dual-controls-area">
-                    <div style="font-size:10px; color:#38bdf8; font-weight:700; margin-bottom:2px;">● اختر القناة الأولى</div>
-                    <select class="dual-select-custom" onchange="loadDualStream(1, this.value)">
-                        <option value="">-- اضغط للاختيار --</option>
-                        <?php foreach($all_channels as $ch): ?>
-                            <option value="<?= $ch['file'] ?>"><?= $ch['name'] ?></option>
-                        <?php foreach($all_channels as $ch): ?><?php endforeach; ?><?php endforeach; ?>
-                    </select>
-                    
-                    <div style="font-size:10px; color:#38bdf8; font-weight:700; margin-bottom:2px; margin-top:5px;">● اختر القناة الثانية</div>
-                    <select class="dual-select-custom" onchange="loadDualStream(2, this.value)">
-                        <option value="">-- اضغط للاختيار --</option>
-                        <?php foreach($all_channels as $ch): ?>
-                            <option value="<?= $ch['file'] ?>"><?= $ch['name'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+
             </div>
         </div>
 
@@ -271,6 +283,7 @@ date_default_timezone_set('Asia/Riyadh');
 <script>
 let lastNotifyId = localStorage.getItem('last_notify_id') || "";
 let notifyHistory = JSON.parse(localStorage.getItem('notify_history')) || [];
+let activeSlot = 0; // عثمان لمتابعة أي مشغل نختار له
 
 function toggleNotifyPanel() {
     let panel = document.getElementById('notify-panel');
@@ -305,10 +318,21 @@ function checkNotifications() {
     });
 }
 
-// وظيفة تشغيل البث المزدوج عثمان
-function loadDualStream(slot, url) {
+// وظائف اختيار القناة المزدوجة عثمان
+function openPicker(slot) {
+    activeSlot = slot;
+    document.getElementById('ch-picker').style.display = 'flex';
+}
+
+function closePicker() {
+    document.getElementById('ch-picker').style.display = 'none';
+}
+
+function confirmPick(url, name) {
     if(!url) return;
-    document.getElementById('dual-slot-' + slot).innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    document.getElementById('dual-screen-' + activeSlot).innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    document.getElementById('btn-text-' + activeSlot).innerText = name;
+    closePicker();
 }
 
 setInterval(checkNotifications, 10000);
