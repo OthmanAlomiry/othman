@@ -124,11 +124,12 @@ date_default_timezone_set('Asia/Riyadh');
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background: #000; }
 
-        /* ستايل المشغل المزدوج عثمان */
-        .dual-screen { display: flex; flex-direction: column; gap: 10px; padding: 10px; }
-        .dual-video { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; border: 1px solid var(--glass-border); }
-        .dual-controls { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .dual-select { width: 100%; padding: 12px; border-radius: 10px; background: #1e293b; color: white; border: 1px solid var(--glass-border); font-family: 'Tajawal'; font-size: 12px; }
+        /* ستايل المشغل المزدوج الجديد عثمان */
+        .dual-layout { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: rgba(0,0,0,0.2); }
+        .dual-screen-item { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); position: relative; }
+        .dual-controls-area { display: flex; flex-direction: column; gap: 8px; padding: 15px; }
+        .dual-select-custom { width: 100%; padding: 12px; border-radius: 12px; background: #111827; color: white; border: 1px solid var(--glass-border); font-family: 'Tajawal'; font-size: 12px; font-weight: 700; outline: none; transition: 0.3s; }
+        .dual-select-custom:focus { border-color: var(--main); }
 
         @media screen and (orientation: landscape) {
             .main-container { max-width: 95%; } 
@@ -199,35 +200,44 @@ date_default_timezone_set('Asia/Riyadh');
         <?php endif; ?>
 
         <div class="category-tabs">
-            <div class="cat-item active" onclick="switchSection('dual', this)">
-                <img src="mg/ch2.png"><span>تشغيل مباريتين</span>
-            </div>
-            <?php foreach($active_sections as $s): ?>
-                <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
-            <?php endforeach; ?>
+            <?php 
+            $sections_list = array_values($active_sections);
+            ?>
+            <?php if(isset($sections_list[0])): ?>
+                <div class="cat-item active" onclick="switchSection('<?= $sections_list[0]['key'] ?>', this)"><img src="<?= $sections_list[0]['img'] ?>"><span><?= $sections_list[0]['name'] ?></span></div>
+            <?php endif; ?>
+
+            <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>تشغيل مباريتين</span></div>
+
+            <?php for($i=1; $i < count($sections_list); $i++): ?>
+                <div class="cat-item" onclick="switchSection('<?= $sections_list[$i]['key'] ?>', this)"><img src="<?= $sections_list[$i]['img'] ?>"><span><?= $sections_list[$i]['name'] ?></span></div>
+            <?php endfor; ?>
         </div>
     </div>
 
     <div class="grid">
-        <div id="section-dual" class="channel-section active">
+        <div id="section-dual_player" class="channel-section">
             <div class="card">
                 <div class="c-head">
                     <div class="name-badge">المشغل المزدوج</div>
-                    <div class="live-badge"><div class="live-dot"></div> متعدد</div>
+                    <div class="live-badge"><div class="live-dot"></div> مباشر</div>
                 </div>
-                <div class="dual-screen">
-                    <div class="dual-video" id="dual-1"></div>
-                    <div class="dual-video" id="dual-2"></div>
+                <div class="dual-layout">
+                    <div class="dual-screen-item" id="dual-slot-1"></div>
+                    <div class="dual-screen-item" id="dual-slot-2"></div>
                 </div>
-                <div class="dual-controls">
-                    <select class="dual-select" onchange="loadDual(1, this.value)">
-                        <option value="">اختر القناة الأولى</option>
+                <div class="dual-controls-area">
+                    <div style="font-size:10px; color:#38bdf8; font-weight:700; margin-bottom:2px;">● اختر القناة الأولى</div>
+                    <select class="dual-select-custom" onchange="loadDualStream(1, this.value)">
+                        <option value="">-- اضغط للاختيار --</option>
                         <?php foreach($all_channels as $ch): ?>
                             <option value="<?= $ch['file'] ?>"><?= $ch['name'] ?></option>
-                        <?php endforeach; ?>
+                        <?php foreach($all_channels as $ch): ?><?php endforeach; ?><?php endforeach; ?>
                     </select>
-                    <select class="dual-select" onchange="loadDual(2, this.value)">
-                        <option value="">اختر القناة الثانية</option>
+                    
+                    <div style="font-size:10px; color:#38bdf8; font-weight:700; margin-bottom:2px; margin-top:5px;">● اختر القناة الثانية</div>
+                    <select class="dual-select-custom" onchange="loadDualStream(2, this.value)">
+                        <option value="">-- اضغط للاختيار --</option>
                         <?php foreach($all_channels as $ch): ?>
                             <option value="<?= $ch['file'] ?>"><?= $ch['name'] ?></option>
                         <?php endforeach; ?>
@@ -237,7 +247,7 @@ date_default_timezone_set('Asia/Riyadh');
         </div>
 
         <?php foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
-        <div id="section-<?= $s['key'] ?>" class="channel-section">
+        <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($s['key'] == $sections_list[0]['key'] ? 'active' : '') ?>">
             <?php if(empty($channels)): ?><div style="text-align:center; padding:80px; opacity:0.3;"><p>لا توجد قنوات حالياً.</p></div><?php endif; ?>
             <?php foreach($channels as $ch): ?>
             <div class="card">
@@ -295,10 +305,10 @@ function checkNotifications() {
     });
 }
 
-// وظيفة تشغيل القنوات في الوضع المزدوج عثمان
-function loadDual(slot, url) {
+// وظيفة تشغيل البث المزدوج عثمان
+function loadDualStream(slot, url) {
     if(!url) return;
-    document.getElementById('dual-' + slot).innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    document.getElementById('dual-slot-' + slot).innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
 }
 
 setInterval(checkNotifications, 10000);
