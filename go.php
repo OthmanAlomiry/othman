@@ -130,13 +130,14 @@ date_default_timezone_set('Asia/Riyadh');
         .dual-screen-v { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
         .dual-btn-select { width: 100%; padding: 12px; background: #111827; border: none; color: #38bdf8; font-family: 'Tajawal'; font-weight: 700; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         
-        /* قائمة اختيار القنوات السريعة */
-        .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 7000; display: none; align-items: center; justify-content: center; }
-        .ch-picker-window { width: 90%; max-width: 400px; background: #0f172a; border-radius: 20px; border: 1px solid var(--glass-border); max-height: 70vh; overflow: hidden; display: flex; flex-direction: column; }
-        .ch-picker-header { padding: 15px; background: var(--main); color: white; font-weight: 900; font-size: 14px; display: flex; justify-content: space-between; }
-        .ch-picker-list { padding: 10px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .ch-pick-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 700; text-align: center; border: 1px solid transparent; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ch-pick-item:hover { border-color: var(--main); background: rgba(225, 29, 72, 0.1); }
+        /* قائمة اختيار القنوات المحدثة عثمان */
+        .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 7000; display: none; align-items: center; justify-content: center; }
+        .ch-picker-window { width: 95%; max-width: 450px; background: #0f172a; border-radius: 25px; border: 1px solid var(--glass-border); max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        .ch-picker-header { padding: 20px; background: var(--main); color: white; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .ch-picker-list { padding: 15px; overflow-y: auto; display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .ch-pick-item { background: rgba(255,255,255,0.07); padding: 18px; border-radius: 15px; font-size: 14px; font-weight: 700; text-align: right; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; color: #fff; transition: 0.2s; display: flex; align-items: center; gap: 12px; }
+        .ch-pick-item::before { content: "\f105"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: var(--main); font-size: 12px; }
+        .ch-pick-item:active { background: var(--main); transform: scale(0.98); }
 
         @media screen and (orientation: landscape) {
             .main-container { max-width: 95%; } 
@@ -239,8 +240,11 @@ date_default_timezone_set('Asia/Riyadh');
 
     <div class="grid">
         <div id="section-dual_player" class="channel-section">
+            <div style="background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9; border-radius: 12px; padding: 10px; margin-bottom: 15px; text-align: center;">
+                <p style="font-size: 11px; font-weight: 700; color: #38bdf8; margin: 0;">أكتم صوت القناة بالضغط على ( ضع علامة كتم الصوت ) لتشغيل القناة الاخرى</p>
+            </div>
+
             <div class="dual-container">
-                
                 <div class="dual-slot">
                     <div class="dual-screen-v" id="dual-screen-1"></div>
                     <button class="dual-btn-select" onclick="openPicker(1)">
@@ -254,7 +258,6 @@ date_default_timezone_set('Asia/Riyadh');
                         <i class="fas fa-tv"></i> <span id="btn-text-2">اختر القناة الثانية</span>
                     </button>
                 </div>
-
             </div>
         </div>
 
@@ -283,7 +286,7 @@ date_default_timezone_set('Asia/Riyadh');
 <script>
 let lastNotifyId = localStorage.getItem('last_notify_id') || "";
 let notifyHistory = JSON.parse(localStorage.getItem('notify_history')) || [];
-let activeSlot = 0; // عثمان لمتابعة أي مشغل نختار له
+let activeSlot = 0; 
 
 function toggleNotifyPanel() {
     let panel = document.getElementById('notify-panel');
@@ -318,7 +321,6 @@ function checkNotifications() {
     });
 }
 
-// وظائف اختيار القناة المزدوجة عثمان
 function openPicker(slot) {
     activeSlot = slot;
     document.getElementById('ch-picker').style.display = 'flex';
