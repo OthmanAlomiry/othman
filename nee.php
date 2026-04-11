@@ -2,58 +2,93 @@
 session_start();
 error_reporting(0);
 
-// --- إعدادات جدول المباريات المحدثة (عثمان) ---
+// --- إعدادات جدول المباريات (عثمان) ---
 date_default_timezone_set('Asia/Riyadh');
+$FOOTBALL_API_KEY = '6b9915e3b84f54b3962e5817b9e26e5f'; 
 $date_get = date('Y-m-d');
 
-$FOOTBALL_API_KEY_NEW = '273aaeb61360452588653ffea820cc19'; 
-$url_new = 'https://api.football-data.org/v4/matches';
-
-// خريطة الدوريات المطلوبة (تم إضافة الدوري الفرنسي FL1)
-$leagues_map_new = [
-    'PL'  => ['name' => 'الدوري الإنجليزي'],
-    'PD'  => ['name' => 'الدوري الإسباني'],
-    'SA'  => ['name' => 'الدوري الإيطالي'],
-    'BL1' => ['name' => 'الدوري الألماني'],
-    'FL1' => ['name' => 'الدوري الفرنسي'],
-    'CL'  => ['name' => 'دوري أبطال أوروبا'],
-];
-
+// مصفوفة الترجمة الشاملة (عثمان)
 $translate = [
-    'NS' => 'لم تبدأ', 'FT' => 'انتهت', 'FINISHED' => 'انتهت', 'TIMED' => 'لم تبدأ', 'IN_PLAY' => 'مباشر', 
-    '1H' => 'شوط 1', '2H' => 'شوط 2', 'HT' => 'بين الشوطين', 'PAUSED' => 'بين الشوطين', 'LIVE' => 'مباشر'
+    // الحالات
+    'NS' => 'لم تبدأ', 'FT' => 'انتهت', '1H' => 'شوط 1', '2H' => 'شوط 2', 
+    'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة', 'CANC' => 'ملغاة',
+    'TBD' => 'يحدد لاحقاً', 'ABD' => 'ملغاة', 'LIVE' => 'مباشر',
+
+    // أندية الدوري السعودي
+    'Al-Hilal' => 'الهلال', 'Al-Nassr' => 'النصر', 'Al-Ittihad' => 'الاتحاد', 'Al-Ahli' => 'الأهلي',
+    'Al-Shabab' => 'الشباب', 'Al-Ettifaq' => 'الاتفاق', 'Al-Fateh' => 'الفتح', 'Al-Taawoun' => 'التعاون',
+    'Al-Wehda' => 'الوحـدة', 'Al-Fayha' => 'الفيحاء', 'Abha' => 'أبها', 'Al-Hazem' => 'الحزم',
+    'Al-Khaleej' => 'الخليج', 'Al-Okhdood' => 'الأخدود', 'Al-Riyadh' => 'الرياض', 'Al-Tai' => 'الطائي',
+    'Damac' => 'ضمك', 'Al-Qadisiyah' => 'القادسية', 'Al-Orobah' => 'العروبة', 'Al-Kholood' => 'الخلود',
+
+    // الدوري الإنجليزي
+    'Manchester City' => 'مانشستر سيتي', 'Liverpool' => 'ليفربول', 'Arsenal' => 'أرسنال',
+    'Manchester United' => 'مانشستر يونايتد', 'Chelsea' => 'تشيلسي', 'Tottenham' => 'توتنهام',
+    'Aston Villa' => 'أستون فيلا', 'Newcastle' => 'نيوكاسل', 'Brighton' => 'برايتون',
+    'West Ham' => 'وست هام', 'Everton' => 'إيفرتون', 'Leicester' => 'ليستر سيتي',
+    'Brentford' => 'برينتفورد', 'Fulham' => 'فولهام', 'Crystal Palace' => 'كريستال بالاس',
+    'Wolves' => 'وولفرهامبتون', 'Nottingham Forest' => 'نوتنجهام فورست', 'Ipswich' => 'إيبسويتش تاون',
+
+    // الدوري الإسباني
+    'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Atletico Madrid' => 'أتلتيكو مدريد',
+    'Girona' => 'جيرونا', 'Athletic Club' => 'أتلتيك بلباو', 'Real Sociedad' => 'ريال سوسيداد',
+    'Real Betis' => 'ريال بيتيس', 'Villarreal' => 'فاريال', 'Sevilla' => 'اشبيلية', 'Valencia' => 'فالنسيا',
+    'Celta Vigo' => 'سلتا فيجو', 'Mallorca' => 'مايوركا', 'Osasuna' => 'أوساسونا', 'Getafe' => 'خيتافي',
+
+    // الدوري الإيطالي
+    'Inter' => 'إنتر ميلان', 'AC Milan' => 'ميلان', 'Juventus' => 'يوفنتوس', 'Napoli' => 'نابولي',
+    'AS Roma' => 'روما', 'Lazio' => 'لاتسيو', 'Atalanta' => 'أتالانتا', 'Fiorentina' => 'فيورنتينا',
+    'Torino' => 'تورينو', 'Bologna' => 'بولونيا', 'Udinese' => 'أودينيزي',
+
+    // أندية عالمية أخرى
+    'Bayern Munich' => 'بايرن ميونخ', 'Borussia Dortmund' => 'بوروسيا دورتموند', 'Bayer Leverkusen' => 'ليفركوزن',
+    'RB Leipzig' => 'لايبزيج', 'Paris Saint Germain' => 'باريس سان جيرمان', 'Marseille' => 'مارسيليا',
+    'Lyon' => 'ليون', 'Monaco' => 'موناكو', 'Benfica' => 'بنفيكا', 'Porto' => 'بورتو', 'Sporting CP' => 'سبورتينج لشبونة'
 ];
 
-function translate_name_pro($text, $manual_list) {
-    if (isset($manual_list[$text])) return $manual_list[$text];
-    $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
-    $response = @file_get_contents($url);
-    if($response) {
-        $result = json_decode($response, true);
-        return $result[0][0][0] ?? $text;
+$league_settings = array(
+    307 => array('name' => 'الدوري السعودي'),
+    42  => array('name' => 'دوري أبطال أوروبا'),
+    73  => array('name' => 'الدوري الأوروبي'),
+    525 => array('name' => 'نخبة آسيا'),
+    39  => array('name' => 'الدوري الإنجليزي'),
+    140 => array('name' => 'الدوري الإسباني'),
+    135 => array('name' => 'الدوري الإيطالي'),
+    78  => array('name' => 'الدوري الألماني'),
+    61  => array('name' => 'الدوري الفرنسي')
+);
+
+function getFixturesWithCache($date, $key) {
+    $cache_file = "cache_" . $date . ".json";
+    $expire_time = 600; 
+    if (file_exists($cache_file) && (time() - filemtime($cache_file) < $expire_time)) {
+        return json_decode(file_get_contents($cache_file), true);
     }
-    return $text;
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://v3.football.api-sports.io/fixtures?date=$date&timezone=Asia/Riyadh",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => array("x-apisports-key: $key"),
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_SSL_VERIFYPEER => false
+    ));
+    $response = curl_exec($curl);
+    curl_close($curl);
+    $data = json_decode($response, true);
+    $results = (isset($data['response'])) ? $data['response'] : array();
+    if (!empty($results)) { file_put_contents($cache_file, json_encode($results)); }
+    return $results;
 }
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url_new);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $FOOTBALL_API_KEY_NEW]);
-$response_new = curl_exec($ch);
-curl_close($ch);
-$match_data_new = json_decode($response_new, true);
-
-$ordered_matches = [];
-if (isset($match_data_new['matches'])) {
-    foreach ($match_data_new['matches'] as $m) {
-        $l_code = $m['competition']['code'];
-        if (isset($leagues_map_new[$l_code])) {
-            $ordered_matches[$l_code][] = $m;
-        }
+$fixtures = getFixturesWithCache($date_get, $FOOTBALL_API_KEY);
+$ordered_matches = array();
+if (!empty($fixtures)) {
+    foreach ($fixtures as $f) {
+        $id = (int)$f['league']['id'];
+        if (isset($league_settings[$id])) { $ordered_matches[$id][] = $f; }
     }
 }
 
-// --- إعدادات سحابية (عثمان الأصلية) ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69d6f6b636566621a891e6c1';
 
@@ -96,78 +131,96 @@ function filterSection($channels, $sec) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
+        
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
+
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: 0.4s ease-in-out; }
         
-        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
-        
-        /* تصميم النتيجة المحسن */
-        .m-time-box { 
-            flex: 0.7; 
-            background: rgba(255, 255, 255, 0.08); 
-            border: 1px solid var(--glass-border); 
-            padding: 8px 5px; 
-            border-radius: 12px; 
-            text-align: center; 
-        }
-        .res-num { 
-            font-size: 18px; 
-            font-weight: 900; 
-            color: #ffffff; 
-            letter-spacing: 2px;
-            display: block;
-            margin-bottom: 2px;
-        }
-        .status-badge {
-            background: var(--main);
-            color: white;
-            font-size: 8px;
-            padding: 2px 8px;
-            border-radius: 50px;
-            font-weight: 700;
-        }
-        .status-wait {
-            background: rgba(255,255,255,0.2);
-            color: #ccc;
+        @media (orientation: landscape) {
+            body { padding-top: 190px; }
+            .main-container { max-width: 95% !important; }
+            .header-fixed { max-width: 95% !important; }
+            .match-grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+            .league-sep { grid-column: span 2; }
+            .channel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
         }
 
-        /* تنسيقات عثمان الأصلية */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
+        .loader-content { display: flex; flex-direction: column; align-items: center; }
+        .intro-icon-box { width: 100px; height: 100px; background: var(--main); border-radius: 30%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(225, 29, 72, 0.5); animation: glowPulse 2s infinite ease-in-out; }
+        .intro-icon-box i { font-size: 50px; color: white; }
+        .intro-title { margin-top: 25px; color: white; font-weight: 900; font-size: 24px; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .loading-bar { width: 150px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 30px; overflow: hidden; position: relative; }
+        .loading-bar::after { content: ""; position: absolute; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--main), transparent); animation: loadingMove 1.5s infinite; }
+        @keyframes glowPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes loadingMove { 100% { left: 100%; } }
+
+        /* نافذة الإعلان المنبثقة */
         .ad-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 8000; display: none; align-items: center; justify-content: center; }
         .ad-popup-content { position: relative; width: 85%; max-width: 320px; animation: popZoom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .ad-popup-image { width: 100%; border-radius: 20px; border: 2px solid var(--glass-border); display: block; }
-        .ad-close-btn { position: absolute; top: -15px; right: -15px; width: 35px; height: 35px; background: var(--main); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; z-index: 10; }
-        .ad-subscribe-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #25d366; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 8px; border: 2px solid white; white-space: nowrap; }
+        .ad-popup-image { width: 100%; border-radius: 20px; border: 2px solid var(--glass-border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: block; }
+        .ad-close-btn { position: absolute; top: -15px; right: -15px; width: 35px; height: 35px; background: var(--main); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; border: 2px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10; }
+        .ad-subscribe-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #25d366; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); border: 2px solid white; white-space: nowrap; }
+        @keyframes popZoom { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: 0.4s; }
+        
         .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; padding: 0 10px; }
         .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; text-align: center; border: 1.5px solid #ffffff; }
         .btn-wa { background: #25d366; } .btn-tg { background: #0088cc; } .btn-sn { background: #FFFC00; color: #000 !important; } .btn-tw { background: #000; }
-        .news-ticker { background: rgba(225, 29, 72, 0.15); height: 32px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; position: relative; }
+
+        .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
         .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; display: flex; align-items: center; }
         .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 45s linear infinite; width: max-content; }
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
-        .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; }
-        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
+        .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.2s; }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: translateY(-2px); }
         .cat-item img { width: 26px; height: 26px; object-fit: contain; margin-bottom: 4px; }
         .cat-item span { font-size: 8px; font-weight: 900; color: #fff; display: block; }
+
         .grid { padding: 15px; }
         .channel-section { display: none; width: 100%; }
-        .channel-section.active { display: block; }
+        .channel-section.active { display: block; animation: slideUp 0.6s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 15px; width: 100%; }
+        
         .play-btn { width: 92%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 13px; }
+        .play-btn i { font-size: 16px; color: var(--main); }
+
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; background-size: cover; background-position: center; }
         .video-box iframe { position: absolute; top:0; left:0; width: 100%; height: 100%; border: none; }
+
+        .match-nav { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; background: var(--glass); padding: 10px; border-radius: 15px; border: 1px solid var(--glass-border); }
         .league-sep { background: rgba(255, 255, 255, 0.07); padding: 10px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; margin: 15px 0 10px; border-right: 4px solid var(--main); color: #fff; }
-        .m-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; }
-        .m-team-col { flex: 1; font-size: 11px; font-weight: 700; color: #fff; text-align: center; }
-        .m-team-col img { width: 32px; height: 32px; display: block; margin: 0 auto 8px; }
-        .visitors-badge-float { position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px; background: rgba(34, 197, 94, 0.1); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1px solid #22c55e; font-size: 10px; font-weight: 900; color: #22c55e; }
+        .m-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; }
+        .m-team-col { flex: 1; font-size: 10px; font-weight: 700; color: #fff; text-align: center; }
+        .m-team-col img { width: 28px; height: 28px; display: block; margin: 0 auto 6px; }
+        
+        /* تحسين شكل النتيجة - عثمان */
+        .m-time-box { flex: 0.6; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border); padding: 8px 5px; border-radius: 12px; text-align: center; }
+        .res-num { font-size: 16px; font-weight: 900; color: #fff; display: block; line-height: 1; margin-bottom: 4px; }
+        .status-badge { background: var(--main); color: #fff; font-size: 8px; padding: 2px 8px; border-radius: 50px; font-weight: 900; }
+        .status-badge.waiting { background: rgba(255,255,255,0.15); color: #ccc; }
+
+        .dual-container { display: flex; flex-direction: column; gap: 15px; align-items: center; width: 100%; }
+        @media (orientation: landscape) { .dual-container { flex-direction: row; justify-content: center; } }
+        .dual-slot { background: #000; border-radius: 15px; overflow: hidden; border: 1px solid var(--glass-border); width: 85%; max-width: 320px; }
+        
+        .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 7000; display: none; align-items: center; justify-content: center; }
+        .ch-picker-window { width: 90%; max-width: 450px; background: #0f172a; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; max-height: 80vh; }
+        .ch-picker-header { padding: 15px; background: var(--main); color: #fff; font-weight: 900; display: flex; justify-content: space-between; }
+        .ch-picker-list { padding: 10px; overflow-y: auto; }
+        .ch-pick-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; color: #fff; font-size: 14px; text-align: right; }
+
+        .visitors-badge-float { position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px; background: rgba(34, 197, 94, 0.1); backdrop-filter: blur(10px); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1px solid #22c55e; font-size: 10px; font-weight: 900; color: #22c55e; }
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         footer { text-align: center; padding: 30px; font-size: 9px; opacity: 0.4; }
-        @media (orientation: landscape) { .main-container { max-width: 95% !important; } }
     </style>
 </head>
 <body>
@@ -187,6 +240,17 @@ function filterSection($channels, $sec) {
         <a href="https://wa.me/966505571164" class="ad-subscribe-btn">
             <i class="fab fa-whatsapp"></i> اشترك الآن عبر واتساب
         </a>
+    </div>
+</div>
+
+<div class="ch-picker-overlay" id="ch-picker">
+    <div class="ch-picker-window">
+        <div class="ch-picker-header"><span>📺 قائمة القنوات</span><i class="fas fa-times" onclick="closePicker()" style="cursor:pointer;"></i></div>
+        <div class="ch-picker-list">
+            <?php foreach($all_channels as $ch): ?>
+                <div class="ch-pick-item" onclick="confirmPick('<?= $ch['file'] ?>', '<?= $ch['name'] ?>')"><?= $ch['name'] ?></div>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
 
@@ -220,43 +284,44 @@ function filterSection($channels, $sec) {
             <div class="match-nav">
                 <span style="font-weight:900; font-size:12px; color:#fff;">مباريات اليوم: <?= $date_get ?></span>
             </div>
-            
+            <div class="match-grid-container">
             <?php if(empty($ordered_matches)): ?>
-                <p style="text-align:center; opacity:0.5; padding:20px;">لا توجد مباريات هامة اليوم</p>
-            <?php else: foreach($ordered_matches as $code => $matches_list): ?>
-                <div class="league-sep"><?= $leagues_map_new[$code]['name'] ?></div>
-                <?php foreach($matches_list as $m): 
-                    $h_name = translate_name_pro($m['homeTeam']['shortName'] ?? $m['homeTeam']['name'], $translate);
-                    $a_name = translate_name_pro($m['awayTeam']['shortName'] ?? $m['awayTeam']['name'], $translate);
-                    $status_text = $translate[$m['status']] ?? 'مباشر';
-                    $is_live = ($m['status'] == 'IN_PLAY' || $m['status'] == '1H' || $m['status'] == '2H');
-                    $is_waiting = ($m['status'] == 'TIMED' || $m['status'] == 'SCHEDULED');
+                <p style="text-align:center; opacity:0.5; padding:20px; grid-column: 1/-1;">لا توجد مباريات هامة لهذا التاريخ</p>
+            <?php else: foreach($league_settings as $id => $set): if(isset($ordered_matches[$id])): ?>
+                <div class="league-sep"><?= $set['name'] ?></div>
+                <?php foreach($ordered_matches[$id] as $m): 
+                    $h_raw = $m['teams']['home']['name'];
+                    $a_raw = $m['teams']['away']['name'];
+                    $h_name = $translate[$h_raw] ?? $h_raw;
+                    $a_name = $translate[$a_raw] ?? $a_raw;
+                    $status = $translate[$m['fixture']['status']['short']] ?? $m['fixture']['status']['short'];
+                    $is_waiting = ($m['fixture']['status']['short'] == 'NS');
                 ?>
                     <div class="card">
                         <div class="m-row">
-                            <div class="m-team-col"><img src="<?= $m['homeTeam']['crest'] ?>"><?= $h_name ?></div>
+                            <div class="m-team-col"><img src="<?= $m['teams']['home']['logo'] ?>"><?= $h_name ?></div>
                             
                             <div class="m-time-box">
                                 <span class="res-num">
-                                    <?php if($is_waiting): ?>
-                                        <?= date("H:i", strtotime($m['utcDate'] . ' +3 hours')) ?>
-                                    <?php else: ?>
-                                        <?= $m['score']['fullTime']['home'] ?> - <?= $m['score']['fullTime']['away'] ?>
-                                    <?php endif; ?>
+                                    <?= ($is_waiting) ? date("H:i", $m['fixture']['timestamp']) : $m['goals']['home'].'-'.$m['goals']['away'] ?>
                                 </span>
-                                <span class="status-badge <?= $is_waiting ? 'status-wait' : '' ?>">
-                                    <?= $status_text ?>
+                                <span class="status-badge <?= $is_waiting ? 'waiting' : '' ?>">
+                                    <?= $status ?>
                                 </span>
                             </div>
                             
-                            <div class="m-team-col"><img src="<?= $m['awayTeam']['crest'] ?>"><?= $a_name ?></div>
+                            <div class="m-team-col"><img src="<?= $m['teams']['away']['logo'] ?>"><?= $a_name ?></div>
                         </div>
                     </div>
-                <?php endforeach; endforeach; endif; ?>
+            <?php endforeach; endif; endforeach; endif; ?>
+            </div>
         </div>
 
         <div id="section-dual_player" class="channel-section">
-             <div class="dual-container">
+            <div style="background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9; border-radius: 12px; padding: 10px; margin: 15px auto; text-align: center; width: 85%;">
+                <p style="font-size: 10px; font-weight: 700; color: #38bdf8; margin: 0;">أكتم صوت القناة بالضغط على ( <i class="fas fa-volume-mute"></i> ) لتشغيل القناة الاخرى</p>
+            </div>
+            <div class="dual-container">
                 <div class="dual-slot">
                     <div class="video-box" id="dual-screen-1" style="background-image:url('mg/chn1.png')"></div>
                     <button class="play-btn" onclick="openPicker(1)"><i class="fas fa-tv"></i> <span id="btn-text-1">القناة الأولى</span></button>
@@ -287,8 +352,20 @@ function filterSection($channels, $sec) {
 </div>
 
 <script>
-// الوظائف الأصلية بدون أي تغيير لضمان عمل الموقع
+let activeSlot = 0; 
+
+// وظائف الإعلان المنبثق
 function closeAd() { document.getElementById('adPopup').style.display = 'none'; }
+
+function openPicker(slot) { activeSlot = slot; document.getElementById('ch-picker').style.display = 'flex'; }
+function closePicker() { document.getElementById('ch-picker').style.display = 'none'; }
+function confirmPick(url, name) {
+    let screen = document.getElementById('dual-screen-' + activeSlot);
+    screen.style.backgroundImage = "none";
+    screen.innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allowfullscreen></iframe>`;
+    document.getElementById('btn-text-' + activeSlot).innerText = name;
+    closePicker();
+}
 function switchSection(id, element) {
     document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
@@ -300,12 +377,17 @@ function startStream(boxId, file, btn) {
     vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=0" allowfullscreen></iframe>`;
     btn.querySelector('span').innerText = 'متصل الآن..'; 
 }
+
 window.addEventListener('load', () => { 
     setTimeout(() => { 
         document.getElementById('pro-intro').classList.add('intro-hide');
-        setTimeout(() => { document.getElementById('adPopup').style.display = 'flex'; }, 500);
+        // إظهار الإعلان بعد اختفاء صفحة التحميل بـ 500 ملي ثانية
+        setTimeout(() => {
+            document.getElementById('adPopup').style.display = 'flex';
+        }, 500);
     }, 1500); 
 });
+
 setInterval(() => { fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(c => { document.getElementById('realtime-visitors').innerText = c; }); }, 5000);
 </script>
 </body>
