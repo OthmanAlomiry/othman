@@ -231,7 +231,7 @@ function filterSection($channels, $sec) {
 <div class="ad-popup-overlay" id="adPopup">
     <div class="ad-popup-content">
         <div class="ad-close-btn" onclick="closeAd()"><i class="fas fa-times"></i></div>
-        <img src="https://files.catbox.moe/7pik4r.png" class="ad-popup-image" alt="إعلان">
+        <img src="https://files.catbox.moe/nnkepx.png" class="ad-popup-image" alt="إعلان">
         <a href="https://wa.me/966505571164" class="ad-subscribe-btn">
             <i class="fab fa-whatsapp"></i> اشترك الآن عبر واتساب
         </a>
