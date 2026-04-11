@@ -10,29 +10,61 @@ $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 
-// مصفوفة الترجمة الشاملة (عثمان)
+// مصفوفة الترجمة الذكية - كلمات مفتاحية (عثمان)
 $translate = [
     // الحالات
     'NS' => 'لم تبدأ', 'FT' => 'انتهت', '1H' => 'شوط 1', '2H' => 'شوط 2', 
     'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة', 'CANC' => 'ملغاة',
     'TBD' => 'يحدد لاحقاً', 'ABD' => 'ملغاة', 'LIVE' => 'مباشر',
 
-    // أندية الدوري السعودي
-    'Al-Hilal' => 'الهلال', 'Al-Nassr' => 'النصر', 'Al-Ittihad' => 'الاتحاد', 'Al-Ahli' => 'الأهلي',
-    'Al-Shabab' => 'الشباب', 'Al-Ettifaq' => 'الاتفاق', 'Al-Fateh' => 'الفتح', 'Al-Taawoun' => 'التعاون',
-    'Al-Wehda' => 'الوحـدة', 'Al-Fayha' => 'الفيحاء', 'Abha' => 'أبها', 'Al-Hazem' => 'الحزم',
-    'Al-Khaleej' => 'الخليج', 'Al-Okhdood' => 'الأخدود', 'Al-Riyadh' => 'الرياض', 'Al-Tai' => 'الطائي',
-    'Damac' => 'ضمك', 'Al-Qadisiyah' => 'القادسية', 'Al-Orobah' => 'العروبة', 'Al-Kholood' => 'الخلود',
+    // الدوري السعودي (كلمات مفتاحية للبحث الجزئي)
+    'Hilal' => 'الهلال', 'Nassr' => 'النصر', 'Ittihad' => 'الاتحاد', 'Ahli' => 'الأهلي',
+    'Shabab' => 'الشباب', 'Ettifaq' => 'الاتفاق', 'Fateh' => 'الفتح', 'Taawoun' => 'التعاون',
+    'Wehda' => 'الوحدة', 'Fayha' => 'الفيحاء', 'Abha' => 'أبها', 'Hazem' => 'الحزم',
+    'Khaleej' => 'الخليج', 'Okhdood' => 'الأخدود', 'Riyadh' => 'الرياض', 'Tai' => 'الطائي',
+    'Damac' => 'ضمك', 'Qadisiyah' => 'القادسية', 'Orobah' => 'العروبة', 'Kholood' => 'الخلود',
 
-    // أندية عالمية
-    'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Atletico Madrid' => 'أتلتيكو مدريد',
-    'Manchester City' => 'مانشستر سيتي', 'Liverpool' => 'ليفربول', 'Arsenal' => 'أرسنال',
-    'Manchester United' => 'مانشستر يونايتد', 'Chelsea' => 'تشيلسي', 'Tottenham' => 'توتنهام',
-    'Bayern Munich' => 'بايرن ميونخ', 'Borussia Dortmund' => 'بوروسيا دورتموند', 'Bayer Leverkusen' => 'ليفركوزن',
-    'Paris Saint Germain' => 'باريس سان جيرمان', 'AC Milan' => 'ميلان', 'Inter' => 'إنتر ميلان',
-    'Juventus' => 'يوفنتوس', 'AS Roma' => 'روما', 'Napoli' => 'نابولي', 'Lazio' => 'لاتسيو',
-    'Aston Villa' => 'أستون فيلا', 'Newcastle' => 'نيوكاسل', 'Girona' => 'جيرونا'
+    // الدوري الإنجليزي
+    'Man City' => 'مانشستر سيتي', 'Manchester City' => 'مانشستر سيتي', 'Liverpool' => 'ليفربول', 
+    'Arsenal' => 'أرسنال', 'Man United' => 'مانشستر يونايتد', 'Manchester United' => 'مانشستر يونايتد', 
+    'Chelsea' => 'تشيلسي', 'Tottenham' => 'توتنهام', 'Aston Villa' => 'أستون فيلا', 
+    'Newcastle' => 'نيوكاسل', 'West Ham' => 'وست هام', 'Brighton' => 'برايتون',
+    'Wolverhampton' => 'وولفرهامبتون', 'Everton' => 'إيفرتون', 'Leicester' => 'ليستر سيتي',
+
+    // الدوري الإسباني
+    'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Atletico' => 'أتلتيكو مدريد', 
+    'Sevilla' => 'اشبيلية', 'Sociedad' => 'سوسيداد', 'Betis' => 'بيتيس', 'Villarreal' => 'فيا ريال',
+    'Girona' => 'جيرونا', 'Athletic' => 'أتلتيك بيلباو', 'Valencia' => 'فالنسيا', 'Getafe' => 'خيتافي',
+
+    // الدوري الإيطالي
+    'Inter' => 'إنتر ميلان', 'Milan' => 'ميلان', 'Juventus' => 'يوفنتوس', 'Roma' => 'روما', 
+    'Napoli' => 'نابولي', 'Lazio' => 'لاتسيو', 'Atalanta' => 'أتالانتا', 'Fiorentina' => 'فيورنتينا',
+    'Bologna' => 'بولونيا', 'Torino' => 'تورينو',
+
+    // الدوري الألماني
+    'Bayern' => 'بايرن ميونخ', 'Dortmund' => 'دورتموند', 'Leverkusen' => 'ليفركوزن', 
+    'Leipzig' => 'لايبزيج', 'Frankfurt' => 'فرانكفورت', 'Stuttgart' => 'شتوتجارت',
+    'Wolfsburg' => 'فولفسبورج', 'Monchengladbach' => 'مونشنغلادباخ',
+
+    // الدوري الفرنسي
+    'Paris' => 'باريس سان جيرمان', 'PSG' => 'باريس سان جيرمان', 'Marseille' => 'مارسيليا', 
+    'Monaco' => 'موناكو', 'Lyon' => 'ليون', 'Lille' => 'ليل', 'Nice' => 'نيس',
+
+    // أندية عربية وأوروبية أخرى
+    'Al Ain' => 'العين', 'Sharjah' => 'الشارقة', 'Shabab Al Ahli' => 'شباب الأهلي',
+    'Zamalek' => 'الزمالك', 'Al Ahly' => 'الأهلي المصري', 'Pyramids' => 'بيراميدز',
+    'Raja' => 'الرجاء', 'Wydad' => 'الوداد', 'Esperance' => 'الترجي', 'Sporting' => 'سبورتينج لشبونة',
+    'Porto' => 'بورتو', 'Benfica' => 'بنفيكا', 'Ajax' => 'أياكس', 'PSV' => 'آيندهوفن'
 ];
+
+// دالة الترجمة الذكية (تبحث عن جزء من الكلمة)
+function smartTranslate($name, $map) {
+    if (isset($map[$name])) return $map[$name];
+    foreach ($map as $key => $val) {
+        if (stripos($name, $key) !== false) return $val;
+    }
+    return $name;
+}
 
 $league_settings = array(
     307 => array('name' => 'الدوري السعودي', 'ch_name' => 'SSC'),
@@ -259,14 +291,10 @@ function filterSection($channels, $sec) {
             <?php else: foreach($league_settings as $id => $set): if(isset($ordered_matches[$id])): ?>
                 <div class="league-sep"><?= $set['name'] ?></div>
                 <?php foreach($ordered_matches[$id] as $m): 
-                    // نظام الترجمة اليدوي (عثمان)
-                    $h_raw = $m['teams']['home']['name'];
-                    $a_raw = $m['teams']['away']['name'];
-                    $s_raw = $m['fixture']['status']['short'];
-
-                    $h_name = isset($translate[$h_raw]) ? $translate[$h_raw] : $h_raw;
-                    $a_name = isset($translate[$a_raw]) ? $translate[$a_raw] : $a_raw;
-                    $status = isset($translate[$s_raw]) ? $translate[$s_raw] : $s_raw;
+                    // نظام الترجمة الذكي (عثمان)
+                    $h_name = smartTranslate($m['teams']['home']['name'], $translate);
+                    $a_name = smartTranslate($m['teams']['away']['name'], $translate);
+                    $status = isset($translate[$m['fixture']['status']['short']]) ? $translate[$m['fixture']['status']['short']] : $m['fixture']['status']['short'];
                 ?>
                     <div class="card" style="margin-bottom:10px;">
                         <div class="m-row">
@@ -280,7 +308,7 @@ function filterSection($channels, $sec) {
                     </div>
             <?php endforeach; endif; endforeach; endif; ?>
         </div>
-
+        
         <div id="section-dual_player" class="channel-section">
             <div style="background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9; border-radius: 12px; padding: 10px; margin: 35px auto 15px; text-align: center; width: 85%;">
                 <p style="font-size: 10px; font-weight: 700; color: #38bdf8; margin: 0;">أكتم صوت القناة بالضغط على ( <i class="fas fa-volume-mute"></i> ) لتشغيل القناة الاخرى</p>
