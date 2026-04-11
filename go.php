@@ -10,10 +10,12 @@ $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 
-// مصفوفة الترجمة البسيطة (يمكنك توسيعها لاحقاً)
+// مصفوفة الترجمة المحدثة
 $translate = [
-    'NS' => 'لم تبدأ', 'FT' => 'انتهت', '1H' => 'شوط 1', '2H' => 'شوط 2', 'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح',
-    'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Al Hilal' => 'الهلال', 'Al Nassr' => 'النصر', 'Al Ittihad' => 'الاتحاد', 'Al Ahli' => 'الأهلي'
+    'NS' => 'لم تبدأ', 'FT' => 'انتهت', '1H' => 'شوط 1', '2H' => 'شوط 2', 
+    'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة',
+    'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Al Hilal' => 'الهلال', 
+    'Al Nassr' => 'النصر', 'Al Ittihad' => 'الاتحاد', 'Al Ahli' => 'الأهلي'
 ];
 
 $league_settings = array(
@@ -101,9 +103,9 @@ function filterSection($channels, $sec) {
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); }
+        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
         
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; }
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; }
 
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
@@ -118,12 +120,12 @@ function filterSection($channels, $sec) {
         .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; text-align: center; border: 1px solid rgba(255,255,255,0.3); }
         .btn-wa { background: #25d366; } .btn-tg { background: #0088cc; } .btn-sn { background: #FFFC00; color: #000 !important; } .btn-tw { background: #000; }
 
-        /* الشريط الإخباري - إصلاح الانسيابية */
+        /* الشريط الإخباري - من اليسار لليمين وبسرعة أبطأ */
         .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); height: 32px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
-        .ticker-move { display: flex; white-space: nowrap; animation: ticker-scroll 25s linear infinite; }
-        .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding-left: 100px; }
-        @keyframes ticker-scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .ticker-move { display: flex; white-space: nowrap; animation: ticker-scroll 35s linear infinite; }
+        .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding-right: 100px; }
+        @keyframes ticker-scroll { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
         .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.3s; }
@@ -138,24 +140,23 @@ function filterSection($channels, $sec) {
         /* كروت القنوات الزجاجية عثمان */
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); margin-bottom: 20px; width: 100%; backdrop-filter: blur(10px); }
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; }
-        .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border); padding: 14px; border-radius: 50px; color: #fff; font-weight: 900; font-size: 13px; cursor: pointer; transition: 0.4s; backdrop-filter: blur(5px); }
-        .play-btn:hover { background: var(--main); border-color: transparent; transform: scale(1.02); }
+        
+        /* أيقونة تشغيل زجاجية احترافية */
+        .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 14px; border-radius: 15px; color: #fff; font-weight: 900; font-size: 13px; cursor: pointer; transition: 0.4s; backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .play-btn i { font-size: 18px; color: var(--main); text-shadow: 0 0 10px rgba(225, 29, 72, 0.5); }
+        .play-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); border-color: var(--main); }
 
-        /* ستايل الجدول الزجاجي */
         .match-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--glass); padding: 10px; border-radius: 15px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
         .match-nav a { color: #fff; background: rgba(255,255,255,0.1); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; border: 1px solid var(--glass-border); }
         .league-sep { background: rgba(255, 255, 255, 0.07); padding: 8px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; margin: 15px 0 10px; border-right: 4px solid var(--main); color: #fff; border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); }
         .m-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; text-align: center; }
         .m-team-col { flex: 1; font-size: 11px; font-weight: 700; color: #fff; }
-        .m-team-col img { width: 32px; height: 32px; display: block; margin: 0 auto 8px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        .m-team-col img { width: 32px; height: 32px; display: block; margin: 0 auto 8px; }
         .m-time-box { flex: 0.6; background: rgba(225, 29, 72, 0.1); border: 1px solid rgba(225, 29, 72, 0.3); padding: 5px; border-radius: 10px; font-weight: 900; font-size: 13px; color: var(--main); }
 
-        /* التشغيل المزدوج */
         .dual-container { padding: 5px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .dual-slot { background: rgba(0,0,0,0.3); border-radius: 15px; overflow: hidden; border: 1px solid var(--glass-border); width: 90%; }
-        .dual-screen-v { width: 100%; aspect-ratio: 16/9; background-color: #000; position: relative; background-size: cover; background-position: center; }
-        #dual-screen-1 { background-image: url('mg/chn1.png'); }
-        #dual-screen-2 { background-image: url('mg/chn2.png'); }
+        .dual-screen-v { width: 100%; aspect-ratio: 16/9; background-color: #000; position: relative; }
         .dual-btn-select { width: 100%; padding: 12px; background: rgba(14, 165, 233, 0.1); border: none; color: #38bdf8; font-family: 'Tajawal'; font-weight: 700; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-top: 1px solid rgba(14, 165, 233, 0.2); }
 
         .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 7000; display: none; align-items: center; justify-content: center; }
@@ -180,7 +181,7 @@ function filterSection($channels, $sec) {
         <?php foreach($all_channels as $ch): ?>
             <div class="ch-pick-item" onclick="confirmPick('<?= $ch['file'] ?>', '<?= $ch['name'] ?>')"><?= $ch['name'] ?></div>
         <?php endforeach; ?>
-        <div class="ch-pick-item" style="color:red; text-align:center; background:rgba(255,0,0,0.05);" onclick="closePicker()">إلغاء</div>
+        <div class="ch-pick-item" style="color:red; text-align:center;" onclick="closePicker()">إلغاء</div>
     </div>
 </div>
 
@@ -200,16 +201,16 @@ function filterSection($channels, $sec) {
         <?php endif; ?>
 
         <div class="category-tabs">
-            <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
+            <div class="cat-item" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
             <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>تشغيل مباريتين</span></div>
             <?php foreach($active_sections as $s): ?>
-                <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
+                <div class="cat-item <?= ($s['key'] == 'bein') ? 'active' : '' ?>" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
             <?php endforeach; ?>
         </div>
     </div>
 
     <div class="grid">
-        <div id="section-matches_table" class="channel-section active">
+        <div id="section-matches_table" class="channel-section">
             <div class="match-nav">
                 <a href="?d=<?= $prev_date ?>"><i class="fas fa-chevron-right"></i></a>
                 <span style="font-weight:900; font-size:13px; color:#fff;"><?= $date_get ?></span>
@@ -251,12 +252,12 @@ function filterSection($channels, $sec) {
         </div>
 
         <?php foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
-        <div id="section-<?= $s['key'] ?>" class="channel-section">
+        <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($s['key'] == 'bein') ? 'active' : '' ?>">
             <?php foreach($channels as $ch): ?>
             <div class="card">
                 <div class="video-box" id="vid-<?= $ch['id'] ?>"></div>
                 <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">
-                    <i class="fas fa-play"></i> تشغيل قناة <?= $ch['name'] ?>
+                    <i class="fas fa-play-circle"></i> تشغيل قناة <?= $ch['name'] ?>
                 </button>
             </div>
             <?php endforeach; ?>
