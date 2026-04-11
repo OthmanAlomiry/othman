@@ -269,7 +269,7 @@ function filterSection($channels, $sec) {
             <div class="cat-item" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>مباريات اليوم</span></div>
             <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>شاشتين</span></div>
             <?php foreach($active_sections as $s): ?>
-                <div class="cat-item <?= ($s['key'] == 'beIN') ? 'active' : '' ?>" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
+                <div id="tab-<?= $s['key'] ?>" class="cat-item <?= ($s['key'] == 'beIN') ? 'active' : '' ?>" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
             <?php endforeach; ?>
         </div>
     </div>
@@ -357,7 +357,7 @@ function switchSection(id, element) {
     document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
     document.getElementById('section-' + id).classList.add('active');
-    element.classList.add('active');
+    if(element) element.classList.add('active');
 }
 function startStream(boxId, file, btn) {
     let vBox = document.getElementById(boxId); vBox.style.backgroundImage = "none";
@@ -368,6 +368,9 @@ function startStream(boxId, file, btn) {
 window.addEventListener('load', () => { 
     setTimeout(() => { 
         document.getElementById('pro-intro').classList.add('intro-hide');
+        // تأكيد فتح قسم beIN برمجياً عند التحميل
+        switchSection('beIN', document.getElementById('tab-beIN'));
+        
         setTimeout(() => {
             document.getElementById('adPopup').style.display = 'flex';
         }, 500);
