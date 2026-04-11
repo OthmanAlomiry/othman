@@ -281,7 +281,7 @@ function filterSection($channels, $sec) {
             </div>
             <div class="match-grid-container">
             <?php if(empty($ordered_matches)): ?>
-                <p style="text-align:center; opacity:0.5; padding:20px; grid-column: 1/-1;">لا توجد مباريات هامة لهذا التاريخ</p>
+                <p style="text-align:center; opacity:0.5; padding:20px; grid-column: 1/-1;">قريباً... الجدول تحت الصيانة </p>
             <?php else: foreach($league_settings as $id => $set): if(isset($ordered_matches[$id])): ?>
                 <div class="league-sep"><?= $set['name'] ?></div>
                 <?php foreach($ordered_matches[$id] as $m): 
