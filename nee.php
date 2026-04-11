@@ -1,13 +1,13 @@
 <?php
 session_start();
-error_reporting(0);
+error_reporting(E_ALL); // تم تفعيل التقرير مؤقتاً لاكتشاف الأخطاء
 
-// --- إعدادات جلب المباريات (عثمان - النظام الجديد) ---
+// --- إعدادات جلب المباريات (النظام المطور) ---
 date_default_timezone_set('Asia/Riyadh');
 $FOOTBALL_API_KEY = '273aaeb61360452588653ffea820cc19'; 
 $date_get = date('Y-m-d');
 
-// مصفوفة تعريف الدوريات (Football-Data API IDs)
+// مصفوفة تعريف الدوريات (تأكد أن هذه الـ IDs مشمولة في خطتك المجانية)
 $league_settings = array(
     2021 => array('name' => 'الدوري الإنجليزي', 'ch_name' => 'beIN Sport 1'),
     2014 => array('name' => 'الدوري الإسباني', 'ch_name' => 'beIN Sport 3'),
@@ -17,8 +17,14 @@ $league_settings = array(
     2001 => array('name' => 'دوري أبطال أوروبا', 'ch_name' => 'beIN Sport 2'),
 );
 
-// دالة الترجمة التلقائية (Google Translate API)
 function translate_name($text) {
+    // مصفوفة ترجمة سريعة للفرق المشهورة لتجنب استهلاك الـ API في كل مرة
+    $manual_translate = [
+        'Arsenal FC' => 'أرسنال', 'Manchester City FC' => 'مانشستر سيتي', 'Liverpool FC' => 'ليفربول',
+        'Real Madrid CF' => 'ريال مدريد', 'FC Barcelona' => 'برشلونة', 'FC Bayern München' => 'بايرن ميونخ'
+    ];
+    if(isset($manual_translate[$text])) return $manual_translate[$text];
+
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
     $response = @file_get_contents($url);
     if($response) {
@@ -28,40 +34,52 @@ function translate_name($text) {
     return $text;
 }
 
-// مصفوفة الحالات الثابتة
 $status_map = [
-    'TIMED' => 'لم تبدأ', 'FINISHED' => 'انتهت', 'IN_PLAY' => 'مباشر', 
-    'PAUSED' => 'بين الشوطين', 'POSTPONED' => 'مؤجلة', 'CANCELLED' => 'ملغاة'
+    'TIMED' => 'لم تبدأ', 'SCHEDULED' => 'مجدولة', 'FINISHED' => 'انتهت', 
+    'IN_PLAY' => 'مباشر', 'PAUSED' => 'بين الشوطين', 'POSTPONED' => 'مؤجلة'
 ];
 
 function getFixturesWithCache($date, $key) {
     $cache_file = "cache_" . $date . ".json";
-    $expire_time = 600; 
+    $expire_time = 300; // 5 دقائق لضمان تحديث النتائج المباشرة
+    
     if (file_exists($cache_file) && (time() - filemtime($cache_file) < $expire_time)) {
         return json_decode(file_get_contents($cache_file), true);
     }
+
     $ch = curl_init();
     curl_setopt_array($ch, array(
         CURLOPT_URL => "https://api.football-data.org/v4/matches?dateFrom=$date&dateTo=$date",
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => array('X-Auth-Token: ' . $key),
-        CURLOPT_TIMEOUT => 15,
+        CURLOPT_HTTPHEADER => array(
+            'X-Auth-Token: ' . $key,
+            'User-Agent: Mozilla/5.0' // إضافة User-Agent لتجنب الحظر
+        ),
+        CURLOPT_TIMEOUT => 20,
         CURLOPT_SSL_VERIFYPEER => false
     ));
     $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    $data = json_decode($response, true);
-    $results = (isset($data['matches'])) ? $data['matches'] : array();
-    if (!empty($results)) { file_put_contents($cache_file, json_encode($results)); }
-    return $results;
+
+    if ($httpCode == 200) {
+        $data = json_decode($response, true);
+        $res = $data['matches'] ?? array();
+        if (!empty($res)) { file_put_contents($cache_file, json_encode($res)); }
+        return $res;
+    }
+    return array(); 
 }
 
 $fixtures = getFixturesWithCache($date_get, $FOOTBALL_API_KEY);
 $ordered_matches = array();
+
 if (!empty($fixtures)) {
     foreach ($fixtures as $f) {
-        $id = (int)$f['competition']['id'];
-        if (isset($league_settings[$id])) { $ordered_matches[$id][] = $f; }
+        $l_id = (int)$f['competition']['id'];
+        if (isset($league_settings[$l_id])) {
+            $ordered_matches[$l_id][] = $f;
+        }
     }
 }
 
@@ -212,28 +230,42 @@ function filterSection($channels, $sec) {
     <div class="grid">
         <div id="section-matches_table" class="channel-section active">
             <div class="match-grid-container">
-            <?php if(empty($ordered_matches)): ?>
-                <p style="text-align:center; opacity:0.5; padding:20px; grid-column: 1/-1;">لا توجد مباريات هامة لهذا التاريخ</p>
-            <?php else: foreach($league_settings as $id => $set): if(isset($ordered_matches[$id])): ?>
-                <div class="league-sep"><?= $set['name'] ?></div>
-                <?php foreach($ordered_matches[$id] as $m): 
-                    // استخدام الترجمة التلقائية للأسماء
-                    $h_name = translate_name($m['homeTeam']['name']);
-                    $a_name = translate_name($m['awayTeam']['name']);
-                    $status = $status_map[$m['status']] ?? $m['status'];
-                ?>
-                    <div class="card">
-                        <div class="m-row">
-                            <div class="m-team-col"><img src="<?= $m['homeTeam']['crest'] ?>"><?= $h_name ?></div>
-                            <div class="m-time-box">
-                                <?= ($m['status'] == 'TIMED') ? date("H:i", strtotime($m['utcDate'] . ' +3 hours')) : $m['score']['fullTime']['home'].'-'.$m['score']['fullTime']['away'] ?>
-                                <br><small style="font-size:7px; display:block;"><?= $status ?></small>
-                                <small style="font-size:6px; color:#aaa;"><?= $set['ch_name'] ?></small>
+            <?php 
+            if(empty($ordered_matches)): ?>
+                <p style="text-align:center; opacity:0.5; padding:20px; grid-column: 1/-1;">لا توجد مباريات هامة لهذا التاريخ أو حدث خطأ في الـ API</p>
+            <?php else: 
+                foreach($league_settings as $id => $set): 
+                    if(isset($ordered_matches[$id])): ?>
+                        <div class="league-sep"><?= $set['name'] ?></div>
+                        <?php foreach($ordered_matches[$id] as $m): 
+                            $h_name = translate_name($m['homeTeam']['name']);
+                            $a_name = translate_name($m['awayTeam']['name']);
+                            $status = $status_map[$m['status']] ?? $m['status'];
+                            
+                            // تحويل الوقت من UTC إلى مكة (+3 ساعات)
+                            $match_time = date("H:i", strtotime($m['utcDate'] . " +3 hours"));
+                        ?>
+                            <div class="card">
+                                <div class="m-row">
+                                    <div class="m-team-col">
+                                        <img src="<?= $m['homeTeam']['crest'] ?>" onerror="this.src='mg/default.png'">
+                                        <?= $h_name ?>
+                                    </div>
+                                    <div class="m-time-box">
+                                        <?= (in_array($m['status'], ['TIMED', 'SCHEDULED'])) ? $match_time : ($m['score']['fullTime']['home'] . ' - ' . $m['score']['fullTime']['away']) ?>
+                                        <br><small style="font-size:7px; display:block;"><?= $status ?></small>
+                                        <small style="font-size:6px; color:#aaa;"><?= $set['ch_name'] ?></small>
+                                    </div>
+                                    <div class="m-team-col">
+                                        <img src="<?= $m['awayTeam']['crest'] ?>" onerror="this.src='mg/default.png'">
+                                        <?= $a_name ?>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="m-team-col"><img src="<?= $m['awayTeam']['crest'] ?>"><?= $a_name ?></div>
-                        </div>
-                    </div>
-            <?php endforeach; endif; endforeach; endif; ?>
+            <?php       endforeach; 
+                    endif; 
+                endforeach; 
+            endif; ?>
             </div>
         </div>
 
