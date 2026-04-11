@@ -4,7 +4,8 @@ error_reporting(0);
 
 // --- إعدادات جدول المباريات (كود عثمان) ---
 date_default_timezone_set('Asia/Riyadh');
-$API_KEY_FOOTBALL = '6b9915e3b84f54b3962e5817b9e26e5f'; 
+$FOOTBALL_API_KEY = '6b9915e3b84f54b3962e5817b9e26e5f'; 
+
 $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
@@ -42,7 +43,8 @@ function getFixturesWithCache($date, $key) {
     if (!empty($results)) { file_put_contents($cache_file, json_encode($results)); }
     return $results;
 }
-$fixtures = getFixturesWithCache($date_get, $API_KEY_FOOTBALL);
+
+$fixtures = getFixturesWithCache($date_get, $FOOTBALL_API_KEY);
 $ordered_matches = array();
 if (!empty($fixtures)) {
     foreach ($fixtures as $f) {
@@ -51,8 +53,8 @@ if (!empty($fixtures)) {
     }
 }
 
-// --- بيانات السحابة (JSONBin) ---
-$API_KEY_BIN = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
+// --- بيانات السحابة ونظام الزوار ---
+$API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69d6f6b636566621a891e6c1';
 
 $visitors_file = 'online_visitors.txt';
@@ -69,13 +71,13 @@ $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents(
 function getCloudFullData($bin, $key) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER => ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
     $res = curl_exec($ch);
     curl_close($ch);
     return json_decode($res, true);
 }
 
-$cloud = getCloudFullData($BIN_ID, $API_KEY_BIN);
+$cloud = getCloudFullData($BIN_ID, $API_KEY);
 $all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : [];
 $active_sections = array_filter($cloud['sections'] ?: [], function($s) { return $s['status'] == 'show'; });
 $news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : ['text' => '', 'status' => 'hide'];
@@ -96,50 +98,52 @@ function filterSection($channels, $sec) {
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; }
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; }
-        
+
         /* شاشة الدخول */
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
-        .intro-icon-box { width: 100px; height: 100px; background: var(--main); border-radius: 30%; display: flex; align-items: center; justify-content: center; animation: glowPulse 2s infinite ease-in-out; }
+        .intro-icon-box { width: 100px; height: 100px; background: var(--main); border-radius: 30%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(225, 29, 72, 0.5); animation: glowPulse 2s infinite ease-in-out; }
         .intro-icon-box i { font-size: 50px; color: white; }
-        .intro-title { margin-top: 25px; color: white; font-weight: 900; font-size: 24px; }
         @keyframes glowPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        /* الهيدر والتبويبات */
+        /* الهيدر الثابت */
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
-        .visitors-badge-float { position: fixed; bottom: 25px; left: 25px; width: 45px; height: 45px; background: rgba(34, 197, 94, 0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1.5px solid #22c55e; }
         .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; padding: 0 10px; }
         .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; text-align: center; border: 1.5px solid #ffffff; }
         .btn-wa { background: #25d366; } .btn-tg { background: #0088cc; } .btn-sn { background: #FFFC00; color: #000 !important; } .btn-tw { background: #000; }
 
+        /* التبويبات */
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
         .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; }
-        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
-        .cat-item i { font-size: 20px; display: block; margin-bottom: 5px; color: var(--main); }
+        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: scale(1.03); }
+        .cat-item i { font-size: 20px; color: #fff; display: block; margin-bottom: 4px; }
         .cat-item img { width: 26px; height: 26px; object-fit: contain; margin-bottom: 4px; }
         .cat-item span { font-size: 8px; font-weight: 900; color: #fff; display: block; }
 
-        /* ستايل جدول المباريات عثمان */
-        .match-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--glass); padding: 10px; border-radius: 15px; }
+        /* ستايل جدول المباريات */
+        .match-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--glass); padding: 10px; border-radius: 18px; border: 1px solid var(--glass-border); }
         .match-nav a { color: #fff; background: var(--main); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; }
-        .league-row { background: linear-gradient(90deg, var(--main), transparent); padding: 8px 12px; border-radius: 8px; margin: 20px 0 10px; font-weight: 900; font-size: 12px; border-right: 4px solid #fff; text-align: right; }
-        .match-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 12px; margin-bottom: 12px; }
+        .league-title { background: linear-gradient(90deg, var(--main), transparent); padding: 8px 12px; border-radius: 10px; margin: 20px 0 10px; font-weight: 900; font-size: 12px; border-right: 4px solid #fff; text-align: right; }
+        .m-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
         .m-top { display: flex; align-items: center; justify-content: space-between; }
-        .m-team { flex: 1; text-align: center; font-size: 10px; }
-        .m-team img { width: 30px; height: 30px; display: block; margin: 0 auto 5px; }
-        .m-score { font-size: 20px; font-weight: 900; }
-        .m-bottom { border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px; display: flex; justify-content: center; }
-        .ch-badge { background: rgba(56,189,248,0.1); padding: 3px 12px; border-radius: 50px; font-size: 10px; color: #38bdf8; }
+        .m-team { flex: 1.2; text-align: center; font-size: 10px; }
+        .m-team img { width: 32px; height: 32px; display: block; margin: 0 auto 8px; }
+        .m-score { font-size: 22px; font-weight: 900; color: #fff; }
+        .m-bottom { border-top: 1px dashed var(--glass-border); padding-top: 10px; margin-top: 10px; display: flex; justify-content: center; }
+        .ch-badge { background: rgba(56,189,248,0.1); padding: 4px 15px; border-radius: 50px; font-size: 10px; color: #38bdf8; display: flex; align-items: center; gap: 5px; }
 
         .grid { padding: 15px; }
         .channel-section { display: none; width: 100%; }
-        .channel-section.active { display: block; animation: slideUp 0.5s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .channel-section.active { display: block; animation: slideUp 0.6s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); margin-bottom: 20px; }
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
         iframe { width: 100%; height: 100%; border: none; }
-        .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--glass); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 50px; font-weight: 900; cursor: pointer; }
+        .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--main); color: #fff; border: none; padding: 12px; border-radius: 50px; font-weight: 900; cursor: pointer; }
+        
+        .visitors-badge-float { position: fixed; bottom: 25px; left: 25px; width: 45px; height: 45px; background: rgba(34, 197, 94, 0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1.5px solid #22c55e; }
+        footer { text-align: center; padding: 40px; font-size: 10px; opacity: 0.5; }
     </style>
 </head>
 <body>
@@ -147,7 +151,7 @@ function filterSection($channels, $sec) {
 <div id="pro-intro">
     <div class="loader-content">
         <div class="intro-icon-box"><i class="fas fa-play-circle"></i></div>
-        <h2 class="intro-title">الخدمة الرقمية</h2>
+        <h2 style="color:white; margin-top:20px;">الخدمة الرقمية</h2>
     </div>
 </div>
 
@@ -164,10 +168,10 @@ function filterSection($channels, $sec) {
 
         <div class="category-tabs">
             <div class="cat-item active" onclick="switchSection('matches_table', this)">
-                <i class="fas fa-calendar-alt"></i>
+                <i class="fas fa-calendar-day"></i>
                 <span>جدول المباريات</span>
             </div>
-            
+
             <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>تشغيل مباريتين</span></div>
             
             <?php foreach($active_sections as $s): ?>
@@ -180,44 +184,47 @@ function filterSection($channels, $sec) {
         <div id="section-matches_table" class="channel-section active">
             <div class="match-nav">
                 <a href="?d=<?= $prev_date ?>"><i class="fas fa-chevron-right"></i></a>
-                <span style="font-weight:900; font-size:14px;"><?= date('Y / m / d', strtotime($date_get)) ?></span>
+                <span style="font-weight:900;"><?= date('Y / m / d', strtotime($date_get)) ?></span>
                 <a href="?d=<?= $next_date ?>"><i class="fas fa-chevron-left"></i></a>
             </div>
 
             <?php if (empty($ordered_matches)): ?>
                 <div style="text-align:center; padding:50px; opacity:0.5;">لا توجد مباريات هامة لهذا اليوم</div>
-            <?php else: ?>
-                <?php foreach($league_settings as $id => $setting): if(isset($ordered_matches[$id])): ?>
-                    <div class="league-row"><?= $setting['name'] ?></div>
-                    <?php $ch_counter = 1; foreach($ordered_matches[$id] as $m): 
-                        $status = $m['fixture']['status']['short'];
-                        $mTime = date("H:i", $m['fixture']['timestamp']);
-                        $current_ch = $setting['ch_name'] . " " . $ch_counter; $ch_counter++;
-                    ?>
-                    <div class="match-card">
-                        <div class="m-top">
-                            <div class="m-team"><img src="<?= $m['teams']['home']['logo'] ?>"><b><?= $m['teams']['home']['name'] ?></b></div>
-                            <div style="text-align:center;">
-                                <?php if(in_array($status, array('1H','2H','HT','ET','P'))): ?>
-                                    <div class="m-score" style="color:var(--main)"><?= $m['goals']['home'] ?>-<?= $m['goals']['away'] ?></div>
-                                    <div style="font-size:10px; color:#22c55e;">مباشر</div>
-                                <?php elseif($status == 'FT'): ?>
-                                    <div class="m-score"><?= $m['goals']['home'] ?>-<?= $m['goals']['away'] ?></div>
-                                    <div style="font-size:9px;">انتهت</div>
-                                <?php else: ?>
-                                    <div style="font-size:16px; font-weight:900;"><?= $mTime ?></div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="m-team"><img src="<?= $m['teams']['away']['logo'] ?>"><b><?= $m['teams']['away']['name'] ?></b></div>
+            <?php else: 
+                foreach($league_settings as $id => $setting): 
+                    if(isset($ordered_matches[$id])):
+                        echo '<div class="league-title">'.$setting['name'].'</div>';
+                        $ch_count = 1;
+                        foreach($ordered_matches[$id] as $m): 
+                            $status = $m['fixture']['status']['short'];
+                            $mTime = date("H:i", $m['fixture']['timestamp']);
+                            $current_ch = $setting['ch_name'] . " " . $ch_count; $ch_count++;
+            ?>
+                <div class="m-card">
+                    <div class="m-top">
+                        <div class="m-team"><img src="<?= $m['teams']['home']['logo'] ?>"><b><?= $m['teams']['home']['name'] ?></b></div>
+                        <div style="flex:1; text-align:center;">
+                            <?php if(in_array($status, array('1H','2H','HT','ET','P'))): ?>
+                                <div class="m-score" style="color:var(--main)"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
+                                <div style="color:#22c55e; font-size:10px; font-weight:900;">مباشر</div>
+                            <?php elseif($status == 'FT'): ?>
+                                <div class="m-score"><?= $m['goals']['home'] ?> - <?= $m['goals']['away'] ?></div>
+                                <div style="font-size:9px;">انتهت</div>
+                            <?php else: ?>
+                                <div style="font-size:18px; font-weight:900;"><?= $mTime ?></div>
+                            <?php endif; ?>
                         </div>
-                        <div class="m-bottom"><div class="ch-badge"><i class="fas fa-tv"></i> <?= $current_ch ?></div></div>
+                        <div class="m-team"><img src="<?= $m['teams']['away']['logo'] ?>"><b><?= $m['teams']['away']['name'] ?></b></div>
                     </div>
-                <?php endforeach; endif; endforeach; ?>
-            <?php endif; ?>
+                    <div class="m-bottom">
+                        <div class="ch-badge"><i class="fas fa-tv"></i> <?= $current_ch ?></div>
+                    </div>
+                </div>
+            <?php endforeach; endif; endforeach; endif; ?>
         </div>
 
         <div id="section-dual_player" class="channel-section">
-            <div style="text-align:center; padding:20px;">استخدم المشغل المزدوج من هنا</div>
+            <p style="text-align:center;">قسم تشغيل مباريتين تحت الصيانة</p>
         </div>
 
         <?php foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
@@ -225,13 +232,13 @@ function filterSection($channels, $sec) {
             <?php foreach($channels as $ch): ?>
             <div class="card">
                 <div class="video-box" id="vid-<?= $ch['id'] ?>"></div>
-                <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)"><?= $ch['name'] ?></button>
+                <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">تشغيل <?= $ch['name'] ?></button>
             </div>
             <?php endforeach; ?>
         </div>
         <?php endforeach; ?>
     </div>
-    
+
     <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
 </div>
 
@@ -244,7 +251,7 @@ function switchSection(id, element) {
 }
 function startStream(boxId, file, btn) {
     document.getElementById(boxId).innerHTML = `<iframe src="${file}?autoplay=1" allowfullscreen></iframe>`;
-    btn.innerHTML = 'تم الاتصال';
+    btn.innerHTML = '<i class="fas fa-check-circle"></i> تم الاتصال';
 }
 window.addEventListener('load', () => { setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 1500); });
 setInterval(() => { fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(c => { document.getElementById('realtime-visitors').innerText = c; }); }, 5000);
