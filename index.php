@@ -4,7 +4,7 @@ error_reporting(0);
 
 // --- إعدادات مباريات اليوم (عثمان) ---
 date_default_timezone_set('Asia/Riyadh');
-$FOOTBALL_API_KEY = '5dc2fedf076a0c9041ea3515dd83d2fa'; 
+$FOOTBALL_API_KEY = '482e3477d907396c2b1f06e099b67774'; 
 $date_get = date('Y-m-d');
 
 // مصفوفة الترجمة الشاملة (عثمان)
