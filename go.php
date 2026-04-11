@@ -4,7 +4,7 @@ error_reporting(0);
 
 // --- إعدادات جدول المباريات (عثمان) ---
 date_default_timezone_set('Asia/Riyadh');
-$FOOTBALL_API_KEY = '6b9915e3b84f54b3962e5817b9e26e5f'; 
+$FOOTBALL_API_KEY = '273aaeb61360452588653ffea820cc19'; 
 $date_get = date('Y-m-d');
 
 // مصفوفة الترجمة الشاملة (عثمان)
@@ -66,7 +66,7 @@ function getFixturesWithCache($date, $key) {
     }
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://v3.football.api-sports.io/fixtures?date=$date&timezone=Asia/Riyadh",
+        CURLOPT_URL => "https://api.football-data.org/v4/matches?date=$date&timezone=Asia/Riyadh",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => array("x-apisports-key: $key"),
         CURLOPT_TIMEOUT => 15,
