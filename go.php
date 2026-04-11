@@ -10,12 +10,10 @@ $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 
-// مصفوفة الترجمة المحدثة لضمان ترجمة الفرق
-$translate = [
+// مصفوفة الحالات الثابتة (لأن الـ API قد لا يترجم الاختصارات)
+$status_translate = [
     'NS' => 'لم تبدأ', 'FT' => 'انتهت', '1H' => 'شوط 1', '2H' => 'شوط 2', 
-    'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة',
-    'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Al Hilal' => 'الهلال', 
-    'Al Nassr' => 'النصر', 'Al Ittihad' => 'الاتحاد', 'Al Ahli' => 'الأهلي'
+    'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة', 'CANC' => 'ملغاة'
 ];
 
 $league_settings = array(
@@ -37,6 +35,7 @@ function getFixturesWithCache($date, $key) {
         return json_decode(file_get_contents($cache_file), true);
     }
     $curl = curl_init();
+    // تم إضافة lang=ar لضمان جلب أسماء الفرق بالعربية من الـ API مباشرة
     curl_setopt_array($curl, array(
         CURLOPT_URL => "https://v3.football.api-sports.io/fixtures?date=$date&timezone=Asia/Riyadh",
         CURLOPT_RETURNTRANSFER => true,
@@ -117,9 +116,6 @@ function filterSection($channels, $sec) {
         .intro-title { margin-top: 25px; color: white; font-weight: 900; font-size: 24px; letter-spacing: 1px; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .loading-bar { width: 150px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 30px; overflow: hidden; position: relative; }
         .loading-bar::after { content: ""; position: absolute; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--main), transparent); animation: loadingMove 1.5s infinite; }
-        @keyframes glowPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes loadingMove { 100% { left: 100%; } }
-        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
 
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: max-width 0.4s; }
         
@@ -132,7 +128,6 @@ function filterSection($channels, $sec) {
         .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
         .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; display: flex; align-items: center; }
-        /* تقليل سرعة الشريط الإخباري */
         .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 45s linear infinite; width: max-content; }
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
@@ -146,16 +141,17 @@ function filterSection($channels, $sec) {
         .grid { padding: 15px; }
         .channel-section { display: none; width: 100%; }
         .channel-section.active { display: block; animation: slideUp 0.6s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 20px; width: 100%; }
-        .c-head { padding: 12px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
-        .name-badge { padding: 5px 12px; border-radius: 10px; font-size: 10px; font-weight: 900; color: #000; background: var(--blue-grad); }
-        .live-badge { display: flex; align-items: center; gap: 5px; background: rgba(225, 29, 72, 0.2); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--main); color: #ff4d4d; font-weight: 900; font-size: 10px; }
-        .live-dot { width: 6px; height: 6px; background: #ff4d4d; border-radius: 50%; animation: pulse-red 1.2s infinite; }
+        .c-head { padding: 10px 15px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
+        
+        .live-badge { display: flex; align-items: center; gap: 5px; background: rgba(225, 29, 72, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(225, 29, 72, 0.4); color: #ff4d4d; font-weight: 900; font-size: 11px; }
+        .live-dot { width: 7px; height: 7px; background: #ff4d4d; border-radius: 50%; animation: pulse-red 1.2s infinite; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 77, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
 
-        .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 14px; border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 13px; transition: 0.4s; }
-        /* إصلاح تنسيق الفيديو في الكرت عثمان */
+        .play-btn { width: 92%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); color: #fff; border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 14px; transition: 0.4s; }
+        .play-btn i { font-size: 18px; color: var(--main); }
+
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; overflow: hidden; }
         .video-box iframe { position: absolute; top:0; left:0; width: 100%; height: 100%; border: none; background: #000; }
 
@@ -167,13 +163,6 @@ function filterSection($channels, $sec) {
         .m-team-col img { width: 32px; height: 32px; display: block; margin: 0 auto 8px; }
         .m-time-box { flex: 0.6; background: rgba(225, 29, 72, 0.1); border: 1px solid rgba(225, 29, 72, 0.3); padding: 5px; border-radius: 10px; font-weight: 900; font-size: 13px; color: var(--main); }
 
-        .dual-container { padding: 5px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .dual-slot { background: rgba(0,0,0,0.3); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); width: 85%; }
-        .dual-screen-v { width: 100%; aspect-ratio: 16/9; background-color: #000; position: relative; background-size: cover; background-position: center; }
-        #dual-screen-1 { background-image: url('mg/chn1.png'); }
-        #dual-screen-2 { background-image: url('mg/chn2.png'); }
-        .dual-btn-select { width: 100%; padding: 10px; background: #111827; border: none; color: #38bdf8; font-family: 'Tajawal'; font-weight: 700; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        
         .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 7000; display: none; align-items: center; justify-content: center; }
         .ch-picker-window { width: 95%; max-width: 480px; background: #0f172a; border-radius: 25px; border: 1px solid var(--glass-border); max-height: 80vh; overflow: hidden; display: flex; flex-direction: column; }
         .ch-picker-header { padding: 20px; background: var(--main); color: white; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
@@ -223,16 +212,16 @@ function filterSection($channels, $sec) {
         <?php endif; ?>
 
         <div class="category-tabs">
-            <div class="cat-item" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
+            <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
             <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>تشغيل مباريتين</span></div>
             <?php foreach($active_sections as $s): ?>
-                <div class="cat-item <?= ($s['key'] == 'bein' ? 'active' : '') ?>" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
+                <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
             <?php endforeach; ?>
         </div>
     </div>
 
     <div class="grid">
-        <div id="section-matches_table" class="channel-section">
+        <div id="section-matches_table" class="channel-section active">
             <div class="match-nav">
                 <a href="?d=<?= $prev_date ?>"><i class="fas fa-chevron-right"></i></a>
                 <span style="font-weight:900; font-size:13px; color:#fff;"><?= $date_get ?></span>
@@ -243,14 +232,19 @@ function filterSection($channels, $sec) {
             <?php else: foreach($league_settings as $id => $set): if(isset($ordered_matches[$id])): ?>
                 <div class="league-sep"><?= $set['name'] ?></div>
                 <?php foreach($ordered_matches[$id] as $m): 
-                    $h_name = isset($translate[$m['teams']['home']['name']]) ? $translate[$m['teams']['home']['name']] : $m['teams']['home']['name'];
-                    $a_name = isset($translate[$m['teams']['away']['name']]) ? $translate[$m['teams']['away']['name']] : $m['teams']['away']['name'];
-                    $status = isset($translate[$m['fixture']['status']['short']]) ? $translate[$m['fixture']['status']['short']] : $m['fixture']['status']['short'];
+                    // استخدام الأسماء العربية مباشرة من الـ API
+                    $h_name = $m['teams']['home']['name'];
+                    $a_name = $m['teams']['away']['name'];
+                    // ترجمة الحالة فقط يدوياً لأنها تأتي كاختصار
+                    $status = isset($status_translate[$m['fixture']['status']['short']]) ? $status_translate[$m['fixture']['status']['short']] : $m['fixture']['status']['short'];
                 ?>
                     <div class="card" style="margin-bottom:10px;">
                         <div class="m-row">
                             <div class="m-team-col"><img src="<?= $m['teams']['home']['logo'] ?>"><?= $h_name ?></div>
-                            <div class="m-time-box"><?= ($m['fixture']['status']['short'] == 'NS') ? date("H:i", $m['fixture']['timestamp']) : $m['goals']['home'].'-'.$m['goals']['away'] ?><br><small style="font-size:8px; display:block;"><?= $status ?></small></div>
+                            <div class="m-time-box">
+                                <?= ($m['fixture']['status']['short'] == 'NS') ? date("H:i", $m['fixture']['timestamp']) : $m['goals']['home'].'-'.$m['goals']['away'] ?>
+                                <br><small style="font-size:8px; display:block;"><?= $status ?></small>
+                            </div>
                             <div class="m-team-col"><img src="<?= $m['teams']['away']['logo'] ?>"><?= $a_name ?></div>
                         </div>
                     </div>
@@ -258,25 +252,27 @@ function filterSection($channels, $sec) {
         </div>
 
         <div id="section-dual_player" class="channel-section">
-            <div style="background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9; border-radius: 12px; padding: 10px; margin: 35px auto 15px; text-align: center; width: 85%;">
-                <p style="font-size: 10px; font-weight: 700; color: #38bdf8; margin: 0;">أكتم صوت القناة بالضغط على ( <i class="fas fa-volume-mute"></i> ) لتشغيل القناة الاخرى</p>
-            </div>
-            <div class="dual-container">
-                <div class="dual-slot">
-                    <div class="dual-screen-v" id="dual-screen-1"></div>
-                    <button class="dual-btn-select" onclick="openPicker(1)"><i class="fas fa-tv"></i> <span id="btn-text-1">اختر القناة الأولى</span></button>
-                </div>
-                <div class="dual-slot">
-                    <div class="dual-screen-v" id="dual-screen-2"></div>
-                    <button class="dual-btn-select" onclick="openPicker(2)"><i class="fas fa-tv"></i> <span id="btn-text-2">اختر القناة الثانية</span></button>
-                </div>
-            </div>
+             <div class="dual-container" style="margin-top:20px;">
+                <div id="dual-screen-1" class="video-box" style="border-radius:15px; margin-bottom:10px;"></div>
+                <button class="play-btn" onclick="openPicker(1)">اختيار القناة الأولى</button>
+                <div id="dual-screen-2" class="video-box" style="border-radius:15px; margin-bottom:10px;"></div>
+                <button class="play-btn" onclick="openPicker(2)">اختيار القناة الثانية</button>
+             </div>
         </div>
 
         <?php foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
-        <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($s['key'] == 'bein' ? 'active' : '') ?>">
+        <div id="section-<?= $s['key'] ?>" class="channel-section">
             <?php foreach($channels as $ch): ?>
-            <div class="card"><div class="c-head"><div class="name-badge"><?= $ch['name'] ?></div><div class="live-badge"><div class="live-dot"></div> مباشر</div></div><div class="video-box" id="vid-<?= $ch['id'] ?>"></div><button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)"><i class="fas fa-play-circle"></i> تشغيل البث المباشر</button></div>
+            <div class="card">
+                <div class="c-head">
+                    <div class="live-badge"><div class="live-dot"></div> مباشر</div>
+                    <div style="font-size: 10px; opacity: 0.6; font-weight: bold;">بث مباشر</div>
+                </div>
+                <div class="video-box" id="vid-<?= $ch['id'] ?>"></div>
+                <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">
+                    <i class="fas fa-play-circle"></i> <span>تشغيل <?= $ch['name'] ?></span>
+                </button>
+            </div>
             <?php endforeach; ?>
         </div>
         <?php endforeach; ?>
@@ -293,7 +289,6 @@ function confirmPick(url, name) {
     let screen = document.getElementById('dual-screen-' + activeSlot);
     screen.style.backgroundImage = "none";
     screen.innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allowfullscreen></iframe>`;
-    document.getElementById('btn-text-' + activeSlot).innerText = name;
     closePicker();
 }
 function switchSection(id, element) {
@@ -305,7 +300,7 @@ function switchSection(id, element) {
 function startStream(boxId, file, btn) {
     let vBox = document.getElementById(boxId); vBox.style.backgroundImage = "none";
     vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=0" allowfullscreen></iframe>`;
-    btn.innerHTML = '<i class="fas fa-check-circle"></i> متصل الآن'; btn.style.background = "#1e293b";
+    btn.querySelector('span').innerText = 'متصل الآن..'; 
 }
 window.addEventListener('load', () => { setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 1500); });
 setInterval(() => { fetch(window.location.pathname + '?fetch_visitors=1') .then(res => res.text()) .then(c => { document.getElementById('realtime-visitors').innerText = c; }); }, 5000);
