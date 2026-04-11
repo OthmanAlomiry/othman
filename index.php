@@ -4,7 +4,7 @@ error_reporting(0);
 
 // --- إعدادات مباريات اليوم (عثمان) ---
 date_default_timezone_set('Asia/Riyadh');
-$FOOTBALL_API_KEY = '482e3477d907396c2b1f06e099b67774'; 
+$FOOTBALL_API_KEY = '5dc2fedf076a0c9041ea3515dd83d2fa'; 
 $date_get = date('Y-m-d');
 
 // مصفوفة الترجمة الشاملة (عثمان)
@@ -266,16 +266,16 @@ function filterSection($channels, $sec) {
         <?php endif; ?>
 
         <div class="category-tabs">
-            <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>مباريات اليوم</span></div>
+            <div class="cat-item" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>مباريات اليوم</span></div>
             <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>شاشتين</span></div>
             <?php foreach($active_sections as $s): ?>
-                <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
+                <div class="cat-item <?= ($s['key'] == 'beIN') ? 'active' : '' ?>" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
             <?php endforeach; ?>
         </div>
     </div>
 
     <div class="grid">
-        <div id="section-matches_table" class="channel-section active">
+        <div id="section-matches_table" class="channel-section">
             <div class="match-nav">
                 <span style="font-weight:900; font-size:12px; color:#fff;">مباريات اليوم: <?= $date_get ?></span>
             </div>
@@ -322,7 +322,7 @@ function filterSection($channels, $sec) {
         </div>
 
         <?php foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
-        <div id="section-<?= $s['key'] ?>" class="channel-section">
+        <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($s['key'] == 'beIN') ? 'active' : '' ?>">
             <div class="channel-grid">
             <?php foreach($channels as $ch): ?>
             <div class="card">
