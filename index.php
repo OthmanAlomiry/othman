@@ -19,7 +19,7 @@ $translate = [
     'Al-Shabab' => 'الشباب', 'Al-Ettifaq' => 'الاتفاق', 'Al-Fateh' => 'الفتح', 'Al-Taawoun' => 'التعاون',
     'Al-Wehda' => 'الوحـدة', 'Al-Fayha' => 'الفيحاء', 'Abha' => 'أبها', 'Al-Hazem' => 'الحزم',
     'Al-Khaleej' => 'الخليج', 'Al-Okhdood' => 'الأخدود', 'Al-Riyadh' => 'الرياض', 'Al-Tai' => 'الطائي',
-    'Damac' => 'ضمك', 'Al-Qadisiyah' => 'القادسية', 'Al-Orobah' => 'العروبة', 'Al-Kholood' => 'الخلود',
+    'Damac' => 'ضمك', 'Al-Qadisiyah' => 'القادية', 'Al-Orobah' => 'العروبة', 'Al-Kholood' => 'الخلود',
 
     // الدوري الإنجليزي
     'Manchester City' => 'مانشستر سيتي', 'Liverpool' => 'ليفربول', 'Arsenal' => 'أرسنال',
