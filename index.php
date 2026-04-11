@@ -2,9 +2,9 @@
 session_start();
 error_reporting(0);
 
-// --- إعدادات مباريات اليوم (عثمان) ---
+// --- إعدادات جدول المباريات (عثمان) ---
 date_default_timezone_set('Asia/Riyadh');
-$FOOTBALL_API_KEY = '5dc2fedf076a0c9041ea3515dd83d2fa'; 
+$FOOTBALL_API_KEY = '6b9915e3b84f54b3962e5817b9e26e5f'; 
 $date_get = date('Y-m-d');
 
 // مصفوفة الترجمة الشاملة (عثمان)
@@ -19,7 +19,7 @@ $translate = [
     'Al-Shabab' => 'الشباب', 'Al-Ettifaq' => 'الاتفاق', 'Al-Fateh' => 'الفتح', 'Al-Taawoun' => 'التعاون',
     'Al-Wehda' => 'الوحـدة', 'Al-Fayha' => 'الفيحاء', 'Abha' => 'أبها', 'Al-Hazem' => 'الحزم',
     'Al-Khaleej' => 'الخليج', 'Al-Okhdood' => 'الأخدود', 'Al-Riyadh' => 'الرياض', 'Al-Tai' => 'الطائي',
-    'Damac' => 'ضمك', 'Al-Qadisiyah' => 'القادية', 'Al-Orobah' => 'العروبة', 'Al-Kholood' => 'الخلود',
+    'Damac' => 'ضمك', 'Al-Qadisiyah' => 'القادسية', 'Al-Orobah' => 'العروبة', 'Al-Kholood' => 'الخلود',
 
     // الدوري الإنجليزي
     'Manchester City' => 'مانشستر سيتي', 'Liverpool' => 'ليفربول', 'Arsenal' => 'أرسنال',
@@ -231,7 +231,7 @@ function filterSection($channels, $sec) {
 <div class="ad-popup-overlay" id="adPopup">
     <div class="ad-popup-content">
         <div class="ad-close-btn" onclick="closeAd()"><i class="fas fa-times"></i></div>
-        <img src="https://files.catbox.moe/nnkepx.png" class="ad-popup-image" alt="إعلان">
+        <img src="https://files.catbox.moe/7pik4r.png" class="ad-popup-image" alt="إعلان">
         <a href="https://wa.me/966505571164" class="ad-subscribe-btn">
             <i class="fab fa-whatsapp"></i> اشترك الآن عبر واتساب
         </a>
@@ -258,7 +258,7 @@ function filterSection($channels, $sec) {
             <a href="https://wa.me/966505571164" class="social-btn btn-wa">واتساب</a>
             <a href="https://t.me/d_s_pro" class="social-btn btn-tg">تليجرام</a>
             <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-sn">سناب</a>
-            <a href="https://x.com/d_service_pro" class="social-btn btn-tw">منصة X</a>
+            <a href="https://x.com/d_service_pro" class="social-btn btn-tw">تويتر</a>
         </div>
 
         <?php if($news['status'] == 'show'): ?>
@@ -266,22 +266,22 @@ function filterSection($channels, $sec) {
         <?php endif; ?>
 
         <div class="category-tabs">
-            <div class="cat-item" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>مباريات اليوم</span></div>
+            <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
             <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>شاشتين</span></div>
             <?php foreach($active_sections as $s): ?>
-                <div id="tab-<?= $s['key'] ?>" class="cat-item <?= ($s['key'] == 'beIN') ? 'active' : '' ?>" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
+                <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
             <?php endforeach; ?>
         </div>
     </div>
 
     <div class="grid">
-        <div id="section-matches_table" class="channel-section">
+        <div id="section-matches_table" class="channel-section active">
             <div class="match-nav">
                 <span style="font-weight:900; font-size:12px; color:#fff;">مباريات اليوم: <?= $date_get ?></span>
             </div>
             <div class="match-grid-container">
             <?php if(empty($ordered_matches)): ?>
-                <p style="text-align:center; opacity:0.5; padding:20px; grid-column: 1/-1;">لا توجد مباريات هامة لهذا التاريخ</p>
+                <p style="text-align:center; opacity:0.5; padding:20px; grid-column: 1/-1;">قريبا.. الجدول تحت الصيانة | مشاهدة ممتعة</p>
             <?php else: foreach($league_settings as $id => $set): if(isset($ordered_matches[$id])): ?>
                 <div class="league-sep"><?= $set['name'] ?></div>
                 <?php foreach($ordered_matches[$id] as $m): 
@@ -322,7 +322,7 @@ function filterSection($channels, $sec) {
         </div>
 
         <?php foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
-        <div id="section-<?= $s['key'] ?>" class="channel-section <?= ($s['key'] == 'beIN') ? 'active' : '' ?>">
+        <div id="section-<?= $s['key'] ?>" class="channel-section">
             <div class="channel-grid">
             <?php foreach($channels as $ch): ?>
             <div class="card">
@@ -342,6 +342,7 @@ function filterSection($channels, $sec) {
 <script>
 let activeSlot = 0; 
 
+// وظائف الإعلان المنبثق
 function closeAd() { document.getElementById('adPopup').style.display = 'none'; }
 
 function openPicker(slot) { activeSlot = slot; document.getElementById('ch-picker').style.display = 'flex'; }
@@ -357,7 +358,7 @@ function switchSection(id, element) {
     document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
     document.getElementById('section-' + id).classList.add('active');
-    if(element) element.classList.add('active');
+    element.classList.add('active');
 }
 function startStream(boxId, file, btn) {
     let vBox = document.getElementById(boxId); vBox.style.backgroundImage = "none";
@@ -368,9 +369,7 @@ function startStream(boxId, file, btn) {
 window.addEventListener('load', () => { 
     setTimeout(() => { 
         document.getElementById('pro-intro').classList.add('intro-hide');
-        // تأكيد فتح قسم beIN برمجياً عند التحميل
-        switchSection('beIN', document.getElementById('tab-beIN'));
-        
+        // إظهار الإعلان بعد اختفاء صفحة التحميل بـ 500 ملي ثانية
         setTimeout(() => {
             document.getElementById('adPopup').style.display = 'flex';
         }, 500);
