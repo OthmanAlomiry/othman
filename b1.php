@@ -1,7 +1,7 @@
 <?php
 
-$base = "http://sportook.online/BEIN-SP1/tracks-v1a1/";
-$file = "mono.m3u8";
+$base = "http://172.238.122.153/bein1/";
+$file = "index.m3u8";
 
 function stream($url){
 
