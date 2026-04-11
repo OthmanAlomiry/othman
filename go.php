@@ -2,7 +2,7 @@
 session_start();
 error_reporting(0);
 
-// --- إعدادات جدول المباريات ---
+// --- إعدادات جدول المباريات (إضافة عثمان) ---
 date_default_timezone_set('Asia/Riyadh');
 $FOOTBALL_API_KEY = '6b9915e3b84f54b3962e5817b9e26e5f'; 
 
@@ -10,10 +10,28 @@ $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 
-// مصفوفة الحالات الثابتة
-$status_translate = [
+// مصفوفة الترجمة الشاملة (عثمان)
+$translate = [
+    // الحالات
     'NS' => 'لم تبدأ', 'FT' => 'انتهت', '1H' => 'شوط 1', '2H' => 'شوط 2', 
-    'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة', 'CANC' => 'ملغاة'
+    'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة', 'CANC' => 'ملغاة',
+    'TBD' => 'يحدد لاحقاً', 'ABD' => 'ملغاة', 'LIVE' => 'مباشر',
+
+    // أندية الدوري السعودي
+    'Al-Hilal' => 'الهلال', 'Al-Nassr' => 'النصر', 'Al-Ittihad' => 'الاتحاد', 'Al-Ahli' => 'الأهلي',
+    'Al-Shabab' => 'الشباب', 'Al-Ettifaq' => 'الاتفاق', 'Al-Fateh' => 'الفتح', 'Al-Taawoun' => 'التعاون',
+    'Al-Wehda' => 'الوحـدة', 'Al-Fayha' => 'الفيحاء', 'Abha' => 'أبها', 'Al-Hazem' => 'الحزم',
+    'Al-Khaleej' => 'الخليج', 'Al-Okhdood' => 'الأخدود', 'Al-Riyadh' => 'الرياض', 'Al-Tai' => 'الطائي',
+    'Damac' => 'ضمك', 'Al-Qadisiyah' => 'القادسية', 'Al-Orobah' => 'العروبة', 'Al-Kholood' => 'الخلود',
+
+    // أندية عالمية
+    'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Atletico Madrid' => 'أتلتيكو مدريد',
+    'Manchester City' => 'مانشستر سيتي', 'Liverpool' => 'ليفربول', 'Arsenal' => 'أرسنال',
+    'Manchester United' => 'مانشستر يونايتد', 'Chelsea' => 'تشيلسي', 'Tottenham' => 'توتنهام',
+    'Bayern Munich' => 'بايرن ميونخ', 'Borussia Dortmund' => 'بوروسيا دورتموند', 'Bayer Leverkusen' => 'ليفركوزن',
+    'Paris Saint Germain' => 'باريس سان جيرمان', 'AC Milan' => 'ميلان', 'Inter' => 'إنتر ميلان',
+    'Juventus' => 'يوفنتوس', 'AS Roma' => 'روما', 'Napoli' => 'نابولي', 'Lazio' => 'لاتسيو',
+    'Aston Villa' => 'أستون فيلا', 'Newcastle' => 'نيوكاسل', 'Girona' => 'جيرونا'
 ];
 
 $league_settings = array(
@@ -59,7 +77,6 @@ if (!empty($fixtures)) {
     }
 }
 
-// --- بيانات السحابة الأصلية ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69d6f6b636566621a891e6c1';
 
@@ -101,41 +118,36 @@ function filterSection($channels, $sec) {
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
+        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); --blue-grad: linear-gradient(45deg, #0ea5e9, #fff); }
         
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
 
-        /* إخفاء شريط جوجل العلوي المزعج */
-        .goog-te-banner-frame.skiptranslate, .goog-te-gadget-icon { display: none !important; }
-        body { top: 0px !important; }
-        .goog-te-gadget-simple { background-color: transparent !important; border: none !important; padding: 0 !important; font-size: 0 !important; }
-        #google_translate_element { display: none; }
-
-        .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; }
+        .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: max-width 0.4s; }
 
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
         .loader-content { display: flex; flex-direction: column; align-items: center; }
-        .intro-icon-box { width: 100px; height: 100px; background: var(--main); border-radius: 30%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(225, 29, 72, 0.5); animation: bounceIn 1s ease-out; }
+        .intro-icon-box { width: 100px; height: 100px; background: var(--main); border-radius: 30%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(225, 29, 72, 0.5); animation: bounceIn 1s ease-out, glowPulse 2s infinite ease-in-out; }
         .intro-icon-box i { font-size: 50px; color: white; }
-        .intro-title { margin-top: 25px; color: white; font-weight: 900; font-size: 24px; }
+        .intro-title { margin-top: 25px; color: white; font-weight: 900; font-size: 24px; letter-spacing: 1px; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .loading-bar { width: 150px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 30px; overflow: hidden; position: relative; }
         .loading-bar::after { content: ""; position: absolute; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--main), transparent); animation: loadingMove 1.5s infinite; }
+        @keyframes glowPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes loadingMove { 100% { left: 100%; } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
+        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: max-width 0.4s; }
         
-        .visitors-badge-float { position: fixed; bottom: 25px; left: 25px; width: 45px; height: 45px; background: rgba(34, 197, 94, 0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 5000; border: 1.5px solid #22c55e; }
+        .visitors-badge-float { position: fixed; bottom: 25px; left: 25px; width: 45px; height: 45px; background: rgba(34, 197, 94, 0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1.5px solid #22c55e; }
 
-        .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; padding: 0 10px; }
-        .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; text-align: center; border: 1.5px solid #ffffff; }
+        .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; flex-wrap: nowrap; padding: 0 10px; }
+        .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; transition: 0.3s; flex: 1; text-align: center; border: 1.5px solid #ffffff; }
         .btn-wa { background: #25d366; } .btn-tg { background: #0088cc; } .btn-sn { background: #FFFC00; color: #000 !important; } .btn-tw { background: #000; }
 
-        .news-ticker { background: rgba(225, 29, 72, 0.15); height: 32px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; position: relative; }
+        .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); height: 32px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
-        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; }
-        .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 45s linear infinite; }
+        .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; display: flex; align-items: center; }
+        .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 45s linear infinite; width: max-content; }
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
@@ -150,37 +162,45 @@ function filterSection($channels, $sec) {
         .channel-section.active { display: block; animation: slideUp 0.6s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 20px; }
+        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 20px; width: 100%; }
         .c-head { padding: 10px 15px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         
         .live-badge { display: flex; align-items: center; gap: 5px; background: rgba(225, 29, 72, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(225, 29, 72, 0.4); color: #ff4d4d; font-weight: 900; font-size: 11px; }
         .live-dot { width: 7px; height: 7px; background: #ff4d4d; border-radius: 50%; animation: pulse-red 1.2s infinite; }
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 77, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
 
-        .play-btn { width: 92%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); color: #fff; border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; font-weight: 900; cursor: pointer; transition: 0.4s; }
+        .play-btn { width: 92%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); color: #fff; border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 14px; transition: 0.4s; }
+        .play-btn i { font-size: 18px; color: var(--main); }
 
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; overflow: hidden; }
-        .video-box iframe { position: absolute; top:0; left:0; width: 100%; height: 100%; border: none; }
+        .video-box iframe { position: absolute; top:0; left:0; width: 100%; height: 100%; border: none; background: #000; }
 
-        .match-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--glass); padding: 10px; border-radius: 15px; border: 1px solid var(--glass-border); }
-        .match-nav a { color: #fff; background: rgba(255,255,255,0.1); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; }
-        .league-sep { background: rgba(255, 255, 255, 0.07); padding: 8px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; margin: 15px 0 10px; border-right: 4px solid var(--main); color: #fff; }
+        .match-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--glass); padding: 10px; border-radius: 15px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+        .match-nav a { color: #fff; background: rgba(255,255,255,0.1); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; border: 1px solid var(--glass-border); }
+        .league-sep { background: rgba(255, 255, 255, 0.07); padding: 8px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; margin: 15px 0 10px; border-right: 4px solid var(--main); color: #fff; border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); }
         .m-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; text-align: center; }
         .m-team-col { flex: 1; font-size: 11px; font-weight: 700; color: #fff; }
         .m-team-col img { width: 32px; height: 32px; display: block; margin: 0 auto 8px; }
         .m-time-box { flex: 0.6; background: rgba(225, 29, 72, 0.1); border: 1px solid rgba(225, 29, 72, 0.3); padding: 5px; border-radius: 10px; font-weight: 900; font-size: 13px; color: var(--main); }
 
+        .dual-container { padding: 5px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .dual-slot { background: rgba(0,0,0,0.3); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); width: 85%; }
+        .dual-screen-v { width: 100%; aspect-ratio: 16/9; background-color: #000; position: relative; background-size: cover; background-position: center; }
+        #dual-screen-1 { background-image: url('mg/chn1.png'); }
+        #dual-screen-2 { background-image: url('mg/chn2.png'); }
+        .dual-btn-select { width: 100%; padding: 10px; background: #111827; border: none; color: #38bdf8; font-family: 'Tajawal'; font-weight: 700; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
         .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 7000; display: none; align-items: center; justify-content: center; }
-        .ch-picker-window { width: 95%; max-width: 480px; background: #0f172a; border-radius: 25px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column; }
-        .ch-picker-header { padding: 20px; background: var(--main); color: white; font-weight: 900; display: flex; justify-content: space-between; }
-        .ch-picker-list { padding: 15px; overflow-y: auto; display: grid; gap: 10px; }
-        .ch-pick-item { background: rgba(255,255,255,0.08); padding: 18px; border-radius: 15px; text-align: right; cursor: pointer; color: #fff; }
+        .ch-picker-window { width: 95%; max-width: 480px; background: #0f172a; border-radius: 25px; border: 1px solid var(--glass-border); max-height: 80vh; overflow: hidden; display: flex; flex-direction: column; }
+        .ch-picker-header { padding: 20px; background: var(--main); color: white; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .ch-picker-list { padding: 15px; overflow-y: auto; display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .ch-pick-item { background: rgba(255,255,255,0.08); padding: 18px; border-radius: 15px; font-size: 14px; font-weight: 700; text-align: right; border: 1.5px solid rgba(255,255,255,0.1); cursor: pointer; color: #fff; transition: 0.2s; display: flex; align-items: center; gap: 15px; }
 
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         footer { text-align: center; padding: 40px; font-size: 10px; opacity: 0.5; }
     </style>
 </head>
-<body class="notranslate"> <div id="google_translate_element"></div>
+<body>
 
 <div id="pro-intro">
     <div class="loader-content">
@@ -228,7 +248,7 @@ function filterSection($channels, $sec) {
     </div>
 
     <div class="grid">
-        <div id="section-matches_table" class="channel-section active translate">
+        <div id="section-matches_table" class="channel-section active">
             <div class="match-nav">
                 <a href="?d=<?= $prev_date ?>"><i class="fas fa-chevron-right"></i></a>
                 <span style="font-weight:900; font-size:13px; color:#fff;"><?= $date_get ?></span>
@@ -239,9 +259,14 @@ function filterSection($channels, $sec) {
             <?php else: foreach($league_settings as $id => $set): if(isset($ordered_matches[$id])): ?>
                 <div class="league-sep"><?= $set['name'] ?></div>
                 <?php foreach($ordered_matches[$id] as $m): 
-                    $h_name = $m['teams']['home']['name'];
-                    $a_name = $m['teams']['away']['name'];
-                    $status = isset($status_translate[$m['fixture']['status']['short']]) ? $status_translate[$m['fixture']['status']['short']] : $m['fixture']['status']['short'];
+                    // نظام الترجمة اليدوي (عثمان)
+                    $h_raw = $m['teams']['home']['name'];
+                    $a_raw = $m['teams']['away']['name'];
+                    $s_raw = $m['fixture']['status']['short'];
+
+                    $h_name = isset($translate[$h_raw]) ? $translate[$h_raw] : $h_raw;
+                    $a_name = isset($translate[$a_raw]) ? $translate[$a_raw] : $a_raw;
+                    $status = isset($translate[$s_raw]) ? $translate[$s_raw] : $s_raw;
                 ?>
                     <div class="card" style="margin-bottom:10px;">
                         <div class="m-row">
@@ -257,12 +282,19 @@ function filterSection($channels, $sec) {
         </div>
 
         <div id="section-dual_player" class="channel-section">
-             <div class="dual-container" style="margin-top:20px;">
-                <div id="dual-screen-1" class="video-box" style="border-radius:15px; margin-bottom:10px;"></div>
-                <button class="play-btn" onclick="openPicker(1)">اختيار القناة الأولى</button>
-                <div id="dual-screen-2" class="video-box" style="border-radius:15px; margin-bottom:10px;"></div>
-                <button class="play-btn" onclick="openPicker(2)">اختيار القناة الثانية</button>
-             </div>
+            <div style="background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9; border-radius: 12px; padding: 10px; margin: 35px auto 15px; text-align: center; width: 85%;">
+                <p style="font-size: 10px; font-weight: 700; color: #38bdf8; margin: 0;">أكتم صوت القناة بالضغط على ( <i class="fas fa-volume-mute"></i> ) لتشغيل القناة الاخرى</p>
+            </div>
+            <div class="dual-container">
+                <div class="dual-slot">
+                    <div class="dual-screen-v" id="dual-screen-1"></div>
+                    <button class="dual-btn-select" onclick="openPicker(1)"><i class="fas fa-tv"></i> <span id="btn-text-1">اختر القناة الأولى</span></button>
+                </div>
+                <div class="dual-slot">
+                    <div class="dual-screen-v" id="dual-screen-2"></div>
+                    <button class="dual-btn-select" onclick="openPicker(2)"><i class="fas fa-tv"></i> <span id="btn-text-2">اختر القناة الثانية</span></button>
+                </div>
+            </div>
         </div>
 
         <?php foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
@@ -285,31 +317,7 @@ function filterSection($channels, $sec) {
     <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية © 2026</footer>
 </div>
 
-<script type="text/javascript">
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'en',
-    includedLanguages: 'ar',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-</script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
 <script>
-// وظيفة إجبارية لبدء الترجمة للعربية فوراً
-function triggerTranslate() {
-    const googleDiv = document.querySelector(".goog-te-combo");
-    if (googleDiv) {
-        googleDiv.value = "ar";
-        googleDiv.dispatchEvent(new Event('change'));
-    } else {
-        setTimeout(triggerTranslate, 500);
-    }
-}
-window.addEventListener('load', triggerTranslate);
-
 let activeSlot = 0; 
 function openPicker(slot) { activeSlot = slot; document.getElementById('ch-picker').style.display = 'flex'; }
 function closePicker() { document.getElementById('ch-picker').style.display = 'none'; }
@@ -318,6 +326,7 @@ function confirmPick(url, name) {
     let screen = document.getElementById('dual-screen-' + activeSlot);
     screen.style.backgroundImage = "none";
     screen.innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allowfullscreen></iframe>`;
+    document.getElementById('btn-text-' + activeSlot).innerText = name;
     closePicker();
 }
 function switchSection(id, element) {
