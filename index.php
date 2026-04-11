@@ -342,7 +342,6 @@ function filterSection($channels, $sec) {
 <script>
 let activeSlot = 0; 
 
-// وظائف الإعلان المنبثق
 function closeAd() { document.getElementById('adPopup').style.display = 'none'; }
 
 function openPicker(slot) { activeSlot = slot; document.getElementById('ch-picker').style.display = 'flex'; }
@@ -369,7 +368,6 @@ function startStream(boxId, file, btn) {
 window.addEventListener('load', () => { 
     setTimeout(() => { 
         document.getElementById('pro-intro').classList.add('intro-hide');
-        // إظهار الإعلان بعد اختفاء صفحة التحميل بـ 500 ملي ثانية
         setTimeout(() => {
             document.getElementById('adPopup').style.display = 'flex';
         }, 500);
