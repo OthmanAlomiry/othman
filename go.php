@@ -10,12 +10,14 @@ $date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
 $prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
 $next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
 
-// مصفوفة الترجمة المحدثة
+// مصفوفة الترجمة (تأكد من مطابقة الأسماء تماماً كما تأتي من API)
 $translate = [
     'NS' => 'لم تبدأ', 'FT' => 'انتهت', '1H' => 'شوط 1', '2H' => 'شوط 2', 
-    'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة',
+    'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة', 'CANC' => 'ملغاة', 'ABD' => 'متوقفة',
     'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Al Hilal' => 'الهلال', 
-    'Al Nassr' => 'النصر', 'Al Ittihad' => 'الاتحاد', 'Al Ahli' => 'الأهلي'
+    'Al Nassr' => 'النصر', 'Al Ittihad' => 'الاتحاد', 'Al Ahli' => 'الأهلي',
+    'Manchester City' => 'مانشستر سيتي', 'Liverpool' => 'ليفربول', 'Arsenal' => 'أرسنال',
+    'Bayern Munich' => 'بايرن ميونخ', 'Paris Saint Germain' => 'باريس سان جيرمان'
 ];
 
 $league_settings = array(
@@ -120,10 +122,10 @@ function filterSection($channels, $sec) {
         .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; text-align: center; border: 1px solid rgba(255,255,255,0.3); }
         .btn-wa { background: #25d366; } .btn-tg { background: #0088cc; } .btn-sn { background: #FFFC00; color: #000 !important; } .btn-tw { background: #000; }
 
-        /* الشريط الإخباري - من اليسار لليمين وبسرعة أبطأ */
         .news-ticker { background: rgba(225, 29, 72, 0.15); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); height: 32px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; position: relative; }
         .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
-        .ticker-move { display: flex; white-space: nowrap; animation: ticker-scroll 35s linear infinite; }
+        /* تقليل سرعة الشريط الإخباري (45 ثانية) */
+        .ticker-move { display: flex; white-space: nowrap; animation: ticker-scroll 45s linear infinite; }
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding-right: 100px; }
         @keyframes ticker-scroll { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
@@ -137,12 +139,12 @@ function filterSection($channels, $sec) {
         .channel-section { display: none; width: 100%; }
         .channel-section.active { display: block; }
         
-        /* كروت القنوات الزجاجية عثمان */
-        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); margin-bottom: 20px; width: 100%; backdrop-filter: blur(10px); }
-        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; }
+        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); margin-bottom: 20px; width: 100%; backdrop-filter: blur(10px); position: relative; }
+        /* إصلاح تنسيق الفيديو داخل الكرت */
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; overflow: hidden; }
+        .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
         
-        /* أيقونة تشغيل زجاجية احترافية */
-        .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 14px; border-radius: 15px; color: #fff; font-weight: 900; font-size: 13px; cursor: pointer; transition: 0.4s; backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .play-btn { width: 90%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 14px; border-radius: 15px; color: #fff; font-weight: 900; font-size: 13px; cursor: pointer; transition: 0.4s; backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; z-index: 5; }
         .play-btn i { font-size: 18px; color: var(--main); text-shadow: 0 0 10px rgba(225, 29, 72, 0.5); }
         .play-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); border-color: var(--main); }
 
@@ -153,16 +155,6 @@ function filterSection($channels, $sec) {
         .m-team-col { flex: 1; font-size: 11px; font-weight: 700; color: #fff; }
         .m-team-col img { width: 32px; height: 32px; display: block; margin: 0 auto 8px; }
         .m-time-box { flex: 0.6; background: rgba(225, 29, 72, 0.1); border: 1px solid rgba(225, 29, 72, 0.3); padding: 5px; border-radius: 10px; font-weight: 900; font-size: 13px; color: var(--main); }
-
-        .dual-container { padding: 5px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .dual-slot { background: rgba(0,0,0,0.3); border-radius: 15px; overflow: hidden; border: 1px solid var(--glass-border); width: 90%; }
-        .dual-screen-v { width: 100%; aspect-ratio: 16/9; background-color: #000; position: relative; }
-        .dual-btn-select { width: 100%; padding: 12px; background: rgba(14, 165, 233, 0.1); border: none; color: #38bdf8; font-family: 'Tajawal'; font-weight: 700; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-top: 1px solid rgba(14, 165, 233, 0.2); }
-
-        .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 7000; display: none; align-items: center; justify-content: center; }
-        .ch-picker-window { width: 95%; max-width: 480px; background: #0f172a; border-radius: 25px; max-height: 80vh; overflow-y: auto; border: 1px solid var(--glass-border); }
-        .ch-pick-item { padding: 18px; border-bottom: 1px solid var(--glass-border); color: #fff; cursor: pointer; text-align: right; font-weight: 700; transition: 0.3s; }
-        .ch-pick-item:hover { background: var(--main); }
 
         footer { text-align: center; padding: 40px; font-size: 10px; opacity: 0.5; color: #fff; }
         .visitors-badge-float { position: fixed; bottom: 25px; left: 25px; width: 45px; height: 45px; background: rgba(34, 197, 94, 0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1.5px solid #22c55e; }
@@ -221,8 +213,11 @@ function filterSection($channels, $sec) {
             <?php else: foreach($league_settings as $id => $set): if(isset($ordered_matches[$id])): ?>
                 <div class="league-sep"><?= $set['name'] ?></div>
                 <?php foreach($ordered_matches[$id] as $m): 
-                    $h_name = isset($translate[$m['teams']['home']['name']]) ? $translate[$m['teams']['home']['name']] : $m['teams']['home']['name'];
-                    $a_name = isset($translate[$m['teams']['away']['name']]) ? $translate[$m['teams']['away']['name']] : $m['teams']['away']['name'];
+                    // إصلاح الترجمة عبر trim() لمطابقة الأسماء بدقة
+                    $h_raw = trim($m['teams']['home']['name']);
+                    $a_raw = trim($m['teams']['away']['name']);
+                    $h_name = isset($translate[$h_raw]) ? $translate[$h_raw] : $h_raw;
+                    $a_name = isset($translate[$a_raw]) ? $translate[$a_raw] : $a_raw;
                     $status = isset($translate[$m['fixture']['status']['short']]) ? $translate[$m['fixture']['status']['short']] : $m['fixture']['status']['short'];
                 ?>
                     <div class="card" style="margin-bottom:10px;">
@@ -285,8 +280,10 @@ function switchSection(id, element) {
     element.classList.add('active');
 }
 function startStream(boxId, file, btn) {
-    let vBox = document.getElementById(boxId); vBox.style.backgroundImage = "none";
-    vBox.innerHTML = `<iframe src="${file}?autoplay=1" allowfullscreen></iframe>`;
+    let vBox = document.getElementById(boxId); 
+    vBox.style.backgroundImage = "none";
+    // إضافة تصفير للهوامش لضمان ملء الإطار بالكامل
+    vBox.innerHTML = `<iframe src="${file}?autoplay=1" allowfullscreen style="width:100%; height:100%;"></iframe>`;
     btn.innerHTML = '<i class="fas fa-check-circle"></i> متصل الآن';
     btn.style.background = "rgba(34, 197, 94, 0.2)";
 }
