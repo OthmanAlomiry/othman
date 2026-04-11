@@ -2,7 +2,7 @@
 session_start();
 error_reporting(0);
 
-// --- إعدادات مباريات اليوم (عثمان) ---
+// --- إعدادات جدول المباريات (عثمان) ---
 date_default_timezone_set('Asia/Riyadh');
 $FOOTBALL_API_KEY = '6b9915e3b84f54b3962e5817b9e26e5f'; 
 $date_get = date('Y-m-d');
@@ -42,7 +42,7 @@ $translate = [
 
     // أندية عالمية أخرى
     'Bayern Munich' => 'بايرن ميونخ', 'Borussia Dortmund' => 'بوروسيا دورتموند', 'Bayer Leverkusen' => 'ليفركوزن',
-    'RB Leipzig' => 'لايبزيج', 'Paris Saint Germain' => 'باريس سان جيرمان', 'Marseille' => 'مارسيليا',
+    'RB Leipzig' => 'لايبزيج', 'Paris Saint Germain' => 'برايتون', 'Marseille' => 'مارسيليا',
     'Lyon' => 'ليون', 'Monaco' => 'موناكو', 'Benfica' => 'بنفيكا', 'Porto' => 'بورتو', 'Sporting CP' => 'سبورتينج لشبونة'
 ];
 
@@ -156,6 +156,14 @@ function filterSection($channels, $sec) {
         @keyframes glowPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes loadingMove { 100% { left: 100%; } }
 
+        /* نافذة الإعلان المنبثقة */
+        .ad-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 8000; display: none; align-items: center; justify-content: center; }
+        .ad-popup-content { position: relative; width: 85%; max-width: 320px; animation: popZoom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .ad-popup-image { width: 100%; border-radius: 20px; border: 2px solid var(--glass-border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: block; }
+        .ad-close-btn { position: absolute; top: -15px; right: -15px; width: 35px; height: 35px; background: var(--main); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; border: 2px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10; }
+        .ad-subscribe-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #25d366; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); border: 2px solid white; white-space: nowrap; }
+        @keyframes popZoom { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: 0.4s; }
         
         .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; padding: 0 10px; }
@@ -220,6 +228,16 @@ function filterSection($channels, $sec) {
     </div>
 </div>
 
+<div class="ad-popup-overlay" id="adPopup">
+    <div class="ad-popup-content">
+        <div class="ad-close-btn" onclick="closeAd()"><i class="fas fa-times"></i></div>
+        <img src="https://files.catbox.moe/7pik4r.png" class="ad-popup-image" alt="إعلان">
+        <a href="https://wa.me/966505571164" class="ad-subscribe-btn">
+            <i class="fab fa-whatsapp"></i> اشترك الآن عبر واتساب
+        </a>
+    </div>
+</div>
+
 <div class="ch-picker-overlay" id="ch-picker">
     <div class="ch-picker-window">
         <div class="ch-picker-header"><span>📺 قائمة القنوات</span><i class="fas fa-times" onclick="closePicker()" style="cursor:pointer;"></i></div>
@@ -248,7 +266,7 @@ function filterSection($channels, $sec) {
         <?php endif; ?>
 
         <div class="category-tabs">
-            <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>مباريات اليوم</span></div>
+            <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
             <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>شاشتين</span></div>
             <?php foreach($active_sections as $s): ?>
                 <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
@@ -323,6 +341,10 @@ function filterSection($channels, $sec) {
 
 <script>
 let activeSlot = 0; 
+
+// وظائف الإعلان المنبثق
+function closeAd() { document.getElementById('adPopup').style.display = 'none'; }
+
 function openPicker(slot) { activeSlot = slot; document.getElementById('ch-picker').style.display = 'flex'; }
 function closePicker() { document.getElementById('ch-picker').style.display = 'none'; }
 function confirmPick(url, name) {
@@ -343,7 +365,17 @@ function startStream(boxId, file, btn) {
     vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=0" allowfullscreen></iframe>`;
     btn.querySelector('span').innerText = 'متصل الآن..'; 
 }
-window.addEventListener('load', () => { setTimeout(() => { document.getElementById('pro-intro').classList.add('intro-hide'); }, 1500); });
+
+window.addEventListener('load', () => { 
+    setTimeout(() => { 
+        document.getElementById('pro-intro').classList.add('intro-hide');
+        // إظهار الإعلان بعد اختفاء صفحة التحميل بـ 500 ملي ثانية
+        setTimeout(() => {
+            document.getElementById('adPopup').style.display = 'flex';
+        }, 500);
+    }, 1500); 
+});
+
 setInterval(() => { fetch(window.location.pathname + '?fetch_visitors=1').then(res => res.text()).then(c => { document.getElementById('realtime-visitors').innerText = c; }); }, 5000);
 </script>
 </body>
