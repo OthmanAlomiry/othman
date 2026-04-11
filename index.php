@@ -2,7 +2,7 @@
 session_start();
 error_reporting(0);
 
-// --- إعدادات جدول المباريات (عثمان) ---
+// --- إعدادات مباريات اليوم (عثمان) ---
 date_default_timezone_set('Asia/Riyadh');
 $FOOTBALL_API_KEY = '6b9915e3b84f54b3962e5817b9e26e5f'; 
 $date_get = date('Y-m-d');
@@ -248,7 +248,7 @@ function filterSection($channels, $sec) {
         <?php endif; ?>
 
         <div class="category-tabs">
-            <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
+            <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>مباريات اليوم</span></div>
             <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>شاشتين</span></div>
             <?php foreach($active_sections as $s): ?>
                 <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
