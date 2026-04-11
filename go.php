@@ -6,65 +6,32 @@ error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 $FOOTBALL_API_KEY = '6b9915e3b84f54b3962e5817b9e26e5f'; 
 
-$date_get = isset($_GET['d']) ? $_GET['d'] : date('Y-m-d');
-$prev_date = date('Y-m-d', strtotime($date_get .' -1 day'));
-$next_date = date('Y-m-d', strtotime($date_get .' +1 day'));
+// جعل التاريخ دائماً اليوم الحالي (حذف التنقل)
+$date_get = date('Y-m-d');
 
-// مصفوفة الترجمة الذكية - كلمات مفتاحية (عثمان)
+// مصفوفة الترجمة الشاملة (عثمان)
 $translate = [
     // الحالات
     'NS' => 'لم تبدأ', 'FT' => 'انتهت', '1H' => 'شوط 1', '2H' => 'شوط 2', 
     'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة', 'CANC' => 'ملغاة',
     'TBD' => 'يحدد لاحقاً', 'ABD' => 'ملغاة', 'LIVE' => 'مباشر',
 
-    // الدوري السعودي (كلمات مفتاحية للبحث الجزئي)
-    'Hilal' => 'الهلال', 'Nassr' => 'النصر', 'Ittihad' => 'الاتحاد', 'Ahli' => 'الأهلي',
-    'Shabab' => 'الشباب', 'Ettifaq' => 'الاتفاق', 'Fateh' => 'الفتح', 'Taawoun' => 'التعاون',
-    'Wehda' => 'الوحدة', 'Fayha' => 'الفيحاء', 'Abha' => 'أبها', 'Hazem' => 'الحزم',
-    'Khaleej' => 'الخليج', 'Okhdood' => 'الأخدود', 'Riyadh' => 'الرياض', 'Tai' => 'الطائي',
-    'Damac' => 'ضمك', 'Qadisiyah' => 'القادسية', 'Orobah' => 'العروبة', 'Kholood' => 'الخلود',
+    // أندية الدوري السعودي
+    'Al-Hilal' => 'الهلال', 'Al-Nassr' => 'النصر', 'Al-Ittihad' => 'الاتحاد', 'Al-Ahli' => 'الأهلي',
+    'Al-Shabab' => 'الشباب', 'Al-Ettifaq' => 'الاتفاق', 'Al-Fateh' => 'الفتح', 'Al-Taawoun' => 'التعاون',
+    'Al-Wehda' => 'الوحـدة', 'Al-Fayha' => 'الفيحاء', 'Abha' => 'أبها', 'Al-Hazem' => 'الحزم',
+    'Al-Khaleej' => 'الخليج', 'Al-Okhdood' => 'الأخدود', 'Al-Riyadh' => 'الرياض', 'Al-Tai' => 'الطائي',
+    'Damac' => 'ضمك', 'Al-Qadisiyah' => 'القادسية', 'Al-Orobah' => 'العروبة', 'Al-Kholood' => 'الخلود',
 
-    // الدوري الإنجليزي
-    'Man City' => 'مانشستر سيتي', 'Manchester City' => 'مانشستر سيتي', 'Liverpool' => 'ليفربول', 
-    'Arsenal' => 'أرسنال', 'Man United' => 'مانشستر يونايتد', 'Manchester United' => 'مانشستر يونايتد', 
-    'Chelsea' => 'تشيلسي', 'Tottenham' => 'توتنهام', 'Aston Villa' => 'أستون فيلا', 
-    'Newcastle' => 'نيوكاسل', 'West Ham' => 'وست هام', 'Brighton' => 'برايتون',
-    'Wolverhampton' => 'وولفرهامبتون', 'Everton' => 'إيفرتون', 'Leicester' => 'ليستر سيتي',
-
-    // الدوري الإسباني
-    'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Atletico' => 'أتلتيكو مدريد', 
-    'Sevilla' => 'اشبيلية', 'Sociedad' => 'سوسيداد', 'Betis' => 'بيتيس', 'Villarreal' => 'فيا ريال',
-    'Girona' => 'جيرونا', 'Athletic' => 'أتلتيك بيلباو', 'Valencia' => 'فالنسيا', 'Getafe' => 'خيتافي',
-
-    // الدوري الإيطالي
-    'Inter' => 'إنتر ميلان', 'Milan' => 'ميلان', 'Juventus' => 'يوفنتوس', 'Roma' => 'روما', 
-    'Napoli' => 'نابولي', 'Lazio' => 'لاتسيو', 'Atalanta' => 'أتالانتا', 'Fiorentina' => 'فيورنتينا',
-    'Bologna' => 'بولونيا', 'Torino' => 'تورينو',
-
-    // الدوري الألماني
-    'Bayern' => 'بايرن ميونخ', 'Dortmund' => 'دورتموند', 'Leverkusen' => 'ليفركوزن', 
-    'Leipzig' => 'لايبزيج', 'Frankfurt' => 'فرانكفورت', 'Stuttgart' => 'شتوتجارت',
-    'Wolfsburg' => 'فولفسبورج', 'Monchengladbach' => 'مونشنغلادباخ',
-
-    // الدوري الفرنسي
-    'Paris' => 'باريس سان جيرمان', 'PSG' => 'باريس سان جيرمان', 'Marseille' => 'مارسيليا', 
-    'Monaco' => 'موناكو', 'Lyon' => 'ليون', 'Lille' => 'ليل', 'Nice' => 'نيس',
-
-    // أندية عربية وأوروبية أخرى
-    'Al Ain' => 'العين', 'Sharjah' => 'الشارقة', 'Shabab Al Ahli' => 'شباب الأهلي',
-    'Zamalek' => 'الزمالك', 'Al Ahly' => 'الأهلي المصري', 'Pyramids' => 'بيراميدز',
-    'Raja' => 'الرجاء', 'Wydad' => 'الوداد', 'Esperance' => 'الترجي', 'Sporting' => 'سبورتينج لشبونة',
-    'Porto' => 'بورتو', 'Benfica' => 'بنفيكا', 'Ajax' => 'أياكس', 'PSV' => 'آيندهوفن'
+    // أندية عالمية
+    'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Atletico Madrid' => 'أتلتيكو مدريد',
+    'Manchester City' => 'مانشستر سيتي', 'Liverpool' => 'ليفربول', 'Arsenal' => 'أرسنال',
+    'Manchester United' => 'مانشستر يونايتد', 'Chelsea' => 'تشيلسي', 'Tottenham' => 'توتنهام',
+    'Bayern Munich' => 'بايرن ميونخ', 'Borussia Dortmund' => 'بوروسيا دورتموند', 'Bayer Leverkusen' => 'ليفركوزن',
+    'Paris Saint Germain' => 'باريس سان جيرمان', 'AC Milan' => 'ميلان', 'Inter' => 'إنتر ميلان',
+    'Juventus' => 'يوفنتوس', 'AS Roma' => 'روما', 'Napoli' => 'نابولي', 'Lazio' => 'لاتسيو',
+    'Aston Villa' => 'أستون فيلا', 'Newcastle' => 'نيوكاسل', 'Girona' => 'جيرونا'
 ];
-
-// دالة الترجمة الذكية (تبحث عن جزء من الكلمة)
-function smartTranslate($name, $map) {
-    if (isset($map[$name])) return $map[$name];
-    foreach ($map as $key => $val) {
-        if (stripos($name, $key) !== false) return $val;
-    }
-    return $name;
-}
 
 $league_settings = array(
     307 => array('name' => 'الدوري السعودي', 'ch_name' => 'SSC'),
@@ -195,20 +162,14 @@ function filterSection($channels, $sec) {
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 20px; width: 100%; }
-        .c-head { padding: 10px 15px; background: rgba(0,0,0,0.4); display: flex; justify-content: space-between; align-items: center; }
         
-        .live-badge { display: flex; align-items: center; gap: 5px; background: rgba(225, 29, 72, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(225, 29, 72, 0.4); color: #ff4d4d; font-weight: 900; font-size: 11px; }
-        .live-dot { width: 7px; height: 7px; background: #ff4d4d; border-radius: 50%; animation: pulse-red 1.2s infinite; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 77, 77, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
-
         .play-btn { width: 92%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); color: #fff; border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; font-weight: 900; cursor: pointer; font-size: 14px; transition: 0.4s; }
         .play-btn i { font-size: 18px; color: var(--main); }
 
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; background-image: url('mg/wel.GIF'); background-size: cover; background-position: center; position: relative; overflow: hidden; }
         .video-box iframe { position: absolute; top:0; left:0; width: 100%; height: 100%; border: none; background: #000; }
 
-        .match-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--glass); padding: 10px; border-radius: 15px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
-        .match-nav a { color: #fff; background: rgba(255,255,255,0.1); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; border: 1px solid var(--glass-border); }
+        .match-nav { display: flex; justify-content: center; align-items: center; margin-bottom: 15px; background: var(--glass); padding: 10px; border-radius: 15px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
         .league-sep { background: rgba(255, 255, 255, 0.07); padding: 8px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; margin: 15px 0 10px; border-right: 4px solid var(--main); color: #fff; border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); }
         .m-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; text-align: center; }
         .m-team-col { flex: 1; font-size: 11px; font-weight: 700; color: #fff; }
@@ -282,19 +243,21 @@ function filterSection($channels, $sec) {
     <div class="grid">
         <div id="section-matches_table" class="channel-section active">
             <div class="match-nav">
-                <a href="?d=<?= $prev_date ?>"><i class="fas fa-chevron-right"></i></a>
-                <span style="font-weight:900; font-size:13px; color:#fff;"><?= $date_get ?></span>
-                <a href="?d=<?= $next_date ?>"><i class="fas fa-chevron-left"></i></a>
+                <span style="font-weight:900; font-size:13px; color:#fff;">مباريات اليوم: <?= $date_get ?></span>
             </div>
             <?php if(empty($ordered_matches)): ?>
                 <p style="text-align:center; opacity:0.5; padding:20px; color:#fff;">لا توجد مباريات هامة لهذا التاريخ</p>
             <?php else: foreach($league_settings as $id => $set): if(isset($ordered_matches[$id])): ?>
                 <div class="league-sep"><?= $set['name'] ?></div>
                 <?php foreach($ordered_matches[$id] as $m): 
-                    // نظام الترجمة الذكي (عثمان)
-                    $h_name = smartTranslate($m['teams']['home']['name'], $translate);
-                    $a_name = smartTranslate($m['teams']['away']['name'], $translate);
-                    $status = isset($translate[$m['fixture']['status']['short']]) ? $translate[$m['fixture']['status']['short']] : $m['fixture']['status']['short'];
+                    // نظام الترجمة اليدوي (عثمان)
+                    $h_raw = $m['teams']['home']['name'];
+                    $a_raw = $m['teams']['away']['name'];
+                    $s_raw = $m['fixture']['status']['short'];
+
+                    $h_name = isset($translate[$h_raw]) ? $translate[$h_raw] : $h_raw;
+                    $a_name = isset($translate[$a_raw]) ? $translate[$a_raw] : $a_raw;
+                    $status = isset($translate[$s_raw]) ? $translate[$s_raw] : $s_raw;
                 ?>
                     <div class="card" style="margin-bottom:10px;">
                         <div class="m-row">
@@ -308,7 +271,7 @@ function filterSection($channels, $sec) {
                     </div>
             <?php endforeach; endif; endforeach; endif; ?>
         </div>
-        
+
         <div id="section-dual_player" class="channel-section">
             <div style="background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9; border-radius: 12px; padding: 10px; margin: 35px auto 15px; text-align: center; width: 85%;">
                 <p style="font-size: 10px; font-weight: 700; color: #38bdf8; margin: 0;">أكتم صوت القناة بالضغط على ( <i class="fas fa-volume-mute"></i> ) لتشغيل القناة الاخرى</p>
@@ -329,10 +292,6 @@ function filterSection($channels, $sec) {
         <div id="section-<?= $s['key'] ?>" class="channel-section">
             <?php foreach($channels as $ch): ?>
             <div class="card">
-                <div class="c-head">
-                    <div class="live-badge"><div class="live-dot"></div> مباشر</div>
-                    <div style="font-size: 10px; opacity: 0.6; font-weight: bold;">بث مباشر</div>
-                </div>
                 <div class="video-box" id="vid-<?= $ch['id'] ?>"></div>
                 <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">
                     <i class="fas fa-play-circle"></i> <span>تشغيل <?= $ch['name'] ?></span>
