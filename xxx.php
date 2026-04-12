@@ -1,6 +1,6 @@
 <?php
 // --- إعدادات API المباريات ---
-$apiKey = '273aaeb61360452588653ffea820cc19';
+$apiKey = '7a80e065b1734a50806dfeadb888b4f5';
 $url = 'https://api.football-data.org/v4/matches';
 
 $leagues_map = [
