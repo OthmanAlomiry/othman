@@ -6,7 +6,7 @@ error_reporting(0); // يمكنك تغييره إلى E_ALL عند التجرب�
 date_default_timezone_set('Asia/Riyadh');
 $date_get = date('Y-m-d');
 
-$FOOTBALL_API_KEY_NEW = '273aaeb61360452588653ffea820cc19'; 
+$FOOTBALL_API_KEY_NEW = '7a80e065b1734a50806dfeadb888b4f5'; 
 $url_new = 'https://api.football-data.org/v4/matches';
 
 $leagues_map_new = [
