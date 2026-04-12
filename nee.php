@@ -6,20 +6,21 @@ error_reporting(0);
 date_default_timezone_set('Asia/Riyadh');
 $date_get = date('Y-m-d');
 
-// مفاتيح الـ API (تأكد من استخدام المفتاح الذي يعمل معك)
+// مفاتيح الـ API
 $FOOTBALL_API_KEY_NEW = '273aaeb61360452588653ffea820cc19'; 
 $url_new = 'https://api.football-data.org/v4/matches';
 
-// خريطة الدوريات المطلوبة للجدول الجديد
+// خريطة الدوريات المطلوبة (تم إضافة الدوري الفرنسي وحذف القنوات)
 $leagues_map_new = [
-    'PL'  => ['name' => 'الدوري الإنجليزي', 'channel' => 'beIN Sport 1'],
-    'PD'  => ['name' => 'الدوري الإسباني', 'channel' => 'beIN Sport 3'],
-    'SA'  => ['name' => 'الدوري الإيطالي', 'channel' => 'STARZPLAY 1'],
-    'BL1' => ['name' => 'الدوري الألماني', 'channel' => 'beIN Sport 5'],
-    'CL'  => ['name' => 'دوري أبطال أوروبا', 'channel' => 'beIN Sport 2'],
+    'PL'  => ['name' => 'الدوري الإنجليزي'],
+    'PD'  => ['name' => 'الدوري الإسباني'],
+    'SA'  => ['name' => 'الدوري الإيطالي'],
+    'BL1' => ['name' => 'الدوري الألماني'],
+    'FL1' => ['name' => 'الدوري الفرنسي'], // الدوري الفرنسي تم إضافته هنا
+    'CL'  => ['name' => 'دوري أبطال أوروبا'],
 ];
 
-// مصفوفة الترجمة الشاملة الخاصة بك
+// مصفوفة الترجمة الشاملة
 $translate = [
     'NS' => 'لم تبدأ', 'FT' => 'انتهت', 'FINISHED' => 'انتهت', 'TIMED' => 'لم تبدأ', 'IN_PLAY' => 'مباشر', 
     '1H' => 'شوط 1', '2H' => 'شوط 2', 'HT' => 'بين الشوطين', 'PAUSED' => 'بين الشوطين',
@@ -38,7 +39,7 @@ function translate_name_pro($text, $manual_list) {
     return $text;
 }
 
-// جلب بيانات المباريات من المصدر الجديد
+// جلب بيانات المباريات
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url_new);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -57,7 +58,7 @@ if (isset($match_data_new['matches'])) {
     }
 }
 
-// --- إعدادات القنوات والزوار (عثمان الأصلي) ---
+// --- إعدادات القنوات والزوار ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69d6f6b636566621a891e6c1';
 
@@ -99,7 +100,6 @@ function filterSection($channels, $sec) {
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* كود الستايل الأصلي الخاص بك بدون أي تغيير */
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: 0.4s ease-in-out; }
@@ -249,14 +249,11 @@ function filterSection($channels, $sec) {
                                 <?php if($m['status'] == 'TIMED' || $m['status'] == 'SCHEDULED'): ?>
                                     <?= $m_time ?>
                                 <?php else: ?>
-                                    <?= $m['score']['fullTime']['home'] ?> - <?= $m['score']['fullTime']['away'] ?>
+                                    <span style="display:block; font-size:16px; letter-spacing:2px;"><?= $m['score']['fullTime']['home'] ?> - <?= $m['score']['fullTime']['away'] ?></span>
                                 <?php endif; ?>
-                                <br><small style="font-size:7px;"><?= $status ?></small>
+                                <small style="font-size:8px; color:rgba(255,255,255,0.6);"><?= $status ?></small>
                             </div>
                             <div class="m-team-col"><img src="<?= $m['awayTeam']['crest'] ?>"><?= $a_name ?></div>
-                        </div>
-                        <div style="text-align:center; padding-bottom:10px;">
-                             <small style="font-size:9px; color:var(--main);"><i class="fas fa-broadcast-tower"></i> <?= $leagues_map_new[$code]['channel'] ?></small>
                         </div>
                     </div>
                 <?php endforeach; endforeach; endif; ?>
