@@ -183,7 +183,7 @@ function filterSection($channels, $sec) {
 <div class="ad-popup-overlay" id="adPopup">
     <div class="ad-popup-content">
         <div class="ad-close-btn" onclick="closeAd()"><i class="fas fa-times"></i></div>
-        <img src="https://files.catbox.moe/nnkepx.png" class="ad-popup-image" alt="إعلان">
+        <img src="https://files.catbox.moe/7pik4r.png" class="ad-popup-image" alt="إعلان">
         <a href="https://wa.me/966505571164" class="ad-subscribe-btn">
             <i class="fab fa-whatsapp"></i> اشترك الآن عبر واتساب
         </a>
@@ -219,7 +219,7 @@ function filterSection($channels, $sec) {
 
         <div class="category-tabs">
             <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
-            <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>مشاهدة مباريتين</span></div>
+            <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>شاشتين</span></div>
             <?php foreach($active_sections as $s): ?>
                 <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
             <?php endforeach; ?>
