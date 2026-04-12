@@ -65,7 +65,7 @@ if(isset($_SESSION['ok'])){
         header("Location: admin.php"); exit;
     }
 
-    // --- 2. إدارة الأقسام (حفظ / تعديل) ---
+    // --- 2. إدارة الأقسام ---
     if(isset($_POST['save_sec'])){
         $sec_id = $_POST['sec_id'] ?: uniqid();
         $new_sec = ['id' => $sec_id, 'name' => $_POST['sec_name'], 'key' => $_POST['sec_key'], 'img' => $_POST['sec_img'], 'status' => $_POST['sec_status']];
@@ -82,11 +82,21 @@ if(isset($_SESSION['ok'])){
         header("Location: admin.php#sections_area"); exit;
     }
 
-    // --- 3. إدارة القنوات (حفظ / تعديل) ---
+    // --- 3. إدارة القنوات (تم إضافة البث الاحتياطي هنا) ---
     if(isset($_POST['save_ch'])){
         $target_id = $_POST['edit_id'];
-        $ch_data = ['id' => $target_id ?: uniqid(), 'name' => $_POST['n'], 'file' => $_POST['f'], 'section' => $_POST['s']];
-        if(!empty($target_id)){ foreach($channels as &$c){ if($c['id'] == $target_id){ $c = $ch_data; break; } } } else { $channels[] = $ch_data; }
+        $ch_data = [
+            'id' => $target_id ?: uniqid(), 
+            'name' => $_POST['n'], 
+            'file' => $_POST['f'], 
+            'file_backup' => $_POST['f_backup'], // الحقل الجديد
+            'section' => $_POST['s']
+        ];
+        if(!empty($target_id)){ 
+            foreach($channels as &$c){ if($c['id'] == $target_id){ $c = $ch_data; break; } } 
+        } else { 
+            $channels[] = $ch_data; 
+        }
         sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
         header("Location: admin.php#channels_area"); exit;
     }
@@ -117,6 +127,7 @@ if(isset($_SESSION['ok'])){
         .item-card { background: rgba(255,255,255,0.03); margin: 8px 0; padding: 12px; border-radius: 10px; border-right: 3px solid #e11d48; display: flex; justify-content: space-between; align-items: center; }
         .btns a { text-decoration: none; font-size: 12px; font-weight: bold; margin-right: 10px; }
         .del { color: #ff4d4d; } .edit { color: #0ea5e9; }
+        .backup-label { font-size: 11px; color: #aaa; margin-top: 5px; display: block; }
     </style>
 </head>
 <body>
@@ -167,8 +178,15 @@ if(isset($_SESSION['ok'])){
         <h2>📺 إدارة القنوات</h2>
         <form method="POST">
             <input type="hidden" name="edit_id" value="<?= $edit_ch ? $edit_ch['id'] : '' ?>">
+            
             <input name="n" placeholder="اسم القناة" value="<?= $edit_ch ? $edit_ch['name'] : '' ?>" required>
-            <input name="f" placeholder="الملف" value="<?= $edit_ch ? $edit_ch['file'] : '' ?>" required>
+            
+            <span class="backup-label">رابط البث الأساسي:</span>
+            <input name="f" placeholder="رابط الملف الأساسي" value="<?= $edit_ch ? $edit_ch['file'] : '' ?>" required>
+            
+            <span class="backup-label">رابط البث الاحتياطي (اختياري):</span>
+            <input name="f_backup" placeholder="رابط الملف الاحتياطي (اتركه فارغاً إذا لا يوجد)" value="<?= $edit_ch ? ($edit_ch['file_backup'] ?? '') : '' ?>">
+            
             <select name="s" required>
                 <option value="">-- اختر القسم --</option>
                 <?php foreach($sections as $s): ?>
@@ -177,8 +195,20 @@ if(isset($_SESSION['ok'])){
             </select>
             <button name="save_ch">حفظ القناة</button>
         </form>
+
         <?php foreach(array_reverse($channels) as $c): ?>
-            <div class="item-card"><div><b><?= $c['name'] ?></b></div><div class="btns"><a href="?edit=<?= $c['id'] ?>#channels_area" class="edit">تعديل</a><a href="?del=<?= $c['id'] ?>" class="del">حذف</a></div></div>
+            <div class="item-card">
+                <div>
+                    <b><?= $c['name'] ?></b>
+                    <?php if(!empty($c['file_backup'])): ?>
+                        <span style="font-size: 10px; background: #22c55e; padding: 2px 5px; border-radius: 4px; margin-right: 5px;">يوجد احتياطي</span>
+                    <?php endif; ?>
+                </div>
+                <div class="btns">
+                    <a href="?edit=<?= $c['id'] ?>#channels_area" class="edit">تعديل</a>
+                    <a href="?del=<?= $c['id'] ?>" class="del">حذف</a>
+                </div>
+            </div>
         <?php endforeach; ?>
         <center style="margin-top:20px;"><a href="index.php" style="color:#aaa; text-decoration:none;">← الموقع</a> | <a href="?out=1" style="color:#ff4d4d; text-decoration:none;">خروج</a></center>
     </div>
