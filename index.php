@@ -302,7 +302,7 @@ function filterSection($channels, $sec) {
 
                 <?php if(!empty($ch['file_backup'])): ?>
                 <button class="backup-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file_backup'] ?>', this)">
-                    <i class="fas fa-shield-alt"></i> <span>بث احتياطي</span>
+                    <i class="fas fa-shield-alt"></i> <span>تشغيل البث الاحتياطي</span>
                 </button>
                 <?php endif; ?>
 
