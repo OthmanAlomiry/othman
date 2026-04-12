@@ -155,6 +155,11 @@ function filterSection($channels, $sec) {
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 15px; width: 100%; }
         .play-btn { width: 92%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 13px; }
         .play-btn i { font-size: 16px; color: var(--main); }
+        
+        /* زر البث الاحتياطي المضاف */
+        .backup-btn { width: 92%; margin: -10px auto 15px; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3); padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 11px; }
+        .backup-btn i { font-size: 14px; }
+
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; background-size: cover; background-position: center; }
         .video-box iframe { position: absolute; top:0; left:0; width: 100%; height: 100%; border: none; }
         .match-nav { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; background: var(--glass); padding: 10px; border-radius: 15px; border: 1px solid var(--glass-border); }
@@ -290,9 +295,17 @@ function filterSection($channels, $sec) {
             <?php foreach($channels as $ch): ?>
             <div class="card">
                 <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.GIF')"></div>
+                
                 <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">
                     <i class="fas fa-play-circle"></i> <span>تشغيل <?= $ch['name'] ?></span>
                 </button>
+
+                <?php if(!empty($ch['file_backup'])): ?>
+                <button class="backup-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file_backup'] ?>', this)">
+                    <i class="fas fa-shield-alt"></i> <span>بث احتياطي</span>
+                </button>
+                <?php endif; ?>
+
             </div>
             <?php endforeach; ?>
             </div>
@@ -323,7 +336,11 @@ function switchSection(id, element) {
 function startStream(boxId, file, btn) {
     let vBox = document.getElementById(boxId); vBox.style.backgroundImage = "none";
     vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=0" allowfullscreen></iframe>`;
-    btn.querySelector('span').innerText = 'متصل الآن..'; 
+    
+    // إذا كان الزر هو الزر الأساسي نقوم بتحديث نصه
+    if(btn.classList.contains('play-btn')) {
+        btn.querySelector('span').innerText = 'متصل الآن..'; 
+    }
 }
 window.addEventListener('load', () => { 
     setTimeout(() => { 
