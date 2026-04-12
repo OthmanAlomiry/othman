@@ -1,92 +1,95 @@
 <?php
 session_start();
-error_reporting(E_ALL); // تم تفعيل التقرير مؤقتاً لاكتشاف الأخطاء
+error_reporting(0);
 
-// --- إعدادات جلب المباريات (النظام المطور) ---
+// --- إعدادات جدول المباريات (عثمان) ---
 date_default_timezone_set('Asia/Riyadh');
-$FOOTBALL_API_KEY = '273aaeb61360452588653ffea820cc19'; 
+// تأكد أن هذا المفتاح من api-sports.io
+$FOOTBALL_API_KEY = '6b9915e3b84f54b3962e5817b9e26e5f'; 
 $date_get = date('Y-m-d');
 
-// مصفوفة تعريف الدوريات (تأكد أن هذه الـ IDs مشمولة في خطتك المجانية)
-$league_settings = array(
-    2021 => array('name' => 'الدوري الإنجليزي', 'ch_name' => 'beIN Sport 1'),
-    2014 => array('name' => 'الدوري الإسباني', 'ch_name' => 'beIN Sport 3'),
-    2019 => array('name' => 'الدوري الإيطالي', 'ch_name' => 'STARZPLAY 1'),
-    2002 => array('name' => 'الدوري الألماني', 'ch_name' => 'beIN Sport 5'),
-    2015 => array('name' => 'الدوري الفرنسي', 'ch_name' => 'beIN Sports'),
-    2001 => array('name' => 'دوري أبطال أوروبا', 'ch_name' => 'beIN Sport 2'),
-);
-
-function translate_name($text) {
-    // مصفوفة ترجمة سريعة للفرق المشهورة لتجنب استهلاك الـ API في كل مرة
-    $manual_translate = [
-        'Arsenal FC' => 'أرسنال', 'Manchester City FC' => 'مانشستر سيتي', 'Liverpool FC' => 'ليفربول',
-        'Real Madrid CF' => 'ريال مدريد', 'FC Barcelona' => 'برشلونة', 'FC Bayern München' => 'بايرن ميونخ'
-    ];
-    if(isset($manual_translate[$text])) return $manual_translate[$text];
-
-    $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
-    $response = @file_get_contents($url);
-    if($response) {
-        $result = json_decode($response, true);
-        return $result[0][0][0] ?? $text;
-    }
-    return $text;
-}
-
-$status_map = [
-    'TIMED' => 'لم تبدأ', 'SCHEDULED' => 'مجدولة', 'FINISHED' => 'انتهت', 
-    'IN_PLAY' => 'مباشر', 'PAUSED' => 'بين الشوطين', 'POSTPONED' => 'مؤجلة'
+// مصفوفة الترجمة الشاملة
+$translate = [
+    'NS' => 'لم تبدأ', 'FT' => 'انتهت', '1H' => 'شوط 1', '2H' => 'شوط 2', 
+    'HT' => 'بين الشوطين', 'P' => 'ركلات ترجيح', 'PST' => 'مؤجلة', 'CANC' => 'ملغاة',
+    'TBD' => 'يحدد لاحقاً', 'ABD' => 'ملغاة', 'LIVE' => 'مباشر',
+    'Al-Hilal' => 'الهلال', 'Al-Nassr' => 'النصر', 'Al-Ittihad' => 'الاتحاد', 'Al-Ahli' => 'الأهلي',
+    'Al-Shabab' => 'الشباب', 'Al-Ettifaq' => 'الاتفاق', 'Al-Fateh' => 'الفتح', 'Al-Taawoun' => 'التعاون',
+    'Al-Wehda' => 'الوحـدة', 'Al-Fayha' => 'الفيحاء', 'Abha' => 'أبها', 'Al-Hazem' => 'الحزم',
+    'Al-Khaleej' => 'الخليج', 'Al-Okhdood' => 'الأخدود', 'Al-Riyadh' => 'الرياض', 'Al-Tai' => 'الطائي',
+    'Damac' => 'ضمك', 'Al-Qadisiyah' => 'القادسية', 'Al-Orobah' => 'العروبة', 'Al-Kholood' => 'الخلود',
+    'Manchester City' => 'مانشستر سيتي', 'Liverpool' => 'ليفربول', 'Arsenal' => 'أرسنال',
+    'Manchester United' => 'مانشستر يونايتد', 'Chelsea' => 'تشيلسي', 'Tottenham' => 'توتنهام',
+    'Real Madrid' => 'ريال مدريد', 'Barcelona' => 'برشلونة', 'Atletico Madrid' => 'أتلتيكو مدريد',
+    'Inter' => 'إنتر ميلان', 'AC Milan' => 'ميلان', 'Juventus' => 'يوفنتوس', 'Napoli' => 'نابولي',
+    'Bayern Munich' => 'بايرن ميونخ', 'Paris Saint Germain' => 'باريس سان جيرمان'
 ];
+
+$league_settings = array(
+    307 => array('name' => 'الدوري السعودي', 'ch_name' => 'SSC'),
+    42  => array('name' => 'دوري أبطال أوروبا', 'ch_name' => 'beIN Sports'),
+    73  => array('name' => 'الدوري الأوروبي', 'ch_name' => 'beIN Sports'),
+    525 => array('name' => 'نخبة آسيا', 'ch_name' => 'beIN AFC'),
+    39  => array('name' => 'الدوري الإنجليزي', 'ch_name' => 'beIN Premium'),
+    140 => array('name' => 'الدوري الإسباني', 'ch_name' => 'beIN Sports'),
+    135 => array('name' => 'الدوري الإيطالي', 'ch_name' => 'AD Sports'),
+    78  => array('name' => 'الدوري الألماني', 'ch_name' => 'beIN Sports'),
+    61  => array('name' => 'الدوري الفرنسي', 'ch_name' => 'beIN Sports')
+);
 
 function getFixturesWithCache($date, $key) {
     $cache_file = "cache_" . $date . ".json";
-    $expire_time = 300; // 5 دقائق لضمان تحديث النتائج المباشرة
-    
+    $expire_time = 300; // 5 دقائق
+
     if (file_exists($cache_file) && (time() - filemtime($cache_file) < $expire_time)) {
-        return json_decode(file_get_contents($cache_file), true);
+        $content = file_get_contents($cache_file);
+        if(!empty($content)) return json_decode($content, true);
     }
 
-    $ch = curl_init();
-    curl_setopt_array($ch, array(
-        CURLOPT_URL => "https://api.football-data.org/v4/matches?dateFrom=$date&dateTo=$date",
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://v3.football.api-sports.io/fixtures?date=$date&timezone=Asia/Riyadh",
         CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "GET",
         CURLOPT_HTTPHEADER => array(
-            'X-Auth-Token: ' . $key,
-            'User-Agent: Mozilla/5.0' // إضافة User-Agent لتجنب الحظر
+            "x-rapidapi-key: $key",
+            "x-rapidapi-host: v3.football.api-sports.io"
         ),
-        CURLOPT_TIMEOUT => 20,
-        CURLOPT_SSL_VERIFYPEER => false
     ));
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
-    if ($httpCode == 200) {
-        $data = json_decode($response, true);
-        $res = $data['matches'] ?? array();
-        if (!empty($res)) { file_put_contents($cache_file, json_encode($res)); }
-        return $res;
+    $response = curl_exec($curl);
+    $err = curl_error($curl);
+    curl_close($curl);
+
+    if ($err) return array();
+
+    $data = json_decode($response, true);
+    $results = (isset($data['response'])) ? $data['response'] : array();
+    
+    if (!empty($results)) { 
+        file_put_contents($cache_file, json_encode($results)); 
     }
-    return array(); 
+    return $results;
 }
 
 $fixtures = getFixturesWithCache($date_get, $FOOTBALL_API_KEY);
 $ordered_matches = array();
-
 if (!empty($fixtures)) {
     foreach ($fixtures as $f) {
-        $l_id = (int)$f['competition']['id'];
-        if (isset($league_settings[$l_id])) {
-            $ordered_matches[$l_id][] = $f;
+        $id = (int)$f['league']['id'];
+        if (isset($league_settings[$id])) { 
+            $ordered_matches[$id][] = $f; 
         }
     }
 }
 
-// --- إعدادات JSONBin والزوار (لا تغيير) ---
+// --- إعدادات JSONBin ---
 $API_KEY_BIN = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
-$BIN_ID_BIN = '69d6f6b636566621a891e6c1';
+$BIN_ID = '69d6f6b636566621a891e6c1';
 
+// --- نظام الزوار ---
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
     $session_id = session_id(); $time = time();
@@ -107,7 +110,7 @@ function getCloudFullData($bin, $key) {
     return json_decode($res, true);
 }
 
-$cloud = getCloudFullData($BIN_ID_BIN, $API_KEY_BIN);
+$cloud = getCloudFullData($BIN_ID, $API_KEY_BIN);
 $all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : [];
 $active_sections = array_filter($cloud['sections'] ?: [], function($s) { return $s['status'] == 'show'; });
 $news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : ['text' => '', 'status' => 'hide'];
@@ -125,10 +128,18 @@ function filterSection($channels, $sec) {
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* --- نفس التصميم الخاص بك بدون أي تغيير --- */
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: 0.4s ease-in-out; }
-        @media (orientation: landscape) { body { padding-top: 190px; } .main-container { max-width: 95% !important; } .header-fixed { max-width: 95% !important; } .match-grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .league-sep { grid-column: span 2; } .channel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; } }
+        @media (orientation: landscape) {
+            body { padding-top: 190px; }
+            .main-container { max-width: 95% !important; }
+            .header-fixed { max-width: 95% !important; }
+            .match-grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+            .league-sep { grid-column: span 2; }
+            .channel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        }
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
         .loader-content { display: flex; flex-direction: column; align-items: center; }
@@ -220,7 +231,7 @@ function filterSection($channels, $sec) {
 
         <div class="category-tabs">
             <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
-            <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>شاشتين</span></div>
+            <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="https://cdn-icons-png.flaticon.com/512/3164/3164801.png" style="filter: brightness(0) invert(1);"><span>شاشتين</span></div>
             <?php foreach($active_sections as $s): ?>
                 <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
             <?php endforeach; ?>
@@ -230,53 +241,39 @@ function filterSection($channels, $sec) {
     <div class="grid">
         <div id="section-matches_table" class="channel-section active">
             <div class="match-grid-container">
-            <?php 
-            if(empty($ordered_matches)): ?>
-                <p style="text-align:center; opacity:0.5; padding:20px; grid-column: 1/-1;">لا توجد مباريات هامة لهذا التاريخ أو حدث خطأ في الـ API</p>
-            <?php else: 
-                foreach($league_settings as $id => $set): 
-                    if(isset($ordered_matches[$id])): ?>
-                        <div class="league-sep"><?= $set['name'] ?></div>
-                        <?php foreach($ordered_matches[$id] as $m): 
-                            $h_name = translate_name($m['homeTeam']['name']);
-                            $a_name = translate_name($m['awayTeam']['name']);
-                            $status = $status_map[$m['status']] ?? $m['status'];
-                            
-                            // تحويل الوقت من UTC إلى مكة (+3 ساعات)
-                            $match_time = date("H:i", strtotime($m['utcDate'] . " +3 hours"));
-                        ?>
-                            <div class="card">
-                                <div class="m-row">
-                                    <div class="m-team-col">
-                                        <img src="<?= $m['homeTeam']['crest'] ?>" onerror="this.src='mg/default.png'">
-                                        <?= $h_name ?>
-                                    </div>
-                                    <div class="m-time-box">
-                                        <?= (in_array($m['status'], ['TIMED', 'SCHEDULED'])) ? $match_time : ($m['score']['fullTime']['home'] . ' - ' . $m['score']['fullTime']['away']) ?>
-                                        <br><small style="font-size:7px; display:block;"><?= $status ?></small>
-                                        <small style="font-size:6px; color:#aaa;"><?= $set['ch_name'] ?></small>
-                                    </div>
-                                    <div class="m-team-col">
-                                        <img src="<?= $m['awayTeam']['crest'] ?>" onerror="this.src='mg/default.png'">
-                                        <?= $a_name ?>
-                                    </div>
-                                </div>
+            <?php if(empty($ordered_matches)): ?>
+                <p style="text-align:center; opacity:0.5; padding:20px; grid-column: 1/-1;">لا توجد مباريات هامة لهذا اليوم</p>
+            <?php else: foreach($league_settings as $id => $set): if(isset($ordered_matches[$id])): ?>
+                <div class="league-sep"><?= $set['name'] ?></div>
+                <?php foreach($ordered_matches[$id] as $m): 
+                    $h_raw = $m['teams']['home']['name'];
+                    $a_raw = $m['teams']['away']['name'];
+                    $h_name = $translate[$h_raw] ?? $h_raw;
+                    $a_name = $translate[$a_raw] ?? $a_raw;
+                    $status = $translate[$m['fixture']['status']['short']] ?? $m['fixture']['status']['short'];
+                ?>
+                    <div class="card">
+                        <div class="m-row">
+                            <div class="m-team-col"><img src="<?= $m['teams']['home']['logo'] ?>"><?= $h_name ?></div>
+                            <div class="m-time-box">
+                                <?= ($m['fixture']['status']['short'] == 'NS') ? date("H:i", $m['fixture']['timestamp']) : $m['goals']['home'].'-'.$m['goals']['away'] ?>
+                                <br><small style="font-size:7px; display:block;"><?= $status ?></small>
                             </div>
-            <?php       endforeach; 
-                    endif; 
-                endforeach; 
-            endif; ?>
+                            <div class="m-team-col"><img src="<?= $m['teams']['away']['logo'] ?>"><?= $a_name ?></div>
+                        </div>
+                    </div>
+            <?php endforeach; endif; endforeach; endif; ?>
             </div>
         </div>
 
         <div id="section-dual_player" class="channel-section">
             <div class="dual-container">
                 <div class="dual-slot">
-                    <div class="video-box" id="dual-screen-1" style="background-image:url('mg/chn1.png')"></div>
+                    <div class="video-box" id="dual-screen-1"></div>
                     <button class="play-btn" onclick="openPicker(1)"><i class="fas fa-tv"></i> <span id="btn-text-1">القناة الأولى</span></button>
                 </div>
                 <div class="dual-slot">
-                    <div class="video-box" id="dual-screen-2" style="background-image:url('mg/chn2.png')"></div>
+                    <div class="video-box" id="dual-screen-2"></div>
                     <button class="play-btn" onclick="openPicker(2)"><i class="fas fa-tv"></i> <span id="btn-text-2">القناة الثانية</span></button>
                 </div>
             </div>
@@ -287,7 +284,7 @@ function filterSection($channels, $sec) {
             <div class="channel-grid">
             <?php foreach($channels as $ch): ?>
             <div class="card">
-                <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.GIF')"></div>
+                <div class="video-box" id="vid-<?= $ch['id'] ?>"></div>
                 <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">
                     <i class="fas fa-play-circle"></i> <span>تشغيل <?= $ch['name'] ?></span>
                 </button>
@@ -306,7 +303,6 @@ function openPicker(slot) { activeSlot = slot; document.getElementById('ch-picke
 function closePicker() { document.getElementById('ch-picker').style.display = 'none'; }
 function confirmPick(url, name) {
     let screen = document.getElementById('dual-screen-' + activeSlot);
-    screen.style.backgroundImage = "none";
     screen.innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allowfullscreen></iframe>`;
     document.getElementById('btn-text-' + activeSlot).innerText = name;
     closePicker();
@@ -318,7 +314,7 @@ function switchSection(id, element) {
     element.classList.add('active');
 }
 function startStream(boxId, file, btn) {
-    let vBox = document.getElementById(boxId); vBox.style.backgroundImage = "none";
+    let vBox = document.getElementById(boxId);
     vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=0" allowfullscreen></iframe>`;
     btn.querySelector('span').innerText = 'متصل الآن..'; 
 }
