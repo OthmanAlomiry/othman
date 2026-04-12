@@ -62,7 +62,7 @@ if (isset($match_data_new['matches'])) {
 
 // --- 3. إعدادات القنوات والزوار و Cloud Data ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
-$BIN_ID = '69d6f6b636566621a891e6c1';
+$BIN_ID = '69c4ad66c3097a1dd55f06d6';
 
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
