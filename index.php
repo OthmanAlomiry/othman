@@ -1,26 +1,23 @@
 <?php
 session_start();
-error_reporting(0);
+error_reporting(0); // يمكنك تغييره إلى E_ALL عند التجربة فقط
 
-// --- إعدادات جدول المباريات الجديدة (دمج عثمان) ---
+// --- 1. إعدادات الوقت والـ API لجدول المباريات ---
 date_default_timezone_set('Asia/Riyadh');
 $date_get = date('Y-m-d');
 
-// مفاتيح الـ API
 $FOOTBALL_API_KEY_NEW = '273aaeb61360452588653ffea820cc19'; 
 $url_new = 'https://api.football-data.org/v4/matches';
 
-// خريطة الدوريات المطلوبة (تم إضافة الدوري الفرنسي وحذف القنوات)
 $leagues_map_new = [
     'PL'  => ['name' => 'الدوري الإنجليزي'],
     'PD'  => ['name' => 'الدوري الإسباني'],
     'SA'  => ['name' => 'الدوري الإيطالي'],
     'BL1' => ['name' => 'الدوري الألماني'],
-    'FL1' => ['name' => 'الدوري الفرنسي'], // الدوري الفرنسي تم إضافته هنا
+    'FL1' => ['name' => 'الدوري الفرنسي'],
     'CL'  => ['name' => 'دوري أبطال أوروبا'],
 ];
 
-// مصفوفة الترجمة الشاملة
 $translate = [
     'NS' => 'لم تبدأ', 'FT' => 'انتهت', 'FINISHED' => 'انتهت', 'TIMED' => 'لم تبدأ', 'IN_PLAY' => 'مباشر', 
     '1H' => 'شوط 1', '2H' => 'شوط 2', 'HT' => 'بين الشوطين', 'PAUSED' => 'بين الشوطين',
@@ -30,8 +27,10 @@ $translate = [
 
 function translate_name_pro($text, $manual_list) {
     if (isset($manual_list[$text])) return $manual_list[$text];
+    // محاولة جلب الترجمة من جوجل مع مهلة زمنية قصيرة
     $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
-    $response = @file_get_contents($url);
+    $ctx = stream_context_create(['http' => ['timeout' => 2]]); 
+    $response = @file_get_contents($url, false, $ctx);
     if($response) {
         $result = json_decode($response, true);
         return $result[0][0][0] ?? $text;
@@ -39,26 +38,29 @@ function translate_name_pro($text, $manual_list) {
     return $text;
 }
 
-// جلب بيانات المباريات
+// --- 2. جلب بيانات المباريات (نسخة معالجة أخطاء الاتصال) ---
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url_new);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $FOOTBALL_API_KEY_NEW]);
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4); // حل مشكلة Render مع IPv6
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);       // تجاوز مشاكل شهادة الأمان
+curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 $response_new = curl_exec($ch);
 curl_close($ch);
-$match_data_new = json_decode($response_new, true);
 
+$match_data_new = json_decode($response_new, true);
 $ordered_matches = [];
 if (isset($match_data_new['matches'])) {
     foreach ($match_data_new['matches'] as $m) {
-        $l_code = $m['competition']['code'];
+        $l_code = $m['competition']['code'] ?? '';
         if (isset($leagues_map_new[$l_code])) {
             $ordered_matches[$l_code][] = $m;
         }
     }
 }
 
-// --- إعدادات القنوات والزوار ---
+// --- 3. إعدادات القنوات والزوار و Cloud Data ---
 $API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 $BIN_ID = '69d6f6b636566621a891e6c1';
 
@@ -68,7 +70,7 @@ if (isset($_GET['fetch_visitors'])) {
     $data = file_exists($visitors_file) ? unserialize(file_get_contents($visitors_file)) : [];
     $data[$session_id] = $time;
     foreach ($data as $id => $last_time) { if ($time - $last_time > 120) unset($data[$id]); }
-    file_put_contents($visitors_file, serialize($data));
+    @file_put_contents($visitors_file, serialize($data));
     echo count($data); exit; 
 }
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
@@ -77,18 +79,22 @@ function getCloudFullData($bin, $key) {
     $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
+    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     $res = curl_exec($ch);
     curl_close($ch);
     return json_decode($res, true);
 }
 
 $cloud = getCloudFullData($BIN_ID, $API_KEY);
-$all_channels = isset($cloud['custom_channels']) ? $cloud['custom_channels'] : [];
-$active_sections = array_filter($cloud['sections'] ?: [], function($s) { return $s['status'] == 'show'; });
-$news = isset($cloud['news_ticker']) ? $cloud['news_ticker'] : ['text' => '', 'status' => 'hide'];
+$all_channels = $cloud['custom_channels'] ?? [];
+$active_sections = array_filter($cloud['sections'] ?: [], function($s) { return ($s['status'] ?? '') == 'show'; });
+$news = $cloud['news_ticker'] ?? ['text' => '', 'status' => 'hide'];
 
 function filterSection($channels, $sec) {
-    return array_filter($channels, function($c) use ($sec) { return (isset($c['section']) && trim(strtolower($c['section'])) == trim(strtolower($sec))); });
+    return array_filter($channels, function($c) use ($sec) { 
+        return (isset($c['section']) && trim(strtolower($c['section'])) == trim(strtolower($sec))); 
+    });
 }
 ?>
 <!DOCTYPE html>
@@ -101,8 +107,8 @@ function filterSection($channels, $sec) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; transition: 0.3s; }
-        .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; transition: 0.4s ease-in-out; }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; }
+        .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; }
         @media (orientation: landscape) {
             body { padding-top: 190px; }
             .main-container { max-width: 95% !important; }
@@ -125,9 +131,9 @@ function filterSection($channels, $sec) {
         .ad-popup-content { position: relative; width: 85%; max-width: 320px; animation: popZoom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .ad-popup-image { width: 100%; border-radius: 20px; border: 2px solid var(--glass-border); box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: block; }
         .ad-close-btn { position: absolute; top: -15px; right: -15px; width: 35px; height: 35px; background: var(--main); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; border: 2px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10; }
-        .ad-subscribe-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #25d366; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); border: 2px solid white; white-space: nowrap; }
+        .ad-subscribe-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #25d366; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 8px; border: 2px solid white; white-space: nowrap; }
         @keyframes popZoom { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; transition: 0.4s; }
+        .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
         .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; padding: 0 10px; }
         .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; text-align: center; border: 1.5px solid #ffffff; }
         .btn-wa { background: #25d366; } .btn-tg { background: #0088cc; } .btn-sn { background: #FFFC00; color: #000 !important; } .btn-tw { background: #000; }
@@ -138,7 +144,7 @@ function filterSection($channels, $sec) {
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
         @keyframes ticker-infinite { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
-        .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.2s; }
+        .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; }
         .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); transform: translateY(-2px); }
         .cat-item img { width: 26px; height: 26px; object-fit: contain; margin-bottom: 4px; }
         .cat-item span { font-size: 8px; font-weight: 900; color: #fff; display: block; }
@@ -213,7 +219,7 @@ function filterSection($channels, $sec) {
             <a href="https://x.com/d_service_pro" class="social-btn btn-tw">تويتر</a>
         </div>
 
-        <?php if($news['status'] == 'show'): ?>
+        <?php if(($news['status'] ?? 'hide') == 'show'): ?>
         <div class="news-ticker"><span class="ticker-label">تنبيهات</span><div class="ticker-wrap"><div class="ticker-move"><span class="ticker-text"><?= $news['text'] ?></span><span class="ticker-text"><?= $news['text'] ?></span></div></div></div>
         <?php endif; ?>
 
@@ -233,7 +239,9 @@ function filterSection($channels, $sec) {
             </div>
             <div class="match-grid-container">
             <?php if(empty($ordered_matches)): ?>
-                <p style="text-align:center; opacity:0.5; padding:20px; grid-column: 1/-1;">لا توجد مباريات هامة لهذا التاريخ</p>
+                <div class="card" style="padding: 20px; text-align: center; grid-column: 1/-1;">
+                    <p style="opacity:0.5; margin:0;">لا توجد مباريات هامة لهذا التاريخ</p>
+                </div>
             <?php else: foreach($ordered_matches as $code => $matches_list): ?>
                 <div class="league-sep"><?= $leagues_map_new[$code]['name'] ?></div>
                 <?php foreach($matches_list as $m): 
@@ -249,7 +257,7 @@ function filterSection($channels, $sec) {
                                 <?php if($m['status'] == 'TIMED' || $m['status'] == 'SCHEDULED'): ?>
                                     <?= $m_time ?>
                                 <?php else: ?>
-                                    <span style="display:block; font-size:16px; letter-spacing:2px;"><?= $m['score']['fullTime']['home'] ?> - <?= $m['score']['fullTime']['away'] ?></span>
+                                    <span style="display:block; font-size:16px; letter-spacing:2px;"><?= ($m['score']['fullTime']['home'] ?? 0) ?> - <?= ($m['score']['fullTime']['away'] ?? 0) ?></span>
                                 <?php endif; ?>
                                 <small style="font-size:8px; color:rgba(255,255,255,0.6);"><?= $status ?></small>
                             </div>
