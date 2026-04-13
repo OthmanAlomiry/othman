@@ -1,21 +1,27 @@
 <?php
-// إعدادات الـ API
+// إعدادات الـ API الخاصة بك
 $api_key = "bYKapDzujDdGdDwq";
 $api_secret = "MLDJw7w8gjbHauTlsEwRi6lBKyixCPoY";
-$url = "https://live-score-api.com/api/live/scores.json?key=$api_key&secret=$api_secret&lang=ar";
+$today = date('Y-m-d');
 
-// استخدام cURL بدلاً من file_get_contents لضمان العمل في بيئة Docker
+// استخدام رابط الـ Fixtures لجلب جدول اليوم كاملاً
+$url = "https://live-score-api.com/api/live/fixtures.json?key=$api_key&secret=$api_secret&lang=ar&date=$today";
+
+// استخدام cURL لضمان العمل على Render و Docker
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // لتجنب مشاكل شهادات SSL
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
 $response = curl_exec($ch);
 curl_close($ch);
 
 $result = json_decode($response, true);
 
-// التحقق من وجود بيانات لتجنب خطأ Array offset on null
-$matches = (isset($result['data']['match']) && is_array($result['data']['match'])) ? $result['data']['match'] : [];
+// استخراج المباريات بشكل آمن
+$matches = [];
+if (isset($result['success']) && $result['success'] == true) {
+    $matches = $result['data']['fixtures'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -23,39 +29,116 @@ $matches = (isset($result['data']['match']) && is_array($result['data']['match']
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مباريات اليوم</title>
+    <title>جدول مباريات اليوم</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; text-align: center; }
-        .container { max-width: 600px; margin: auto; }
-        .match-card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-around; align-items: center; }
-        .score { font-weight: bold; font-size: 1.2em; color: #6200ea; }
-        .league { font-size: 0.8em; color: #888; display: block; margin-bottom: 5px; }
-        .error-msg { color: #d32f2f; background: #ffcdd2; padding: 10px; border-radius: 5px; }
+        :root {
+            --main-purple: #6200ea;
+            --bg-color: #f0f2f5;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 15px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+        }
+        .header {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .header h1 { color: var(--main-purple); margin: 0; font-size: 24px; }
+        .header p { color: #666; margin-top: 5px; }
+
+        .match-item {
+            background: white;
+            margin-bottom: 12px;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+        .match-item:hover { transform: translateY(-2px); }
+
+        .league-tag {
+            font-size: 11px;
+            background: #eee;
+            padding: 3px 8px;
+            border-radius: 5px;
+            color: #555;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        .team-name {
+            flex: 1;
+            font-weight: 600;
+            font-size: 15px;
+            text-align: center;
+        }
+        .match-info {
+            flex: 0.8;
+            text-align: center;
+            border-right: 1px solid #eee;
+            border-left: 1px solid #eee;
+            margin: 0 10px;
+        }
+        .time {
+            font-weight: bold;
+            color: var(--main-purple);
+            font-size: 18px;
+            display: block;
+        }
+        .status {
+            font-size: 12px;
+            color: #888;
+        }
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="color: #6200ea;">⚽ مباريات اليوم المباشرة</h1>
-    <p><?php echo date('Y-m-d'); ?></p>
+    <div class="header">
+        <h1>⚽ جدول مباريات اليوم</h1>
+        <p><?php echo $today; ?></p>
+    </div>
 
     <?php if (!empty($matches)): ?>
         <?php foreach ($matches as $match): ?>
-            <div class="match-card">
-                <div style="flex:1"><?php echo $match['home_name']; ?></div>
-                <div style="flex:1">
-                    <span class="league"><?php echo $match['league_name']; ?></span>
-                    <span class="score"><?php echo $match['score']; ?></span>
-                    <div style="font-size: 0.7em; color: red;"><?php echo $match['time']; ?>'</div>
+            <div class="match-item">
+                <div class="team-name"><?php echo $match['home_name']; ?></div>
+                
+                <div class="match-info">
+                    <span class="league-tag"><?php echo $match['league_name']; ?></span>
+                    <span class="time"><?php echo substr($match['time'], 0, 5); ?></span>
+                    <span class="status"><?php echo $match['location']; ?></span>
                 </div>
-                <div style="flex:1"><?php echo $match['away_name']; ?></div>
+                
+                <div class="team-name"><?php echo $match['away_name']; ?></div>
             </div>
         <?php endforeach; ?>
     <?php else: ?>
-        <div class="error-msg">
-            لا توجد مباريات مباشرة حالياً أو انتهت صلاحية المفتاح التجريبي.
-            <br>
-            <small>تأكد من تفعيل الباقة في موقع live-score-api.com</small>
+        <div class="no-data">
+            <p>لا توجد مباريات مجدولة اليوم في حسابك.</p>
+            <p><small>ملاحظة: تأكد من أن باقة الـ Trial مفعلة وتدعم الدوريات الحالية.</small></p>
+            <?php if(isset($result['error'])): ?>
+                <p style="color:red">سبب الرفض من الموقع: <?php echo $result['error']; ?></p>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 </div>
