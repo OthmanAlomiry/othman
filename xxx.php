@@ -1,15 +1,17 @@
 <?php
-// --- إعدادات API المباريات ---
-$apiKey = '7a80e065b1734a50806dfeadb888b4f5';
-$url = 'https://api.football-data.org/v4/matches';
+// --- إعدادات API الجديدة باستخدام مفتاحك المستخرج ---
+$apiKey = '49e271c73amsh02ca0a4d3f5b237p145598jsn7c1cee0f8ec9'; // تم استخراج المفتاح من صورتك
+$dateToday = date('Y-m-d');
+$url = "https://api-football-v1.p.rapidapi.com/v3/fixtures?date=$dateToday";
 
+// خريطة البطولات ومعرفاتها في الـ API
 $leagues_map = [
-    'PL'  => ['name' => 'الدوري الإنجليزي', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
-    'PD'  => ['name' => 'الدوري الإسباني', 'channel' => 'beIN Sport 3', 'ch_num' => '3'],
-    'SA'  => ['name' => 'الدوري الإيطالي', 'channel' => 'STARZPLAY 1', 'ch_num' => '10'],
-    'BL1' => ['name' => 'الدوري الألماني', 'channel' => 'beIN Sport 5', 'ch_num' => '5'],
-    'CL'  => ['name' => 'دوري أبطال أوروبا', 'channel' => 'beIN Sport 2', 'ch_num' => '2'],
-    'CLI' => ['name' => 'دوري أبطال آسيا للنخبة', 'channel' => 'beIN AFC', 'ch_num' => '11'], // إضافة دوري أبطال آسيا
+    850 => ['name' => 'دوري أبطال آسيا للنخبة', 'channel' => 'beIN AFC', 'ch_num' => '11'],
+    307 => ['name' => 'دوري روشن السعودي', 'channel' => 'SSC 1', 'ch_num' => '12'],
+    39  => ['name' => 'الدوري الإنجليزي', 'channel' => 'beIN Sport 1', 'ch_num' => '1'],
+    140 => ['name' => 'الدوري الإسباني', 'channel' => 'beIN Sport 3', 'ch_num' => '3'],
+    2   => ['name' => 'دوري أبطال أوروبا', 'channel' => 'beIN Sport 2', 'ch_num' => '2'],
+    135 => ['name' => 'الدوري الإيطالي', 'channel' => 'STARZPLAY 1', 'ch_num' => '10'],
 ];
 
 function translate_name($text) {
@@ -25,7 +27,10 @@ function translate_name($text) {
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $apiKey]);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "X-RapidAPI-Host: api-football-v1.p.rapidapi.com",
+    "X-RapidAPI-Key: $apiKey"
+]);
 $response = curl_exec($ch);
 curl_close($ch);
 $match_data = json_decode($response, true);
@@ -37,204 +42,103 @@ date_default_timezone_set('Asia/Riyadh');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>بوابة الرياضة - متجر الخدمة الرقمية</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
     <style>
-        :root { 
-            --main: #e11d48; --bg-deep: #050c14; --whatsapp: #25d366; 
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --purple-grad: linear-gradient(45deg, #7c3aed, #fff); 
-            --green-grad: linear-gradient(45deg, #16a34a, #fff);
-            --anim-speed: 0.4s;
-        }
-        
-        html { scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
-
-        #pro-cinematic-intro {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            z-index: 2000; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1);
-        }
-        .intro-finish-vfx { transform: scale(1.5); opacity: 0; visibility: hidden; }
-        .intro-icon { font-size: 90px; color: #fff; filter: drop-shadow(0 0 30px var(--main)); animation: pulseLogo 2s infinite ease-in-out; }
-        .intro-loading-box { width: 200px; height: 2px; background: rgba(255,255,255,0.1); margin-top: 30px; border-radius: 10px; overflow: hidden; }
-        .intro-loading-bar { width: 0%; height: 100%; background: var(--main); box-shadow: 0 0 15px var(--main); animation: loadProgress 3s forwards; }
-        @keyframes loadProgress { to { width: 100%; } }
-
-        .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
-        .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
-        @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
-
-        .header-fixed-container { 
-            position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
-            background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
-            border-bottom: 1px solid var(--glass-border); padding: 15px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-        }
-        .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; width: 95%; }
-        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
-
-        .matches-section { padding: 10px 15px; animation: fadeIn 1s ease-in; }
-        .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .match-scroll::-webkit-scrollbar { display: none; }
-        .match-card { 
-            min-width: 270px; background: var(--glass); border-radius: 20px; padding: 15px; 
-            border: 1px solid var(--glass-border); text-align: center; 
-            transition: 0.4s;
-        }
-        .match-card:hover { transform: translateY(-8px); background: rgba(255,255,255,0.08); }
-        .m-league { font-size: 9px; color: #00ff87; font-weight: 800; margin-bottom: 10px; }
-        .match-main { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
-        .team { flex: 1; display: flex; flex-direction: column; align-items: center; }
-        .team img { width: 38px; height: 38px; object-fit: contain; }
-        .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; }
-        .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; }
-        .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
-        .card { 
-            background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; 
-            overflow: hidden; border: 1px solid var(--glass-border);
-        }
-        .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
-        .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
-        .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
-        .live-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.2; } }
-
-        .play-btn-premium { 
-            width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; 
-            background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); 
-            padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer;
-        }
-
-        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
-        footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
+        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
+        body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--bg-deep); padding-top: 175px; color: #e2e8f0; overflow-x: hidden; }
+        .header-fixed-container { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
+        .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; }
+        .match-card { min-width: 270px; background: var(--glass); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); transition: 0.3s; }
+        .m-league { font-size: 10px; color: #00ff87; font-weight: 800; margin-bottom: 10px; text-align: center; }
+        .match-main { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .team img { width: 35px; height: 35px; object-fit: contain; }
+        .team-name { font-size: 10px; font-weight: 700; display: block; margin-top: 5px; }
+        .m-score { font-size: 1.5rem; font-weight: 900; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; padding: 15px; }
+        .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
+        video { width: 100%; aspect-ratio: 16/9; background: #000; }
+        .play-btn { width: 90%; margin: 10px auto; display: block; padding: 12px; border-radius: 50px; border: none; background: var(--main); color: #fff; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="pro-cinematic-intro">
-    <div class="intro-icon"><i class="fas fa-play-circle"></i></div>
-    <h1 style="color:#fff; font-weight:900; font-size:28px; margin-top:15px;">الخدمة الرقمية</h1>
-    <div class="intro-loading-box"><div class="intro-loading-bar"></div></div>
-</div>
-
-<div class="bg-pattern-animated"></div>
-
 <div class="header-fixed-container">
-    <div class="promo-text">
-        هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات<br>
-        للاشتراك في الباقة كاملة على جميع الأجهزة والشاشات تواصل معنا
-    </div>
-    <div class="social-links">
-        <a href="https://wa.me/966505571164" class="social-btn" style="background:#25d366"><i class="fab fa-whatsapp"></i> واتساب</a>
-        <a href="https://t.me/d_s_pro" class="social-btn" style="background:#0088cc"><i class="fab fa-telegram-plane"></i> تليجرام</a>
-        <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn" style="background:#FFFC00; color:#000"><i class="fab fa-snapchat"></i> سناب</a>
-        <a href="https://x.com/d_service_pro" class="social-btn" style="background:#000"><i class="fab fa-x-twitter"></i> تويتر</a>
+    <div style="font-size:11px; margin-bottom:10px;">هذه الصفحة مقدمة من متجر الخدمة الرقمية مجاناً وبدون إعلانات</div>
+    <div style="display:flex; justify-content:center; gap:10px;">
+        <a href="https://wa.me/966505571164" style="background:#25d366; color:white; padding:5px 15px; border-radius:20px; text-decoration:none; font-size:10px;">واتساب</a>
+        <a href="https://t.me/d_s_pro" style="background:#0088cc; color:white; padding:5px 15px; border-radius:20px; text-decoration:none; font-size:10px;">تليجرام</a>
     </div>
 </div>
 
 <div class="matches-section">
-    <div style="font-size:15px; font-weight:900; margin-bottom:12px; display:flex; align-items:center; gap:8px;"><i class="fas fa-calendar-alt" style="color:#f1c40f"></i> مباريات ونتائج اليوم</div>
+    <div style="padding:0 15px; font-weight:900;"><i class="fas fa-trophy" style="color:#f1c40f"></i> مباريات ونتائج اليوم</div>
     <div class="match-scroll">
-        <?php if (isset($match_data['matches'])):
-            foreach ($match_data['matches'] as $m): 
-                $code = $m['competition']['code'];
-                if (isset($leagues_map[$code])): 
-                    $is_live = ($m['status'] == 'IN_PLAY' || $m['status'] == 'PAUSED');
-                    $is_fin = ($m['status'] == 'FINISHED');
+        <?php 
+        if (!empty($match_data['response'])):
+            foreach ($match_data['response'] as $m): 
+                $leagueID = $m['league']['id'];
+                if (isset($leagues_map[$leagueID])): 
+                    $status = $m['fixture']['status']['short'];
+                    $homeScore = $m['goals']['home'] ?? 0;
+                    $awayScore = $m['goals']['away'] ?? 0;
         ?>
                 <div class="match-card">
-                    <div class="m-league"><?php echo $leagues_map[$code]['name']; ?></div>
+                    <div class="m-league"><?= $leagues_map[$leagueID]['name'] ?></div>
                     <div class="match-main">
-                        <div class="team">
-                            <img src="<?php echo $m['homeTeam']['crest']; ?>" onerror="this.src='https://via.placeholder.com/40'">
-                            <span class="team-name"><?php echo translate_name($m['homeTeam']['name']); ?></span>
+                        <div class="team" style="flex:1; text-align:center;">
+                            <img src="<?= $m['teams']['home']['logo'] ?>">
+                            <span class="team-name"><?= translate_name($m['teams']['home']['name']) ?></span>
                         </div>
-                        <div class="m-status" style="flex:0.6; text-align:center;">
-                            <?php if ($is_live || $is_fin): ?>
-                                <div class="m-score"><?php echo $m['score']['fullTime']['home'].'-'.$m['score']['fullTime']['away']; ?></div>
-                                <?php if($is_live): ?><span style="color:#ff4d4d; font-size:8px; font-weight:900;">LIVE</span><?php endif; ?>
+                        <div style="flex:0.8; text-align:center;">
+                            <?php if(in_array($status, ['1H','2H','HT','ET','P','LIVE'])): ?>
+                                <div class="m-score"><?= $homeScore ?> - <?= $awayScore ?></div>
+                                <span style="color:red; font-size:9px; font-weight:900;">بث مباشر</span>
+                            <?php elseif($status == 'FT'): ?>
+                                <div class="m-score"><?= $homeScore ?> - <?= $awayScore ?></div>
+                                <span style="font-size:9px;">انتهت</span>
                             <?php else: ?>
-                                <div style="font-size:11px; font-weight:bold; color:#f1c40f;"><?php echo date('h:i A', strtotime($m['utcDate'])); ?></div>
+                                <div style="font-size:12px; font-weight:bold; color:#f1c40f;"><?= date('h:i A', strtotime($m['fixture']['date'])) ?></div>
                             <?php endif; ?>
                         </div>
-                        <div class="team">
-                            <img src="<?php echo $m['awayTeam']['crest']; ?>" onerror="this.src='https://via.placeholder.com/40'">
-                            <span class="team-name"><?php echo translate_name($m['awayTeam']['name']); ?></span>
+                        <div class="team" style="flex:1; text-align:center;">
+                            <img src="<?= $m['teams']['away']['logo'] ?>">
+                            <span class="team-name"><?= translate_name($m['teams']['away']['name']) ?></span>
                         </div>
                     </div>
-                    <div class="m-footer">
-                        <span style="opacity:0.7;">📺 <?php echo $leagues_map[$code]['channel']; ?></span>
-                        <span style="color:#00ff87; font-weight:900; cursor:pointer;" onclick="goToChannel('<?php echo $leagues_map[$code]['ch_num']; ?>')">شاهد الآن ▶</span>
-                    </div>
                 </div>
-        <?php endif; endforeach; endif; ?>
+        <?php endif; endforeach; else: ?>
+            <p style="padding:20px;">لا توجد مباريات كبرى اليوم</p>
+        <?php endif; ?>
     </div>
 </div>
 
 <div class="grid">
-    <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:5px;">قنوات beIN Sports</div>
-    
-    <?php for($i = 1; $i <= 9; $i++): ?>
-    <div class="card" id="ch-row-<?php echo $i; ?>">
-        <div class="c-head">
-            <div class="name-box-purple">beIN Sport <?php echo $i; ?></div>
-            <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
-        </div>
-        <video id="vid<?php echo $i; ?>" playsinline controls></video>
-        <button class="play-btn-premium" onclick="robustPlay('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php', 'bs<?php echo $i; ?>.php', this)"> 
-            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
-        </button>
+    <?php for($i = 1; $i <= 10; $i++): ?>
+    <div class="card" id="ch-row-<?= $i ?>">
+        <div style="padding:10px; background:rgba(0,0,0,0.3); font-size:12px;">beIN Sport <?= $i ?></div>
+        <video id="vid<?= $i ?>" playsinline controls></video>
+        <button class="play-btn" onclick="robustPlay('vid<?= $i ?>', 'b<?= $i ?>.php')">بدء البث المباشر</button>
     </div>
     <?php endfor; ?>
 
     <div class="card" id="ch-row-11">
-        <div class="c-head">
-            <div class="name-box-purple">beIN Sports AFC</div>
-            <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
-        </div>
+        <div style="padding:10px; background:rgba(0,0,0,0.3); font-size:12px;">beIN Sports AFC</div>
         <video id="vid11" playsinline controls></video>
-        <button class="play-btn-premium" onclick="robustPlay('vid11', 'b11.php', 'bs11.php', this)"> 
-            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
-        </button>
+        <button class="play-btn" onclick="robustPlay('vid11', 'b11.php')">بدء البث المباشر</button>
     </div>
 </div>
 
 <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية</footer>
 
 <script>
-window.addEventListener('load', function() {
-    setTimeout(() => { document.getElementById('pro-cinematic-intro').classList.add('intro-finish-vfx'); }, 2500); 
-});
-
-function goToChannel(num) {
-    const el = document.getElementById('ch-row-' + num);
-    if(el) { window.scrollTo({ top: el.offsetTop - 190, behavior: 'smooth' }); setTimeout(() => el.querySelector('.play-btn-premium').click(), 800); }
-}
-
-function robustPlay(videoId, primary, backup, btn) {
+function robustPlay(videoId, url) {
     const video = document.getElementById(videoId);
-    const btnText = btn.querySelector('span');
-    btnText.innerText = "جاري الاتصال...";
-    function run(url) {
-        if (video.hls) { video.hls.destroy(); }
-        if (Hls.isSupported()) {
-            const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play(); btnText.innerText = "تم التشغيل بنجاح"; });
-            video.hls = hls;
-        } else { video.src = url; video.play(); }
-    }
-    run(primary);
-    setTimeout(() => { if (video.paused) run(backup); }, 7000);
+    if (Hls.isSupported()) {
+        const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+    } else { video.src = url; video.play(); }
 }
 </script>
 </body>
