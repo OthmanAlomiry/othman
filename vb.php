@@ -1,29 +1,10 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>تحميل فيديو سناب شات</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 50px; text-align: center; }
-        input[type="text"] { width: 300px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 10px 20px; background-color: #FFFC00; border: 1px solid #000; cursor: pointer; border-radius: 5px; font-weight: bold; }
-        .result { margin-top: 20px; padding: 20px; border: 1px solid #eee; background: #fafafa; word-wrap: break-word; }
-    </style>
-</head>
-<body>
-
-    <h2>أداة تحميل فيديوهات سناب شات</h2>
-    
-    <form method="POST">
-        <input type="text" name="snap_url" placeholder="ضع رابط سناب شات هنا..." required>
-        <button type="submit">استخراج الفيديو</button>
-    </form>
-
-    <div class="result">
     <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['snap_url'])) {
         
         $snapUrl = $_POST['snap_url'];
+        // تنظيف الرابط من أي مسافات زائدة
+        $snapUrl = trim($snapUrl);
+        
         $apiUrl = "https://download-snapchat-video-spotlight-online.p.rapidapi.com/download?url=" . urlencode($snapUrl);
 
         $curl = curl_init();
@@ -42,24 +23,25 @@
         curl_close($curl);
 
         if ($err) {
-            echo "خطأ في الاتصال: " . $err;
+            echo "<p style='color:red;'>خطأ في الاتصال: " . $err . "</p>";
         } else {
             $data = json_decode($response, true);
             
+            // فحص المفاتيح المحتملة للرابط (بعض الـ APIs تستخدم 'download_url' أو 'media_url')
+            $videoUrl = $data['url'] ?? $data['download_url'] ?? $data['result'] ?? null;
+
             if (isset($data['error'])) {
-                echo "<p style='color:red;'>عذراً: " . $data['error'] . "</p>";
-            } elseif (isset($data['url'])) {
-                echo "<h3>تم العثور على الفيديو:</h3>";
-                echo "<a href='".$data['url']."' target='_blank' style='color:blue; text-decoration:underline;'>اضغط هنا لفتح وتحميل الفيديو</a>";
+                echo "<p style='color:red;'>تنبيه من الـ API: " . $data['error'] . "</p>";
+            } elseif ($videoUrl) {
+                echo "<h3>✅ تم استخراج الفيديو بنجاح:</h3>";
+                echo "<a href='".$videoUrl."' target='_blank' style='display:inline-block; padding:15px; background:green; color:white; text-decoration:none; border-radius:5px;'>تحميل الفيديو الآن</a>";
             } else {
-                echo "استجابة غير معروفة، جرب رابطاً آخر.";
+                // إذا لم نجد الرابط، سنعرض الاستجابة الخام لنفهم المشكلة
+                echo "<p style='color:orange;'>لم يتم العثور على رابط مباشر. إليك الرد الفني من السيرفر:</p>";
+                echo "<pre style='text-align:left; background:#eee; padding:10px; direction:ltr;'>";
+                print_r($data);
+                echo "</pre>";
             }
         }
-    } else {
-        echo "يرجى إدخال الرابط أعلاه لبدء العملية.";
     }
     ?>
-    </div>
-
-</body>
-</html>
