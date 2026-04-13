@@ -1,31 +1,13 @@
 <?php
-/**
- * صفحة المباريات المتكاملة - متجر الخدمة الرقمية
- * API: API-Football (الأفضل للدوريات العربية والأوروبية)
- */
+// إعدادات الـ API الخاصة بك من الصورة
+$api_key = "bYKapDzujDdGdDwq";
+$api_secret = "MLDJw7w8gjbHauTlsEwRi6lBKyixCPoY";
 
-$apiKey = '49e271c73amsh02ca0a4d3f5b237p145598jsn7c1cee0f8ec9'; // مفتاحك
-$dateToday = date('Y-m-d');
+// جلب مباريات اليوم - تم إضافة lang=ar للغة العربية
+$url = "https://live-score-api.com/api/live/scores.json?key=$api_key&secret=$api_secret&lang=ar";
 
-// رابط الـ API (يجب التأكد من الاشتراك في باقة Basic المجانية لـ API-Football في RapidAPI)
-$url = "https://api-football-v1.p.rapidapi.com/v3/fixtures?date=$dateToday";
-
-$ch = curl_init();
-curl_setopt_array($ch, [
-    CURLOPT_URL => $url,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_HTTPHEADER => [
-        "X-RapidAPI-Host: api-football-v1.p.rapidapi.com",
-        "X-RapidAPI-Key: $apiKey"
-    ],
-]);
-$response = curl_exec($ch);
-curl_close($ch);
-$data = json_decode($response, true);
-
-// جلب القنوات من Bin الخاص بك
-$binUrl = "https://api.jsonbin.io/v3/b/69db5855aaba882197ed8b66/latest";
-$ch_data = json_decode(@file_get_contents($binUrl), true)['record']['custom_channels'] ?? [];
+$response = file_get_contents($url);
+$result = json_decode($response, true);
 ?>
 
 <!DOCTYPE html>
@@ -33,46 +15,107 @@ $ch_data = json_decode(@file_get_contents($binUrl), true)['record']['custom_chan
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جدول المباريات | d-service.pro</title>
+    <title>مباريات اليوم</title>
     <style>
-        body { background: #050c14; color: #fff; font-family: sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: auto; }
-        .match-card { background: rgba(255,255,255,0.05); border: 1px solid #222; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; }
-        .team { flex: 1; text-align: center; font-size: 13px; }
-        .team img { width: 35px; margin-bottom: 5px; }
-        .info { flex: 1.5; text-align: center; border-left: 1px solid #333; border-right: 1px solid #333; }
-        .time { font-size: 18px; font-weight: bold; color: #f1c40f; }
-        .league { font-size: 10px; color: #00ff87; display: block; }
-        .btn { display: inline-block; background: #e11d48; color: #fff; text-decoration: none; padding: 5px 15px; border-radius: 5px; font-size: 11px; margin-top: 8px; }
+        :root {
+            --primary-color: #6200ea;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            padding: 20px 0;
+            color: var(--primary-color);
+        }
+        .match-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .team {
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .score-area {
+            flex: 1;
+            text-align: center;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 0 15px;
+        }
+        .score {
+            font-size: 1.5em;
+            font-weight: 900;
+            color: #333;
+        }
+        .status {
+            display: block;
+            font-size: 0.8em;
+            color: #d32f2f;
+            margin-top: 5px;
+        }
+        .league-name {
+            font-size: 0.85em;
+            color: #777;
+            text-align: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .no-matches {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align: center;">🏆 مباريات اليوم</h2>
-    
-    <?php if (!empty($data['response'])): ?>
-        <?php foreach ($data['response'] as $m): ?>
-        <div class="match-card">
-            <div class="team">
-                <img src="<?= $m['teams']['home']['logo'] ?>">
-                <span><?= $m['teams']['home']['name'] ?></span>
-            </div>
-            
-            <div class="info">
-                <span class="league"><?= $m['league']['name'] ?></span>
-                <div class="time"><?= date('H:i', strtotime($m['fixture']['date'])) ?></div>
-                <a href="watch.php" class="btn">شاهد الآن</a>
-            </div>
+    <header>
+        <h1>⚽ مباريات اليوم المباشرة</h1>
+        <p><?php echo date('Y-m-d'); ?></p>
+    </header>
 
-            <div class="team">
-                <img src="<?= $m['teams']['away']['logo'] ?>">
-                <span><?= $m['teams']['away']['name'] ?></span>
+    <?php if ($result['success'] && !empty($result['data']['match'])): ?>
+        <?php foreach ($result['data']['match'] as $match): ?>
+            <div class="match-card">
+                <div class="league-name"><?php echo $match['league_name']; ?></div>
+                <div style="display: flex; width: 100%; align-items: center;">
+                    <div class="team"><?php echo $match['home_name']; ?></div>
+                    
+                    <div class="score-area">
+                        <div class="score"><?php echo $match['score']; ?></div>
+                        <span class="status"><?php echo $match['status']; ?> '<?php echo $match['time']; ?></span>
+                    </div>
+                    
+                    <div class="team"><?php echo $match['away_name']; ?></div>
+                </div>
             </div>
-        </div>
         <?php endforeach; ?>
     <?php else: ?>
-        <p style="text-align: center; opacity: 0.5;">لا توجد مباريات جارية. تأكد من الاشتراك في <b>API-Football</b> عبر RapidAPI.</p>
+        <div class="no-matches">
+            <h3>لا توجد مباريات مباشرة في الوقت الحالي</h3>
+            <p>تأكد من حالة الاشتراك في لوحة التحكم الخاصة بك.</p>
+        </div>
     <?php endif; ?>
 </div>
 
