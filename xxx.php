@@ -9,6 +9,7 @@ $leagues_map = [
     'SA'  => ['name' => 'الدوري الإيطالي', 'channel' => 'STARZPLAY 1', 'ch_num' => '10'],
     'BL1' => ['name' => 'الدوري الألماني', 'channel' => 'beIN Sport 5', 'ch_num' => '5'],
     'CL'  => ['name' => 'دوري أبطال أوروبا', 'channel' => 'beIN Sport 2', 'ch_num' => '2'],
+    'CLI' => ['name' => 'دوري أبطال آسيا للنخبة', 'channel' => 'beIN AFC', 'ch_num' => '11'], // إضافة دوري أبطال آسيا
 ];
 
 function translate_name($text) {
@@ -54,7 +55,6 @@ date_default_timezone_set('Asia/Riyadh');
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 175px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* --- شاشة الدخول VFX --- */
         #pro-cinematic-intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
@@ -66,52 +66,43 @@ date_default_timezone_set('Asia/Riyadh');
         .intro-loading-bar { width: 0%; height: 100%; background: var(--main); box-shadow: 0 0 15px var(--main); animation: loadProgress 3s forwards; }
         @keyframes loadProgress { to { width: 100%; } }
 
-        /* --- الخلفية --- */
         .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.05; animation: movePattern 60s linear infinite; }
         @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
 
-        /* --- الهيدر الزجاجي --- */
         .header-fixed-container { 
             position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000;
             background: rgba(5, 12, 20, 0.9); backdrop-filter: blur(25px); 
             border-bottom: 1px solid var(--glass-border); padding: 15px 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             display: flex; flex-direction: column; align-items: center; text-align: center;
-            transition: all var(--anim-speed) ease;
         }
-        .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); margin-inline: auto; }
-        .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; width: 95%; margin-inline: auto; }
-        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: var(--anim-speed) ease; display: flex; align-items: center; gap: 6px; }
-        .social-btn:hover { transform: translateY(-3px) scale(1.05); filter: brightness(1.2); }
+        .promo-text { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.6; width: 90%; max-width: 600px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .social-links { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; width: 95%; }
+        .social-btn { padding: 7px 15px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 10px; color: #fff; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; display: flex; align-items: center; gap: 6px; }
 
-        /* --- جدول المباريات --- */
         .matches-section { padding: 10px 15px; animation: fadeIn 1s ease-in; }
         .match-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .match-scroll::-webkit-scrollbar { display: none; }
         .match-card { 
             min-width: 270px; background: var(--glass); border-radius: 20px; padding: 15px; 
             border: 1px solid var(--glass-border); text-align: center; 
-            transition: transform var(--anim-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275), background var(--anim-speed);
+            transition: 0.4s;
         }
-        .match-card:hover { transform: translateY(-8px) scale(1.02); background: rgba(255,255,255,0.08); }
-        .m-league { font-size: 9px; color: #00ff87; font-weight: 800; text-align: center; margin-bottom: 10px; }
+        .match-card:hover { transform: translateY(-8px); background: rgba(255,255,255,0.08); }
+        .m-league { font-size: 9px; color: #00ff87; font-weight: 800; margin-bottom: 10px; }
         .match-main { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
-        .team { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .team img { width: 38px; height: 38px; object-fit: contain; display: block; margin: 0 auto; transition: 0.5s ease; }
-        .match-card:hover .team img { transform: rotate(5deg) scale(1.1); }
-        .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; display: block; text-align: center; }
-        .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; flex: 0.6; text-align: center; }
+        .team { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .team img { width: 38px; height: 38px; object-fit: contain; }
+        .team-name { font-size: 10px; font-weight: 700; margin-top: 6px; }
+        .m-score { font-size: 1.4em; font-weight: 900; letter-spacing: 2px; }
         .m-footer { border-top: 1px solid var(--glass-border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 9px; align-items: center; }
 
-        /* --- القنوات --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; padding: 15px; }
         .card { 
             background: var(--glass); backdrop-filter: blur(20px); border-radius: 20px; 
             overflow: hidden; border: 1px solid var(--glass-border);
-            transition: transform var(--anim-speed) ease, box-shadow var(--anim-speed) ease;
         }
-        .card:hover { transform: scale(1.01); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
         .c-head { padding: 12px 18px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
         .name-box-purple { background: var(--purple-grad); padding: 5px 15px; border-radius: 8px; color: #061626; font-weight: 900; font-size: 11px; }
         .live-box { display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); }
@@ -122,13 +113,7 @@ date_default_timezone_set('Asia/Riyadh');
             width: 90%; margin: 15px auto; display: flex; justify-content: center; align-items: center; gap: 10px; 
             background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); 
             padding: 14px; border-radius: 50px; font-weight: 900; font-size: 13px; cursor: pointer;
-            backdrop-filter: blur(5px); transition: all 0.3s ease; 
-            animation: glassGlow 3s infinite;
         }
-        .play-btn-premium:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
-        @keyframes glassGlow { 0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); } 50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); } }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
         footer { text-align: center; padding: 40px; font-size: 11px; opacity: 0.5; }
@@ -198,6 +183,7 @@ date_default_timezone_set('Asia/Riyadh');
 
 <div class="grid">
     <div style="grid-column: 1/-1; font-size:18px; font-weight:900; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:5px;">قنوات beIN Sports</div>
+    
     <?php for($i = 1; $i <= 9; $i++): ?>
     <div class="card" id="ch-row-<?php echo $i; ?>">
         <div class="c-head">
@@ -210,6 +196,17 @@ date_default_timezone_set('Asia/Riyadh');
         </button>
     </div>
     <?php endfor; ?>
+
+    <div class="card" id="ch-row-11">
+        <div class="c-head">
+            <div class="name-box-purple">beIN Sports AFC</div>
+            <div class="live-box"><div class="live-dot"></div><span style="font-size:9px; color:#22c55e; font-weight:900;">LIVE</span></div>
+        </div>
+        <video id="vid11" playsinline controls></video>
+        <button class="play-btn-premium" onclick="robustPlay('vid11', 'b11.php', 'bs11.php', this)"> 
+            <i class="fas fa-play"></i> <span>بدء البث المباشر</span>
+        </button>
+    </div>
 </div>
 
 <footer>جميع الحقوق محفوظة لمتجر الخدمة الرقمية</footer>
@@ -228,7 +225,7 @@ function robustPlay(videoId, primary, backup, btn) {
     const video = document.getElementById(videoId);
     const btnText = btn.querySelector('span');
     btnText.innerText = "جاري الاتصال...";
-    function run(url, isB = false) {
+    function run(url) {
         if (video.hls) { video.hls.destroy(); }
         if (Hls.isSupported()) {
             const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
@@ -237,7 +234,7 @@ function robustPlay(videoId, primary, backup, btn) {
         } else { video.src = url; video.play(); }
     }
     run(primary);
-    setTimeout(() => { if (video.paused) run(backup, true); }, 7000);
+    setTimeout(() => { if (video.paused) run(backup); }, 7000);
 }
 </script>
 </body>
