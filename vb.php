@@ -1,13 +1,21 @@
 <?php
-// إعدادات الـ API الخاصة بك من الصورة
+// إعدادات الـ API
 $api_key = "bYKapDzujDdGdDwq";
 $api_secret = "MLDJw7w8gjbHauTlsEwRi6lBKyixCPoY";
-
-// جلب مباريات اليوم - تم إضافة lang=ar للغة العربية
 $url = "https://live-score-api.com/api/live/scores.json?key=$api_key&secret=$api_secret&lang=ar";
 
-$response = file_get_contents($url);
+// استخدام cURL بدلاً من file_get_contents لضمان العمل في بيئة Docker
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // لتجنب مشاكل شهادات SSL
+$response = curl_exec($ch);
+curl_close($ch);
+
 $result = json_decode($response, true);
+
+// التحقق من وجود بيانات لتجنب خطأ Array offset on null
+$matches = (isset($result['data']['match']) && is_array($result['data']['match'])) ? $result['data']['match'] : [];
 ?>
 
 <!DOCTYPE html>
@@ -17,104 +25,37 @@ $result = json_decode($response, true);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مباريات اليوم</title>
     <style>
-        :root {
-            --primary-color: #6200ea;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        header {
-            text-align: center;
-            padding: 20px 0;
-            color: var(--primary-color);
-        }
-        .match-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .team {
-            flex: 1;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        .score-area {
-            flex: 1;
-            text-align: center;
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 0 15px;
-        }
-        .score {
-            font-size: 1.5em;
-            font-weight: 900;
-            color: #333;
-        }
-        .status {
-            display: block;
-            font-size: 0.8em;
-            color: #d32f2f;
-            margin-top: 5px;
-        }
-        .league-name {
-            font-size: 0.85em;
-            color: #777;
-            text-align: center;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-        .no-matches {
-            text-align: center;
-            padding: 50px;
-            color: #888;
-        }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: auto; }
+        .match-card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-around; align-items: center; }
+        .score { font-weight: bold; font-size: 1.2em; color: #6200ea; }
+        .league { font-size: 0.8em; color: #888; display: block; margin-bottom: 5px; }
+        .error-msg { color: #d32f2f; background: #ffcdd2; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1>⚽ مباريات اليوم المباشرة</h1>
-        <p><?php echo date('Y-m-d'); ?></p>
-    </header>
+    <h1 style="color: #6200ea;">⚽ مباريات اليوم المباشرة</h1>
+    <p><?php echo date('Y-m-d'); ?></p>
 
-    <?php if ($result['success'] && !empty($result['data']['match'])): ?>
-        <?php foreach ($result['data']['match'] as $match): ?>
+    <?php if (!empty($matches)): ?>
+        <?php foreach ($matches as $match): ?>
             <div class="match-card">
-                <div class="league-name"><?php echo $match['league_name']; ?></div>
-                <div style="display: flex; width: 100%; align-items: center;">
-                    <div class="team"><?php echo $match['home_name']; ?></div>
-                    
-                    <div class="score-area">
-                        <div class="score"><?php echo $match['score']; ?></div>
-                        <span class="status"><?php echo $match['status']; ?> '<?php echo $match['time']; ?></span>
-                    </div>
-                    
-                    <div class="team"><?php echo $match['away_name']; ?></div>
+                <div style="flex:1"><?php echo $match['home_name']; ?></div>
+                <div style="flex:1">
+                    <span class="league"><?php echo $match['league_name']; ?></span>
+                    <span class="score"><?php echo $match['score']; ?></span>
+                    <div style="font-size: 0.7em; color: red;"><?php echo $match['time']; ?>'</div>
                 </div>
+                <div style="flex:1"><?php echo $match['away_name']; ?></div>
             </div>
         <?php endforeach; ?>
     <?php else: ?>
-        <div class="no-matches">
-            <h3>لا توجد مباريات مباشرة في الوقت الحالي</h3>
-            <p>تأكد من حالة الاشتراك في لوحة التحكم الخاصة بك.</p>
+        <div class="error-msg">
+            لا توجد مباريات مباشرة حالياً أو انتهت صلاحية المفتاح التجريبي.
+            <br>
+            <small>تأكد من تفعيل الباقة في موقع live-score-api.com</small>
         </div>
     <?php endif; ?>
 </div>
