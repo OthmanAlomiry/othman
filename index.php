@@ -339,7 +339,7 @@ function startStream(boxId, file, btn, channelName) {
     
     // التعديل المطلوب: الحفاظ على اسم القناة مع إضافة متصل الآن
     if(btn.classList.contains('play-btn') || btn.classList.contains('backup-btn')) {
-        btn.querySelector('span').innerText = channelName + ' ( بث..)'; 
+        btn.querySelector('span').innerText = channelName + ' (يبث الآن)'; 
     }
 }
 window.addEventListener('load', () => { 
