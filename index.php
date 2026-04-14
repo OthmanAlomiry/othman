@@ -296,12 +296,12 @@ function filterSection($channels, $sec) {
             <div class="card">
                 <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.GIF')"></div>
                 
-                <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this)">
+                <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this, '<?= $ch['name'] ?>')">
                     <i class="fas fa-play-circle"></i> <span>تشغيل <?= $ch['name'] ?></span>
                 </button>
 
                 <?php if(!empty($ch['file_backup'])): ?>
-                <button class="backup-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file_backup'] ?>', this)">
+                <button class="backup-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file_backup'] ?>', this, '<?= $ch['name'] ?>')">
                     <i class="fas fa-shield-alt"></i> <span>تشغيل البث الاحتياطي</span>
                 </button>
                 <?php endif; ?>
@@ -333,13 +333,13 @@ function switchSection(id, element) {
     document.getElementById('section-' + id).classList.add('active');
     element.classList.add('active');
 }
-function startStream(boxId, file, btn) {
+function startStream(boxId, file, btn, channelName) {
     let vBox = document.getElementById(boxId); vBox.style.backgroundImage = "none";
     vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=0" allowfullscreen></iframe>`;
     
-    // إذا كان الزر هو الزر الأساسي نقوم بتحديث نصه
-    if(btn.classList.contains('play-btn')) {
-        btn.querySelector('span').innerText = 'متصل الآن..'; 
+    // التعديل المطلوب: الحفاظ على اسم القناة مع إضافة متصل الآن
+    if(btn.classList.contains('play-btn') || btn.classList.contains('backup-btn')) {
+        btn.querySelector('span').innerText = channelName + ' ( بث..)'; 
     }
 }
 window.addEventListener('load', () => { 
