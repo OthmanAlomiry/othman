@@ -1,6 +1,6 @@
 <?php
 
-$base = "http://172.238.122.153/bein3/";
+$base = "http://185.202.236.109/bein3/";
 $file = "mono.ts.m3u8";
 
 function stream($url){
