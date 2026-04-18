@@ -1,6 +1,6 @@
 <?php
 
-$base = "http://sportook.online/SHAHID-EVENT-1/";
+$base = "http://sportme.online/SHAHID-EVENT-1/";
 $file = "mono.m3u8";
 
 function stream($url){
