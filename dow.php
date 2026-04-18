@@ -1,12 +1,12 @@
 <?php
-// --- الجزء الأول: منطق التحميل ---
+// --- الجزء الأول: منطق التحميل المباشر (للملفات) ---
 if (isset($_GET['dl']) && !empty($_GET['url'])) {
     $fileUrl = $_GET['url'];
     $fileName = isset($_GET['title']) ? $_GET['title'] : 'video';
     $cleanFileName = preg_replace('/[^A-Za-z0-9]/', '_', $fileName) . ".mp4";
 
     header('Content-Description: File Transfer');
-    header('Content-Type: video/mp4'); // تم التعديل ليكون متوافقاً مع iOS
+    header('Content-Type: video/mp4');
     header('Content-Disposition: attachment; filename="' . $cleanFileName . '"');
     header('Expires: 0');
     header('Cache-Control: must-revalidate');
@@ -16,7 +16,7 @@ if (isset($_GET['dl']) && !empty($_GET['url'])) {
     exit;
 }
 
-// --- الجزء الثاني: جلب البيانات ---
+// --- الجزء الثاني: جلب البيانات من API ---
 $videoData = null;
 $error = null;
 
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['tiktok_url'])) {
     if ($result && isset($result['data'])) {
         $videoData = $result['data'];
     } else {
-        $error = "عذراً، لم نتمكن من العثور على الفيديو.";
+        $error = "عذراً، لم نتمكن من جلب الفيديو. تأكد من الرابط.";
     }
 }
 ?>
@@ -45,21 +45,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['tiktok_url'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محمل تيك توك للأيفون</title>
+    <title>محمل تيك توك الاحترافي</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background: #121212; color: white; font-family: sans-serif; }
-        .card { background: #1e1e1e; border: none; border-radius: 20px; }
-        .btn-tiktok { background: #fe2c55; border: none; color: white; }
-        .iphone-tip { background: #2c2c2c; padding: 15px; border-radius: 10px; font-size: 0.9em; border-right: 4px solid #007bff; }
+        .card { background: #1e1e1e; border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .btn-tiktok { background: #fe2c55; border: none; color: white; padding: 12px; }
+        .video-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 300px; 
+            margin: 0 auto; 
+            border-radius: 15px; 
+            overflow: hidden;
+            border: 2px solid #333;
+        }
+        video { width: 100%; display: block; background: #000; }
+        .instruction-box { 
+            background: #2c2c2c; 
+            padding: 15px; 
+            border-radius: 12px; 
+            font-size: 0.85em; 
+            border-right: 4px solid #fe2c55; 
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-<div class="container py-5">
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-md-7 card p-4">
-            <h2 class="text-center mb-4">تحميل للأيفون والطلب</h2>
+        <div class="col-md-6 card p-4">
+            <h3 class="text-center mb-4">تحميل فيديو تيك توك</h3>
             
             <form method="POST" action="dow.php">
                 <div class="input-group mb-3">
@@ -68,28 +85,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['tiktok_url'])) {
                 </div>
             </form>
 
+            <?php if ($error): ?>
+                <div class="alert alert-danger mt-3"><?php echo $error; ?></div>
+            <?php endif; ?>
+
             <?php if ($videoData): ?>
-                <div class="text-center mt-4 border-top pt-4">
-                    <img src="<?php echo $videoData['cover']; ?>" style="width:150px; border-radius:10px;" class="mb-3">
+                <div class="text-center mt-4 pt-3 border-top border-secondary">
                     
-                    <div class="d-grid gap-3">
+                    <div class="video-container mb-3">
+                        <video controls playsinline webkit-playsinline poster="<?php echo $videoData['cover']; ?>">
+                            <source src="<?php echo $videoData['play']; ?>" type="video/mp4">
+                            متصفحك لا يدعم تشغيل الفيديو.
+                        </video>
+                    </div>
+
+                    <h6 class="mb-3 text-truncate"><?php echo htmlspecialchars($videoData['title']); ?></h6>
+
+                    <div class="d-grid gap-2">
                         <a href="dow.php?dl=true&url=<?php echo urlencode($videoData['play']); ?>&title=<?php echo urlencode($videoData['title']); ?>" 
                            class="btn btn-success btn-lg">
-                           📥 تحميل (يُحفظ في الملفات)
-                        </a>
-
-                        <a href="<?php echo $videoData['play']; ?>" target="_blank" class="btn btn-primary btn-lg">
-                           📱 فتح الفيديو للحفظ في الاستوديو
+                           📥 تحميل إلى "الملفات"
                         </a>
                     </div>
 
-                    <div class="iphone-tip mt-4 text-start">
-                        <strong>💡 لمستخدمي الأيفون:</strong>
-                        <ol class="mt-2">
-                            <li>اضغط على زر <b>"فتح الفيديو"</b> بالأعلى.</li>
-                            <li>سيفتح الفيديو في صفحة جديدة، اضغط على أيقونة <b>المشاركة (السهم المربع)</b> في أسفل المتصفح.</li>
-                            <li>اختر <b>"حفظ الفيديو" (Save Video)</b> وسيتم نقله فوراً للاستوديو.</li>
-                        </ol>
+                    <div class="instruction-box text-start">
+                        <strong>📲 للحفظ في "استديو الصور" مباشرة:</strong>
+                        <ul class="mt-2 mb-0">
+                            <li>شغل الفيديو أعلاه (سيعمل داخل الصفحة).</li>
+                            <li>اضغط على أيقونة <b>المشاركة</b> في متصفح سفاري (المربع مع السهم).</li>
+                            <li>اختر <b>"حفظ في الاستديو"</b> أو <b>"Save Video"</b>.</li>
+                        </ul>
                     </div>
                 </div>
             <?php endif; ?>
