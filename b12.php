@@ -1,6 +1,6 @@
 <?php
 
-$base = "http://sportook.online/MBC-ACTION/tracks-v1a1/";
+$base = "http://sportme.online/MBC-ACTION/tracks-v1a1/";
 $file = "mono.m3u8";
 
 function stream($url){
