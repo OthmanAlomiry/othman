@@ -1,23 +1,43 @@
 <?php
 session_start();
-error_reporting(0); // يمكنك تغييره إلى E_ALL عند التجربة فقط
+error_reporting(0); 
 
-// --- 1. إعدادات الوقت والـ API لجدول المباريات ---
+// --- 1. إعدادات الوقت والقواعد الثابتة ---
 date_default_timezone_set('Asia/Riyadh');
 $date_get = date('Y-m-d');
 
-$FOOTBALL_API_KEY_NEW = '02e59a7388ad43b29661ef3bf22e74de'; 
-$url_new = 'https://api.football-data.org/v4/matches';
+// ملفات الكاش المحلية
+$channels_cache_file = 'channels_cache.json';
+$matches_cache_file = 'matches_cache.json';
 
-$leagues_map_new = [
-    'PL'  => ['name' => 'الدوري الإنجليزي'],
-    'PD'  => ['name' => 'الدوري الإسباني'],
-    'SA'  => ['name' => 'الدوري الإيطالي'],
-    'BL1' => ['name' => 'الدوري الألماني'],
-    'FL1' => ['name' => 'الدوري الفرنسي'],
-    'CL'  => ['name' => 'دوري أبطال أوروبا'],
-];
+// إعدادات JSONBIN
+$BIN_ID = '69c4ad66c3097a1dd55f06d6';
+$API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
 
+// --- 2. وظيفة التحديث اليدوي (تُستدعى عند الضغط على الزر) ---
+if (isset($_GET['update_data'])) {
+    // جلب القنوات من JSONBIN
+    $ch = curl_init("https://api.jsonbin.io/v3/b/" . $BIN_ID . "/latest");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $API_KEY, "X-Bin-Meta: false"]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $res = curl_exec($ch);
+    curl_close($ch);
+    
+    if ($res) {
+        file_put_contents($channels_cache_file, $res);
+        header("Location: " . strtok($_SERVER["REQUEST_URI"], '?') . "?success=1");
+        exit;
+    }
+}
+
+// --- 3. جلب البيانات من الكاش المحلي ---
+$cloud = file_exists($channels_cache_file) ? json_decode(file_get_contents($channels_cache_file), true) : [];
+$all_channels = $cloud['custom_channels'] ?? [];
+$active_sections = array_filter($cloud['sections'] ?: [], function($s) { return ($s['status'] ?? '') == 'show'; });
+$news = $cloud['news_ticker'] ?? ['text' => '', 'status' => 'hide'];
+
+// --- 4. ترجمة ثابتة (تم حذف جوجل للسرعة) ---
 $translate = [
     'NS' => 'لم تبدأ', 'FT' => 'انتهت', 'FINISHED' => 'انتهت', 'TIMED' => 'لم تبدأ', 'IN_PLAY' => 'مباشر', 
     '1H' => 'شوط 1', '2H' => 'شوط 2', 'HT' => 'بين الشوطين', 'PAUSED' => 'بين الشوطين',
@@ -26,30 +46,32 @@ $translate = [
 ];
 
 function translate_name_pro($text, $manual_list) {
-    if (isset($manual_list[$text])) return $manual_list[$text];
-    // محاولة جلب الترجمة من جوجل مع مهلة زمنية قصيرة
-    $url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=" . urlencode($text);
-    $ctx = stream_context_create(['http' => ['timeout' => 2]]); 
-    $response = @file_get_contents($url, false, $ctx);
-    if($response) {
-        $result = json_decode($response, true);
-        return $result[0][0][0] ?? $text;
-    }
-    return $text;
+    return $manual_list[$text] ?? $text;
 }
 
-// --- 2. جلب بيانات المباريات (نسخة معالجة أخطاء الاتصال) ---
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url_new);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $FOOTBALL_API_KEY_NEW]);
-curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4); // حل مشكلة Render مع IPv6
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);       // تجاوز مشاكل شهادة الأمان
-curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-$response_new = curl_exec($ch);
-curl_close($ch);
+// --- 5. جلب المباريات (كاش لمدة 10 دقائق لتجنب الحظر) ---
+if (file_exists($matches_cache_file) && (time() - filemtime($matches_cache_file) < 600)) {
+    $match_data_new = json_decode(file_get_contents($matches_cache_file), true);
+} else {
+    $FOOTBALL_API_KEY_NEW = '02e59a7388ad43b29661ef3bf22e74de'; 
+    $ch = curl_init('https://api.football-data.org/v4/matches');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $FOOTBALL_API_KEY_NEW]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $response_new = curl_exec($ch);
+    curl_close($ch);
+    if ($response_new) {
+        file_put_contents($matches_cache_file, $response_new);
+        $match_data_new = json_decode($response_new, true);
+    }
+}
 
-$match_data_new = json_decode($response_new, true);
+$leagues_map_new = [
+    'PL'  => ['name' => 'الدوري الإنجليزي'], 'PD'  => ['name' => 'الدوري الإسباني'],
+    'SA'  => ['name' => 'الدوري الإيطالي'], 'BL1' => ['name' => 'الدوري الألماني'],
+    'FL1' => ['name' => 'الدوري الفرنسي'], 'CL'  => ['name' => 'دوري أبطال أوروبا'],
+];
+
 $ordered_matches = [];
 if (isset($match_data_new['matches'])) {
     foreach ($match_data_new['matches'] as $m) {
@@ -60,10 +82,7 @@ if (isset($match_data_new['matches'])) {
     }
 }
 
-// --- 3. إعدادات القنوات والزوار و Cloud Data ---
-$API_KEY = '$2a$10$HsgEopXEHj.LV8oAFpXB..ziTCTUK/9q6h/aHygbnFeW42h4B90Ge';
-$BIN_ID = '69c4ad66c3097a1dd55f06d6';
-
+// --- 6. الزوار ---
 $visitors_file = 'online_visitors.txt';
 if (isset($_GET['fetch_visitors'])) {
     $session_id = session_id(); $time = time();
@@ -74,22 +93,6 @@ if (isset($_GET['fetch_visitors'])) {
     echo count($data); exit; 
 }
 $online_now = file_exists($visitors_file) ? count(unserialize(file_get_contents($visitors_file))) : 1;
-
-function getCloudFullData($bin, $key) {
-    $ch = curl_init("https://api.jsonbin.io/v3/b/" . $bin . "/latest");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Master-Key: " . $key, "X-Bin-Meta: false"]);
-    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    $res = curl_exec($ch);
-    curl_close($ch);
-    return json_decode($res, true);
-}
-
-$cloud = getCloudFullData($BIN_ID, $API_KEY);
-$all_channels = $cloud['custom_channels'] ?? [];
-$active_sections = array_filter($cloud['sections'] ?: [], function($s) { return ($s['status'] ?? '') == 'show'; });
-$news = $cloud['news_ticker'] ?? ['text' => '', 'status' => 'hide'];
 
 function filterSection($channels, $sec) {
     return array_filter($channels, function($c) use ($sec) { 
@@ -109,6 +112,12 @@ function filterSection($channels, $sec) {
         :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; }
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; }
+        
+        /* تنسيق زر التحديث اليدوي */
+        .admin-refresh-area { padding: 10px; text-align: center; }
+        .refresh-btn { background: #0ea5e9; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 12px; transition: 0.3s; }
+        .refresh-btn:hover { background: #0284c7; }
+
         @media (orientation: landscape) {
             body { padding-top: 190px; }
             .main-container { max-width: 95% !important; }
@@ -155,11 +164,8 @@ function filterSection($channels, $sec) {
         .card { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); margin-bottom: 15px; width: 100%; }
         .play-btn { width: 92%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 13px; }
         .play-btn i { font-size: 16px; color: var(--main); }
-        
-        /* زر البث الاحتياطي المضاف */
         .backup-btn { width: 92%; margin: -10px auto 15px; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3); padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 11px; }
         .backup-btn i { font-size: 14px; }
-
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; background-size: cover; background-position: center; }
         .video-box iframe { position: absolute; top:0; left:0; width: 100%; height: 100%; border: none; }
         .match-nav { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; background: var(--glass); padding: 10px; border-radius: 15px; border: 1px solid var(--glass-border); }
@@ -168,14 +174,6 @@ function filterSection($channels, $sec) {
         .m-team-col { flex: 1; font-size: 10px; font-weight: 700; color: #fff; text-align: center; }
         .m-team-col img { width: 28px; height: 28px; display: block; margin: 0 auto 6px; }
         .m-time-box { flex: 0.6; background: rgba(225, 29, 72, 0.1); border: 1px solid rgba(225, 29, 72, 0.2); padding: 6px; border-radius: 10px; text-align: center; font-weight: 900; font-size: 12px; color: var(--main); }
-        .dual-container { display: flex; flex-direction: column; gap: 15px; align-items: center; width: 100%; }
-        @media (orientation: landscape) { .dual-container { flex-direction: row; justify-content: center; } }
-        .dual-slot { background: #000; border-radius: 15px; overflow: hidden; border: 1px solid var(--glass-border); width: 85%; max-width: 320px; }
-        .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 7000; display: none; align-items: center; justify-content: center; }
-        .ch-picker-window { width: 90%; max-width: 450px; background: #0f172a; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; max-height: 80vh; }
-        .ch-picker-header { padding: 15px; background: var(--main); color: #fff; font-weight: 900; display: flex; justify-content: space-between; }
-        .ch-picker-list { padding: 10px; overflow-y: auto; }
-        .ch-pick-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; color: #fff; font-size: 14px; text-align: right; }
         .visitors-badge-float { position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px; background: rgba(34, 197, 94, 0.1); backdrop-filter: blur(10px); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1px solid #22c55e; font-size: 10px; font-weight: 900; color: #22c55e; }
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(135deg, #050c14 0%, #0a1f33 100%); }
         footer { text-align: center; padding: 30px; font-size: 9px; opacity: 0.4; }
@@ -191,6 +189,17 @@ function filterSection($channels, $sec) {
     </div>
 </div>
 
+<?php if(isset($_GET['admin'])): ?>
+<div class="admin-refresh-area">
+    <button class="refresh-btn" onclick="location.href='?update_data=1&admin=1'">
+        <i class="fas fa-sync-alt"></i> تحديث القنوات من Cloud
+    </button>
+    <?php if(isset($_GET['success'])): ?>
+        <p style="color: #22c55e; font-size: 10px;">تم تحديث الكاش بنجاح!</p>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
+
 <div class="ad-popup-overlay" id="adPopup">
     <div class="ad-popup-content">
         <div class="ad-close-btn" onclick="closeAd()"><i class="fas fa-times"></i></div>
@@ -198,17 +207,6 @@ function filterSection($channels, $sec) {
         <a href="https://wa.me/966505571164" class="ad-subscribe-btn">
             <i class="fab fa-whatsapp"></i> اشترك الآن عبر واتساب
         </a>
-    </div>
-</div>
-
-<div class="ch-picker-overlay" id="ch-picker">
-    <div class="ch-picker-window">
-        <div class="ch-picker-header"><span>📺 قائمة القنوات</span><i class="fas fa-times" onclick="closePicker()" style="cursor:pointer;"></i></div>
-        <div class="ch-picker-list">
-            <?php foreach($all_channels as $ch): ?>
-                <div class="ch-pick-item" onclick="confirmPick('<?= $ch['file'] ?>', '<?= $ch['name'] ?>')"><?= $ch['name'] ?></div>
-            <?php endforeach; ?>
-        </div>
     </div>
 </div>
 
@@ -230,7 +228,6 @@ function filterSection($channels, $sec) {
 
         <div class="category-tabs">
             <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
-            <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="mg/ch2.png"><span>مشاهدة مباريتين</span></div>
             <?php foreach($active_sections as $s): ?>
                 <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
             <?php endforeach; ?>
@@ -239,14 +236,10 @@ function filterSection($channels, $sec) {
 
     <div class="grid">
         <div id="section-matches_table" class="channel-section active">
-            <div class="match-nav">
-                <span style="font-weight:900; font-size:12px; color:#fff;">مباريات اليوم: <?= $date_get ?></span>
-            </div>
+            <div class="match-nav"><span style="font-weight:900; font-size:12px; color:#fff;">مباريات اليوم: <?= $date_get ?></span></div>
             <div class="match-grid-container">
             <?php if(empty($ordered_matches)): ?>
-                <div class="card" style="padding: 20px; text-align: center; grid-column: 1/-1;">
-                    <p style="opacity:0.5; margin:0;">لا توجد مباريات هامة لهذا التاريخ</p>
-                </div>
+                <div class="card" style="padding: 20px; text-align: center;"><p style="opacity:0.5; margin:0;">لا توجد مباريات هامة لهذا التاريخ</p></div>
             <?php else: foreach($ordered_matches as $code => $matches_list): ?>
                 <div class="league-sep"><?= $leagues_map_new[$code]['name'] ?></div>
                 <?php foreach($matches_list as $m): 
@@ -259,33 +252,15 @@ function filterSection($channels, $sec) {
                         <div class="m-row">
                             <div class="m-team-col"><img src="<?= $m['homeTeam']['crest'] ?>"><?= $h_name ?></div>
                             <div class="m-time-box">
-                                <?php if($m['status'] == 'TIMED' || $m['status'] == 'SCHEDULED'): ?>
-                                    <?= $m_time ?>
-                                <?php else: ?>
-                                    <span style="display:block; font-size:16px; letter-spacing:2px;"><?= ($m['score']['fullTime']['home'] ?? 0) ?> - <?= ($m['score']['fullTime']['away'] ?? 0) ?></span>
+                                <?php if($m['status'] == 'TIMED' || $m['status'] == 'SCHEDULED'): ?> <?= $m_time ?>
+                                <?php else: ?> <span style="display:block; font-size:16px;"><?= ($m['score']['fullTime']['home'] ?? 0) ?> - <?= ($m['score']['fullTime']['away'] ?? 0) ?></span>
                                 <?php endif; ?>
-                                <small style="font-size:8px; color:rgba(255,255,255,0.6);"><?= $status ?></small>
+                                <small style="font-size:8px; opacity:0.6;"><?= $status ?></small>
                             </div>
                             <div class="m-team-col"><img src="<?= $m['awayTeam']['crest'] ?>"><?= $a_name ?></div>
                         </div>
                     </div>
                 <?php endforeach; endforeach; endif; ?>
-            </div>
-        </div>
-
-        <div id="section-dual_player" class="channel-section">
-            <div style="background: rgba(14, 165, 233, 0.1); border: 1px dashed #0ea5e9; border-radius: 12px; padding: 10px; margin: 15px auto; text-align: center; width: 85%;">
-                <p style="font-size: 10px; font-weight: 700; color: #38bdf8; margin: 0;">أكتم صوت القناة بالضغط على ( <i class="fas fa-volume-mute"></i> ) لتشغيل القناة الاخرى</p>
-            </div>
-            <div class="dual-container">
-                <div class="dual-slot">
-                    <div class="video-box" id="dual-screen-1" style="background-image:url('mg/chn1.png')"></div>
-                    <button class="play-btn" onclick="openPicker(1)"><i class="fas fa-tv"></i> <span id="btn-text-1">القناة الأولى</span></button>
-                </div>
-                <div class="dual-slot">
-                    <div class="video-box" id="dual-screen-2" style="background-image:url('mg/chn2.png')"></div>
-                    <button class="play-btn" onclick="openPicker(2)"><i class="fas fa-tv"></i> <span id="btn-text-2">القناة الثانية</span></button>
-                </div>
             </div>
         </div>
 
@@ -295,17 +270,9 @@ function filterSection($channels, $sec) {
             <?php foreach($channels as $ch): ?>
             <div class="card">
                 <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.GIF')"></div>
-                
                 <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this, '<?= $ch['name'] ?>')">
                     <i class="fas fa-play-circle"></i> <span>تشغيل <?= $ch['name'] ?></span>
                 </button>
-
-                <?php if(!empty($ch['file_backup'])): ?>
-                <button class="backup-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file_backup'] ?>', this, '<?= $ch['name'] ?>')">
-                    <i class="fas fa-shield-alt"></i> <span>تشغيل البث الاحتياطي</span>
-                </button>
-                <?php endif; ?>
-
             </div>
             <?php endforeach; ?>
             </div>
@@ -316,17 +283,7 @@ function filterSection($channels, $sec) {
 </div>
 
 <script>
-let activeSlot = 0; 
 function closeAd() { document.getElementById('adPopup').style.display = 'none'; }
-function openPicker(slot) { activeSlot = slot; document.getElementById('ch-picker').style.display = 'flex'; }
-function closePicker() { document.getElementById('ch-picker').style.display = 'none'; }
-function confirmPick(url, name) {
-    let screen = document.getElementById('dual-screen-' + activeSlot);
-    screen.style.backgroundImage = "none";
-    screen.innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allowfullscreen></iframe>`;
-    document.getElementById('btn-text-' + activeSlot).innerText = name;
-    closePicker();
-}
 function switchSection(id, element) {
     document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
@@ -336,11 +293,7 @@ function switchSection(id, element) {
 function startStream(boxId, file, btn, channelName) {
     let vBox = document.getElementById(boxId); vBox.style.backgroundImage = "none";
     vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=0" allowfullscreen></iframe>`;
-    
-    // التعديل المطلوب: الحفاظ على اسم القناة مع إضافة متصل الآن
-    if(btn.classList.contains('play-btn') || btn.classList.contains('backup-btn')) {
-        btn.querySelector('span').innerText = channelName + ' (يبث الآن)'; 
-    }
+    btn.querySelector('span').innerText = channelName + ' (يبث الآن)'; 
 }
 window.addEventListener('load', () => { 
     setTimeout(() => { 
