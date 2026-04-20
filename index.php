@@ -221,7 +221,7 @@ function filterSection($channels, $sec) {
             <a href="https://wa.me/966505571164" class="social-btn btn-wa">واتساب</a>
             <a href="https://t.me/d_s_pro" class="social-btn btn-tg">تليجرام</a>
             <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-sn">سناب</a>
-            <a href="https://x.com/d_service_pro" class="social-btn btn-tw">تويتر</a>
+            <a href="https://x.com/d_service_pro" class="social-btn btn-tw">منصة X</a>
         </div>
 
         <?php if(($news['status'] ?? 'hide') == 'show'): ?>
