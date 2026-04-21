@@ -152,17 +152,15 @@ function filterSection($channels, $sec) {
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; background-size: cover; background-position: center; }
         .video-box iframe { position: absolute; top:0; left:0; width: 100%; height: 100%; border: none; }
 
+        /* ستايل قسم مباريات مهمة الجديد */
+        .match-card-top { padding: 12px; text-align: center; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.02); }
+        .m-league-name { font-size: 10px; color: var(--main); font-weight: 900; margin-bottom: 5px; display: block; }
+        .m-teams-flex { display: flex; justify-content: center; align-items: center; gap: 15px; }
+        .m-team-name { font-size: 13px; font-weight: 900; color: #fff; }
+        .m-vs-tag { font-size: 10px; background: var(--main); padding: 2px 6px; border-radius: 4px; color: #fff; }
+        
         .play-btn { width: 92%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 13px; }
         .backup-btn { width: 92%; margin: -10px auto 15px; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3); padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 11px; }
-
-        /* مشاهدة مباريتين */
-        .dual-container { display: flex; flex-direction: column; gap: 15px; align-items: center; width: 100%; }
-        .dual-slot { background: #000; border-radius: 15px; overflow: hidden; border: 1px solid var(--glass-border); width: 100%; }
-        .ch-picker-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 7000; display: none; align-items: center; justify-content: center; }
-        .ch-picker-window { width: 90%; max-width: 450px; background: #0f172a; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; max-height: 80vh; }
-        .ch-picker-header { padding: 15px; background: var(--main); color: #fff; font-weight: 900; display: flex; justify-content: space-between; }
-        .ch-picker-list { padding: 10px; overflow-y: auto; }
-        .ch-pick-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; color: #fff; font-size: 14px; text-align: right; }
 
         .league-sep { background: rgba(255, 255, 255, 0.07); padding: 10px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; margin: 15px 0 10px; border-right: 4px solid var(--main); }
         .m-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; }
@@ -181,17 +179,6 @@ function filterSection($channels, $sec) {
         <div class="intro-icon-box"><i class="fas fa-play-circle"></i></div>
         <h2 class="intro-title">الخدمة الرقمية</h2>
         <div class="loading-bar"></div>
-    </div>
-</div>
-
-<div class="ch-picker-overlay" id="ch-picker">
-    <div class="ch-picker-window">
-        <div class="ch-picker-header"><span>📺 قائمة القنوات</span><i class="fas fa-times" onclick="closePicker()" style="cursor:pointer;"></i></div>
-        <div class="ch-picker-list">
-            <?php foreach($all_channels as $ch): ?>
-                <div class="ch-pick-item" onclick="confirmPick('<?= $ch['file'] ?>', '<?= $ch['name'] ?>')"><?= $ch['name'] ?></div>
-            <?php endforeach; ?>
-        </div>
     </div>
 </div>
 
@@ -226,7 +213,7 @@ function filterSection($channels, $sec) {
 
         <div class="category-tabs">
             <div class="cat-item active" onclick="switchSection('matches_table', this)"><img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" style="filter: brightness(0) invert(1);"><span>جدول المباريات</span></div>
-            <div class="cat-item" onclick="switchSection('dual_player', this)"><img src="https://cdn-icons-png.flaticon.com/512/3592/3592518.png" style="filter: brightness(0) invert(1);"><span>مشاهدة مباريتين</span></div>
+            <div class="cat-item" onclick="switchSection('important_matches', this)"><img src="https://files.catbox.moe/cjayfo.png"><span>مباريات مهمة</span></div>
             <?php foreach($active_sections as $s): ?>
                 <div class="cat-item" onclick="switchSection('<?= $s['key'] ?>', this)"><img src="<?= $s['img'] ?>"><span><?= $s['name'] ?></span></div>
             <?php endforeach; ?>
@@ -259,17 +246,31 @@ function filterSection($channels, $sec) {
             </div>
         </div>
 
-        <div id="section-dual_player" class="channel-section">
-            <div class="dual-container">
-                <div class="dual-slot">
-                    <div class="video-box" id="dual-screen-1" style="background-image:url('mg/wel.GIF')"></div>
-                    <button class="play-btn" onclick="openPicker(1)"><i class="fas fa-tv"></i> <span id="btn-text-1">اختر القناة الأولى</span></button>
+        <div id="section-important_matches" class="channel-section">
+            <?php 
+            $important_channels = filterSection($all_channels, 'important'); 
+            if(empty($important_channels)): echo '<div class="card" style="padding:20px; text-align:center; opacity:0.5;">لا توجد مباريات جارية مضافة حالياً</div>';
+            else: foreach($important_channels as $ch): ?>
+            <div class="card">
+                <div class="match-card-top">
+                    <span class="m-league-name"><?= $ch['match_name'] ?></span>
+                    <div class="m-teams-flex">
+                        <span class="m-team-name"><?= $ch['team1'] ?></span>
+                        <span class="m-vs-tag">VS</span>
+                        <span class="m-team-name"><?= $ch['team2'] ?></span>
+                    </div>
                 </div>
-                <div class="dual-slot">
-                    <div class="video-box" id="dual-screen-2" style="background-image:url('mg/wel.GIF')"></div>
-                    <button class="play-btn" onclick="openPicker(2)"><i class="fas fa-tv"></i> <span id="btn-text-2">اختر القناة الثانية</span></button>
-                </div>
+                <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.GIF')"></div>
+                <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this, '<?= $ch['name'] ?>')">
+                    <i class="fas fa-play-circle"></i> <span>تشغيل البث: <?= $ch['name'] ?></span>
+                </button>
+                <?php if(!empty($ch['file_backup'])): ?>
+                <button class="backup-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file_backup'] ?>', this, '<?= $ch['name'] ?> (احتياطي)')">
+                    <i class="fas fa-shield-alt"></i> <span>تشغيل البث الاحتياطي</span>
+                </button>
+                <?php endif; ?>
             </div>
+            <?php endforeach; endif; ?>
         </div>
 
         <?php foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
@@ -294,18 +295,7 @@ function filterSection($channels, $sec) {
 </div>
 
 <script>
-let activeSlot = 0;
 function closeAd() { document.getElementById('adPopup').style.display = 'none'; }
-function openPicker(slot) { activeSlot = slot; document.getElementById('ch-picker').style.display = 'flex'; }
-function closePicker() { document.getElementById('ch-picker').style.display = 'none'; }
-
-function confirmPick(url, name) {
-    let screen = document.getElementById('dual-screen-' + activeSlot);
-    screen.style.backgroundImage = "none";
-    screen.innerHTML = `<iframe src="${url}?autoplay=1&muted=1" allowfullscreen></iframe>`;
-    document.getElementById('btn-text-' + activeSlot).innerText = name;
-    closePicker();
-}
 
 function switchSection(id, element) {
     document.querySelectorAll('.channel-section').forEach(s => s.classList.remove('active'));
