@@ -37,7 +37,6 @@ if(isset($_SESSION['ok'])){
     $news_ticker = isset($record['news_ticker']) ? $record['news_ticker'] : ['text' => 'مرحباً بكم', 'status' => 'hide'];
     $notification = isset($record['notification']) ? $record['notification'] : ['id' => '', 'msg' => ''];
 
-    // --- تحديث السحابة الشامل ---
     function sync($bin, $key, $channels, $sections, $news, $notify) {
         callCloud("PUT", $bin, $key, [
             'custom_channels' => array_values($channels),
@@ -47,25 +46,18 @@ if(isset($_SESSION['ok'])){
         ]);
     }
 
-    // --- 0. إرسال إشعار فوري جديد ---
     if(isset($_POST['send_notify'])){
-        $notification = [
-            'id' => uniqid(),
-            'msg' => $_POST['notify_msg'],
-            'time' => time()
-        ];
+        $notification = ['id' => uniqid(), 'msg' => $_POST['notify_msg'], 'time' => time()];
         sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
         header("Location: admin.php"); exit;
     }
 
-    // --- 1. إدارة الشريط الإخباري ---
     if(isset($_POST['update_ticker'])){
         $news_ticker = ['text' => $_POST['ticker_text'], 'status' => $_POST['ticker_status']];
         sync($BIN_ID, $API_KEY, $channels, $sections, $news_ticker, $notification);
         header("Location: admin.php"); exit;
     }
 
-    // --- 2. إدارة الأقسام ---
     if(isset($_POST['save_sec'])){
         $sec_id = $_POST['sec_id'] ?: uniqid();
         $new_sec = ['id' => $sec_id, 'name' => $_POST['sec_name'], 'key' => $_POST['sec_key'], 'img' => $_POST['sec_img'], 'status' => $_POST['sec_status']];
@@ -82,15 +74,19 @@ if(isset($_SESSION['ok'])){
         header("Location: admin.php#sections_area"); exit;
     }
 
-    // --- 3. إدارة القنوات (تم إضافة البث الاحتياطي هنا) ---
+    // --- تحديث إدارة القنوات ليشمل بيانات المباريات المهمة ---
     if(isset($_POST['save_ch'])){
         $target_id = $_POST['edit_id'];
         $ch_data = [
             'id' => $target_id ?: uniqid(), 
             'name' => $_POST['n'], 
             'file' => $_POST['f'], 
-            'file_backup' => $_POST['f_backup'], // الحقل الجديد
-            'section' => $_POST['s']
+            'file_backup' => $_POST['f_backup'],
+            'section' => $_POST['s'],
+            // حقول مباريات مهمة الإضافية
+            'match_name' => $_POST['m_name'] ?? '',
+            'team1' => $_POST['t1'] ?? '',
+            'team2' => $_POST['t2'] ?? ''
         ];
         if(!empty($target_id)){ 
             foreach($channels as &$c){ if($c['id'] == $target_id){ $c = $ch_data; break; } } 
@@ -127,7 +123,8 @@ if(isset($_SESSION['ok'])){
         .item-card { background: rgba(255,255,255,0.03); margin: 8px 0; padding: 12px; border-radius: 10px; border-right: 3px solid #e11d48; display: flex; justify-content: space-between; align-items: center; }
         .btns a { text-decoration: none; font-size: 12px; font-weight: bold; margin-right: 10px; }
         .del { color: #ff4d4d; } .edit { color: #0ea5e9; }
-        .backup-label { font-size: 11px; color: #aaa; margin-top: 5px; display: block; }
+        .info-label { font-size: 11px; color: #0ea5e9; margin-top: 5px; display: block; font-weight: bold; }
+        .important-only { background: rgba(225, 29, 72, 0.1); padding: 10px; border-radius: 10px; margin: 10px 0; border: 1px dashed var(--main); display: none; }
     </style>
 </head>
 <body>
@@ -141,20 +138,14 @@ if(isset($_SESSION['ok'])){
 
     <div class="box">
         <h2>🔔 إرسال إشعار فوري (Pop-up)</h2>
-        <form method="POST">
-            <textarea name="notify_msg" placeholder="اكتب نص الإشعار هنا..." rows="2" required></textarea>
-            <button name="send_notify" style="background:#0ea5e9">إرسال الإشعار الآن</button>
-        </form>
+        <form method="POST"><textarea name="notify_msg" placeholder="اكتب نص الإشعار هنا..." rows="2" required></textarea><button name="send_notify" style="background:#0ea5e9">إرسال الإشعار الآن</button></form>
     </div>
 
     <div class="box">
         <h2>📰 الشريط الإخباري (Ticker)</h2>
         <form method="POST">
             <textarea name="ticker_text" placeholder="نص الشريط..." required><?= $news_ticker['text'] ?></textarea>
-            <select name="ticker_status">
-                <option value="show" <?= ($news_ticker['status']=='show')?'selected':'' ?>>إظهار الشريط</option>
-                <option value="hide" <?= ($news_ticker['status']=='hide')?'selected':'' ?>>إخفاء الشريط</option>
-            </select>
+            <select name="ticker_status"><option value="show" <?= ($news_ticker['status']=='show')?'selected':'' ?>>إظهار الشريط</option><option value="hide" <?= ($news_ticker['status']=='hide')?'selected':'' ?>>إخفاء الشريط</option></select>
             <button name="update_ticker" style="background:#22c55e">تحديث الشريط</button>
         </form>
     </div>
@@ -164,50 +155,57 @@ if(isset($_SESSION['ok'])){
         <form method="POST">
             <input type="hidden" name="sec_id" value="<?= $edit_sec ? $edit_sec['id'] : '' ?>">
             <input name="sec_name" placeholder="اسم القسم" value="<?= $edit_sec ? $edit_sec['name'] : '' ?>" required>
-            <input name="sec_key" placeholder="الكود" value="<?= $edit_sec ? $edit_sec['key'] : '' ?>" required>
-            <input name="sec_img" placeholder="الصورة" value="<?= $edit_sec ? $edit_sec['img'] : '' ?>" required>
+            <input name="sec_key" placeholder="الكود (مهم: ضع important لمباريات مهمة)" value="<?= $edit_sec ? $edit_sec['key'] : '' ?>" required>
+            <input name="sec_img" placeholder="رابط صورة الايقونة" value="<?= $edit_sec ? $edit_sec['img'] : '' ?>" required>
             <select name="sec_status"><option value="show" <?= ($edit_sec && $edit_sec['status']=='show')?'selected':'' ?>>إظهار</option><option value="hide" <?= ($edit_sec && $edit_sec['status']=='hide')?'selected':'' ?>>إخفاء</option></select>
             <button name="save_sec" style="background:#0ea5e9">حفظ القسم</button>
         </form>
         <?php foreach($sections as $s): ?>
-            <div class="item-card"><div><b><?= $s['name'] ?></b></div><div class="btns"><a href="?edit_sec=<?= $s['id'] ?>#sections_area" class="edit">تعديل</a><a href="?del_sec=<?= $s['id'] ?>" class="del">حذف</a></div></div>
+            <div class="item-card"><div><b><?= $s['name'] ?></b> (<?= $s['key'] ?>)</div><div class="btns"><a href="?edit_sec=<?= $s['id'] ?>#sections_area" class="edit">تعديل</a><a href="?del_sec=<?= $s['id'] ?>" class="del">حذف</a></div></div>
         <?php endforeach; ?>
     </div>
 
     <div class="box" id="channels_area">
-        <h2>📺 إدارة القنوات</h2>
-        <form method="POST">
+        <h2>📺 إدارة القنوات والمباريات</h2>
+        <form method="POST" id="chForm">
             <input type="hidden" name="edit_id" value="<?= $edit_ch ? $edit_ch['id'] : '' ?>">
             
-            <input name="n" placeholder="اسم القناة" value="<?= $edit_ch ? $edit_ch['name'] : '' ?>" required>
+            <span class="info-label">إعدادات القناة:</span>
+            <input name="n" placeholder="اسم القناة (يظهر في زر التشغيل)" value="<?= $edit_ch ? $edit_ch['name'] : '' ?>" required>
+            <input name="f" placeholder="رابط البث الأساسي" value="<?= $edit_ch ? $edit_ch['file'] : '' ?>" required>
+            <input name="f_backup" placeholder="رابط البث الاحتياطي (اختياري)" value="<?= $edit_ch ? ($edit_ch['file_backup'] ?? '') : '' ?>">
             
-            <span class="backup-label">رابط البث الأساسي:</span>
-            <input name="f" placeholder="رابط الملف الأساسي" value="<?= $edit_ch ? $edit_ch['file'] : '' ?>" required>
-            
-            <span class="backup-label">رابط البث الاحتياطي (اختياري):</span>
-            <input name="f_backup" placeholder="رابط الملف الاحتياطي (اتركه فارغاً إذا لا يوجد)" value="<?= $edit_ch ? ($edit_ch['file_backup'] ?? '') : '' ?>">
-            
-            <select name="s" required>
+            <select name="s" id="secSelect" required onchange="checkType()">
                 <option value="">-- اختر القسم --</option>
                 <?php foreach($sections as $s): ?>
                     <option value="<?= $s['key'] ?>" <?= ($edit_ch && $edit_ch['section']==$s['key'])?'selected':'' ?>><?= $s['name'] ?></option>
                 <?php endforeach; ?>
             </select>
-            <button name="save_ch">حفظ القناة</button>
+
+            <div id="impFields" class="important-only" style="<?= ($edit_ch && $edit_ch['section']=='important')?'display:block':'' ?>">
+                <span class="info-label">تفاصيل المباراة (لقسم important فقط):</span>
+                <input name="m_name" placeholder="اسم البطولة (مثلاً: الدوري الإسباني)" value="<?= $edit_ch ? ($edit_ch['match_name'] ?? '') : '' ?>">
+                <input name="t1" placeholder="الفريق الأول" value="<?= $edit_ch ? ($edit_ch['team1'] ?? '') : '' ?>">
+                <input name="t2" placeholder="الفريق الثاني" value="<?= $edit_ch ? ($edit_ch['team2'] ?? '') : '' ?>">
+            </div>
+
+            <button name="save_ch">حفظ البيانات</button>
         </form>
+
+        <script>
+            function checkType() {
+                var s = document.getElementById('secSelect').value;
+                document.getElementById('impFields').style.display = (s == 'important') ? 'block' : 'none';
+            }
+        </script>
 
         <?php foreach(array_reverse($channels) as $c): ?>
             <div class="item-card">
                 <div>
-                    <b><?= $c['name'] ?></b>
-                    <?php if(!empty($c['file_backup'])): ?>
-                        <span style="font-size: 10px; background: #22c55e; padding: 2px 5px; border-radius: 4px; margin-right: 5px;">يوجد احتياطي</span>
-                    <?php endif; ?>
+                    <b><?= $c['name'] ?></b> <small>(<?= $c['section'] ?>)</small>
+                    <?php if(!empty($c['file_backup'])): ?><span style="font-size: 9px; background: #22c55e; padding: 1px 4px; border-radius: 3px;">+ احتياطي</span><?php endif; ?>
                 </div>
-                <div class="btns">
-                    <a href="?edit=<?= $c['id'] ?>#channels_area" class="edit">تعديل</a>
-                    <a href="?del=<?= $c['id'] ?>" class="del">حذف</a>
-                </div>
+                <div class="btns"><a href="?edit=<?= $c['id'] ?>#channels_area" class="edit">تعديل</a><a href="?del=<?= $c['id'] ?>" class="del">حذف</a></div>
             </div>
         <?php endforeach; ?>
         <center style="margin-top:20px;"><a href="index.php" style="color:#aaa; text-decoration:none;">← الموقع</a> | <a href="?out=1" style="color:#ff4d4d; text-decoration:none;">خروج</a></center>
