@@ -260,7 +260,7 @@ function filterSection($channels, $sec) {
                         <span class="m-team-name"><?= $ch['team2'] ?></span>
                     </div>
                 </div>
-                <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.GIF')"></div>
+                <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.png')"></div>
                 <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this, '<?= $ch['name'] ?>')">
                     <i class="fas fa-play-circle"></i> <span>تشغيل البث: <?= $ch['name'] ?></span>
                 </button>
@@ -277,7 +277,7 @@ function filterSection($channels, $sec) {
         <div id="section-<?= $s['key'] ?>" class="channel-section">
             <?php foreach($channels as $ch): ?>
             <div class="card">
-                <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.GIF')"></div>
+                <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.png')"></div>
                 <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this, '<?= $ch['name'] ?>')">
                     <i class="fas fa-play-circle"></i> <span>تشغيل <?= $ch['name'] ?></span>
                 </button>
