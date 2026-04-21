@@ -1,6 +1,6 @@
 <?php
 
-$base = "http://sportme.online/BEIN-Sow1/tracks-v1a1/";
+$base = "http://ssserver.site/BEIN-Spor1/tracks-v1a1/";
 $file = "mono.m3u8";
 
 function stream($url){
