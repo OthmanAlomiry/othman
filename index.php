@@ -304,10 +304,17 @@ function switchSection(id, element) {
     element.classList.add('active');
 }
 
+// تعديل المشغل ليدعم روابط b1.php بشكل مباشر وصحيح للبث الأساسي والاحتياطي
 function startStream(boxId, file, btn, channelName) {
-    let vBox = document.getElementById(boxId); vBox.style.backgroundImage = "none";
-    vBox.innerHTML = `<iframe src="${file}?autoplay=1&muted=0" allowfullscreen></iframe>`;
-    btn.querySelector('span').innerText = channelName + ' (يبث الآن)'; 
+    let vBox = document.getElementById(boxId); 
+    vBox.style.backgroundImage = "none";
+    // يتم استدعاء الملف كـ iframe لضمان تشغيل الكود الداخلي فيه
+    vBox.innerHTML = `<iframe src="${file}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+    
+    // تحديث نص الزر الذي تم الضغط عليه فقط
+    if(btn.classList.contains('play-btn') || btn.classList.contains('backup-btn')) {
+        btn.querySelector('span').innerText = channelName + ' (يبث الآن)';
+    }
 }
 
 window.addEventListener('load', () => { 
