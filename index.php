@@ -101,19 +101,19 @@ function filterSection($channels, $sec) {
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main: #e11d48; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.15); }
+        :root { --main: #D4AF37; --bg-deep: #050c14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(212, 175, 55, 0.3); }
         body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; color: #e2e8f0; overflow-x: hidden; display: flex; justify-content: center; }
         .main-container { width: 100%; max-width: 500px; position: relative; min-height: 100vh; }
         
         .admin-refresh-area { padding: 10px; text-align: center; }
-        .refresh-btn { background: #0ea5e9; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 12px; }
+        .refresh-btn { background: var(--main); color: #000; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 12px; }
 
         #pro-intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #050c14 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: 0.8s; }
         .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.2); }
         .loader-content { display: flex; flex-direction: column; align-items: center; }
-        .intro-icon-box { width: 100px; height: 100px; background: var(--main); border-radius: 30%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(225, 29, 72, 0.5); animation: glowPulse 2s infinite ease-in-out; }
-        .intro-icon-box i { font-size: 50px; color: white; }
-        .intro-title { margin-top: 25px; color: white; font-weight: 900; font-size: 24px; }
+        .intro-icon-box { width: 100px; height: 100px; background: var(--main); border-radius: 30%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(212, 175, 55, 0.5); animation: glowPulse 2s infinite ease-in-out; }
+        .intro-icon-box i { font-size: 50px; color: #000; }
+        .intro-title { margin-top: 25px; color: var(--main); font-weight: 900; font-size: 24px; }
         .loading-bar { width: 150px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 30px; overflow: hidden; position: relative; }
         .loading-bar::after { content: ""; position: absolute; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--main), transparent); animation: loadingMove 1.5s infinite; }
         @keyframes glowPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
@@ -121,17 +121,17 @@ function filterSection($channels, $sec) {
 
         .ad-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 8000; display: none; align-items: center; justify-content: center; }
         .ad-popup-content { position: relative; width: 85%; max-width: 320px; }
-        .ad-popup-image { width: 100%; border-radius: 20px; border: 2px solid var(--glass-border); }
-        .ad-close-btn { position: absolute; top: -15px; right: -15px; width: 35px; height: 35px; background: var(--main); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; cursor: pointer; z-index: 10; }
+        .ad-popup-image { width: 100%; border-radius: 20px; border: 2px solid var(--main); }
+        .ad-close-btn { position: absolute; top: -15px; right: -15px; width: 35px; height: 35px; background: var(--main); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; cursor: pointer; z-index: 10; }
         .ad-subscribe-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #25d366; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 900; font-size: 14px; border: 2px solid white; display: flex; align-items: center; gap: 8px; }
 
         .header-fixed { position: fixed; top: 0; width: 100%; max-width: 500px; z-index: 1000; background: rgba(5, 12, 20, 0.95); backdrop-filter: blur(25px); border-bottom: 1px solid var(--glass-border); padding: 15px 0; text-align: center; }
         .social-links { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; padding: 0 10px; }
-        .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; border: 1.5px solid #ffffff; }
+        .social-btn { padding: 7px 5px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 9px; color: #fff; flex: 1; border: 1.5px solid rgba(212, 175, 55, 0.5); }
         .btn-wa { background: #25d366; } .btn-tg { background: #0088cc; } .btn-sn { background: #FFFC00; color: #000 !important; } .btn-tw { background: #000; }
         
-        .news-ticker { background: rgba(225, 29, 72, 0.15); height: 32px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; position: relative; }
-        .ticker-label { background: var(--main); color: #fff; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
+        .news-ticker { background: rgba(212, 175, 55, 0.1); height: 32px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; position: relative; border-y: 1px solid rgba(212, 175, 55, 0.2); }
+        .ticker-label { background: var(--main); color: #000; padding: 0 12px; height: 100%; display: flex; align-items: center; font-size: 10px; font-weight: 900; z-index: 10; position: absolute; right: 0; }
         .ticker-wrap { flex: 1; overflow: hidden; direction: ltr; display: flex; align-items: center; }
         .ticker-move { display: flex; white-space: nowrap; animation: ticker-infinite 45s linear infinite; }
         .ticker-text { color: #fff; font-size: 12px; font-weight: 700; padding: 0 60px; }
@@ -139,9 +139,10 @@ function filterSection($channels, $sec) {
 
         .category-tabs { display: flex; gap: 8px; width: 95%; margin: 0 auto; overflow-x: auto; scrollbar-width: none; padding: 5px 0; }
         .cat-item { min-width: 65px; flex-shrink: 0; background: var(--glass); border: 1px solid var(--glass-border); padding: 8px 3px; border-radius: 12px; cursor: pointer; text-align: center; }
-        .cat-item.active { background: rgba(225, 29, 72, 0.2); border-color: var(--main); }
+        .cat-item.active { background: rgba(212, 175, 55, 0.2); border-color: var(--main); }
         .cat-item img { width: 26px; height: 26px; object-fit: contain; margin-bottom: 4px; }
         .cat-item span { font-size: 8px; font-weight: 900; color: #fff; display: block; }
+        .cat-item.active span { color: var(--main); }
 
         .grid { padding: 15px; }
         .channel-section { display: none; width: 100%; }
@@ -152,24 +153,24 @@ function filterSection($channels, $sec) {
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; background-size: cover; background-position: center; }
         .video-box iframe { position: absolute; top:0; left:0; width: 100%; height: 100%; border: none; }
 
-        /* ستايل قسم مباريات مهمة الجديد */
         .match-card-top { padding: 12px; text-align: center; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.02); }
         .m-league-name { font-size: 10px; color: var(--main); font-weight: 900; margin-bottom: 5px; display: block; }
         .m-teams-flex { display: flex; justify-content: center; align-items: center; gap: 15px; }
         .m-team-name { font-size: 13px; font-weight: 900; color: #fff; }
-        .m-vs-tag { font-size: 10px; background: var(--main); padding: 2px 6px; border-radius: 4px; color: #fff; }
+        .m-vs-tag { font-size: 10px; background: var(--main); padding: 2px 6px; border-radius: 4px; color: #000; font-weight: 900; }
         
-        .play-btn { width: 92%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); padding: 12px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 13px; }
-        .backup-btn { width: 92%; margin: -10px auto 15px; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(14, 165, 233, 0.1); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3); padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 11px; }
+        .play-btn { width: 92%; margin: 15px auto; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(212, 175, 55, 0.1); color: var(--main); border: 1px solid var(--main); padding: 12px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 13px; transition: 0.3s; }
+        .play-btn:hover { background: var(--main); color: #000; }
+        .backup-btn { width: 92%; margin: -10px auto 15px; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255, 255, 255, 0.03); color: #fff; border: 1px solid var(--glass-border); padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 11px; }
 
-        .league-sep { background: rgba(255, 255, 255, 0.07); padding: 10px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; margin: 15px 0 10px; border-right: 4px solid var(--main); }
+        .league-sep { background: rgba(212, 175, 55, 0.05); padding: 10px 15px; border-radius: 10px; font-size: 11px; font-weight: 900; margin: 15px 0 10px; border-right: 4px solid var(--main); color: var(--main); }
         .m-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; }
         .m-team-col { flex: 1; font-size: 10px; font-weight: 700; text-align: center; }
         .m-team-col img { width: 28px; height: 28px; display: block; margin: 0 auto 6px; }
-        .m-time-box { flex: 0.6; background: rgba(225, 29, 72, 0.1); border: 1px solid rgba(225, 29, 72, 0.2); padding: 6px; border-radius: 10px; text-align: center; font-weight: 900; font-size: 12px; color: var(--main); }
+        .m-time-box { flex: 0.6; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.2); padding: 6px; border-radius: 10px; text-align: center; font-weight: 900; font-size: 12px; color: var(--main); }
         
-        .visitors-badge-float { position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px; background: rgba(34, 197, 94, 0.1); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1px solid #22c55e; font-size: 10px; font-weight: 900; color: #22c55e; }
-        footer { text-align: center; padding: 30px; font-size: 9px; opacity: 0.4; }
+        .visitors-badge-float { position: fixed; bottom: 20px; left: 20px; width: 40px; height: 40px; background: rgba(212, 175, 55, 0.1); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; border: 1px solid var(--main); font-size: 10px; font-weight: 900; color: var(--main); }
+        footer { text-align: center; padding: 30px; font-size: 9px; opacity: 0.6; color: var(--main); }
     </style>
 </head>
 <body>
@@ -304,14 +305,11 @@ function switchSection(id, element) {
     element.classList.add('active');
 }
 
-// تعديل المشغل ليدعم روابط b1.php بشكل مباشر وصحيح للبث الأساسي والاحتياطي
 function startStream(boxId, file, btn, channelName) {
     let vBox = document.getElementById(boxId); 
     vBox.style.backgroundImage = "none";
-    // يتم استدعاء الملف كـ iframe لضمان تشغيل الكود الداخلي فيه
     vBox.innerHTML = `<iframe src="${file}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
     
-    // تحديث نص الزر الذي تم الضغط عليه فقط
     if(btn.classList.contains('play-btn') || btn.classList.contains('backup-btn')) {
         btn.querySelector('span').innerText = channelName + ' (يبث الآن)';
     }
