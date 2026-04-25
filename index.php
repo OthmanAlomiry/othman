@@ -268,7 +268,10 @@ function filterSection($channels, $sec) {
             <?php 
             $important_channels = filterSection($all_channels, 'important'); 
             if(empty($important_channels)): echo '<div class="card" style="padding:20px; text-align:center; opacity:0.5; grid-column: 1 / -1;">لا توجد مباريات جارية مضافة حالياً</div>';
-            else: foreach($important_channels as $ch): ?>
+            else: foreach($important_channels as $ch): 
+                // التحقق من وجود صورة مخصصة (poster) وإلا استخدام الصورة الافتراضية
+                $poster = (!empty($ch['poster'])) ? $ch['poster'] : 'mg/wel.png';
+            ?>
             <div class="card">
                 <div class="match-card-top">
                     <span class="m-league-name"><?= $ch['match_name'] ?></span>
@@ -278,7 +281,7 @@ function filterSection($channels, $sec) {
                         <span class="m-team-name"><?= $ch['team2'] ?></span>
                     </div>
                 </div>
-                <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.png')"></div>
+                <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('<?= $poster ?>')"></div>
                 <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this, '<?= $ch['name'] ?>')">
                     <i class="fas fa-play-circle"></i> <span>تشغيل البث: <?= $ch['name'] ?></span>
                 </button>
@@ -293,9 +296,12 @@ function filterSection($channels, $sec) {
 
         <?php foreach($active_sections as $s): $channels = filterSection($all_channels, $s['key']); ?>
         <div id="section-<?= $s['key'] ?>" class="channel-section">
-            <?php foreach($channels as $ch): ?>
+            <?php foreach($channels as $ch): 
+                // التحقق من وجود صورة مخصصة (poster) وإلا استخدام الصورة الافتراضية
+                $poster = (!empty($ch['poster'])) ? $ch['poster'] : 'mg/wel.png';
+            ?>
             <div class="card">
-                <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('mg/wel.png')"></div>
+                <div class="video-box" id="vid-<?= $ch['id'] ?>" style="background-image:url('<?= $poster ?>')"></div>
                 <button class="play-btn" onclick="startStream('vid-<?= $ch['id'] ?>', '<?= $ch['file'] ?>', this, '<?= $ch['name'] ?>')">
                     <i class="fas fa-play-circle"></i> <span>تشغيل <?= $ch['name'] ?></span>
                 </button>
