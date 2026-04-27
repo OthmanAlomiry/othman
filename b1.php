@@ -18,7 +18,7 @@
     (function() {
         const videoElement = document.getElementById('live-player');
         // الرابط الذي أكدت أنه يعمل
-        const streamUrl = 'https://pub-988290a10bbf42009d966bd9ef7153c8.r2.dev/1.m3u8';
+        const streamUrl = 'https://ssserver.space/beinSpo1/video.m3u8';
 
         if (Hls.isSupported()) {
             const hls = new Hls({
