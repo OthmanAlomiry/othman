@@ -18,7 +18,7 @@
     (function() {
         const videoElement = document.getElementById('live-player');
         // الرابط الذي أكدت أنه يعمل
-        const streamUrl = 'https://ssserver.site/STC-SPORT2/tracks-v1a1/mono.m3u8';
+        const streamUrl = 'https://ssserver.site/AdSPORT1/tracks-v1a1/mono.m3u8';
 
         if (Hls.isSupported()) {
             const hls = new Hls({
