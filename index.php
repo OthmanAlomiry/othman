@@ -2,6 +2,13 @@
 session_start();
 error_reporting(0); 
 
+// --- 0. تحويل تلقائي إلى HTTP (لضمان عمل البث وتوفير البيانات) ---
+if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+    $url = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    header("Location: $url");
+    exit;
+}
+
 // --- 1. إعدادات الوقت والقواعد الثابتة ---
 date_default_timezone_set('Asia/Riyadh');
 $date_get = date('Y-m-d');
@@ -177,7 +184,7 @@ function filterSection($channels, $sec) {
         <?php endif; ?>
 
         <?php if(($news['status'] ?? 'hide') == 'show'): ?>
-        <div class="news-ticker"><span class="ticker-label">تنبيهات</span><div class="ticker-wrap"><div class="ticker-move"><span class="ticker-text"><?= $news['text'] ?></span><span class="ticker-text"><?= $news['text'] ?></span></div></div></div>
+        <div class="news-ticker"><span class="ticker-label">تنبيهات</span><div class="ticker-wrap"><div class="ticker-wrap"><div class="ticker-move"><span class="ticker-text"><?= $news['text'] ?></span><span class="ticker-text"><?= $news['text'] ?></span></div></div></div>
         <?php endif; ?>
 
         <div class="category-tabs">
