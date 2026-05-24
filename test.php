@@ -2,217 +2,235 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوابة الرياضة - متجر الخدمة الرقمية</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Poppins:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>روابط الإدارة | عثمان الزبيدي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --main: #e11d48; 
-            --main-glow: rgba(225, 29, 72, 0.6);
-            --bg-deep: #061626; 
-            --whatsapp: #25d366; 
-            --snapchat: #FFFC00; 
+        :root {
+            --bg-color: #f5f5f7;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --primary-text: #1d1d1f;
+            --secondary-text: #86868b;
+            --accent-blue: #0071e3;
+            --success-green: #28a745;
+            --glass-border: rgba(255, 255, 255, 0.3);
         }
-        
-        body { margin: 0; font-family: 'Tajawal', sans-serif; background-color: var(--bg-deep); padding-top: 180px; overflow-x: hidden; color: #e2e8f0; }
 
-        /* --- الخلفية الزخرفية المتحركة --- */
-        .bg-pattern-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: url('https://www.transparenttextures.com/patterns/black-paper.png'), linear-gradient(135deg, var(--bg-deep) 0%, #0a1f33 100%); background-color: var(--bg-deep); }
-        .bg-pattern-animated::after { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.15; animation: movePattern 60s linear infinite; }
-        @keyframes movePattern { from { transform: translate(0, 0); } to { transform: translate(-50px, -50px); } }
-        .side-glow { position: fixed; top: 0; right: 0; width: 50%; height: 100%; background: radial-gradient(circle at right, rgba(13, 45, 68, 0.6) 0%, transparent 70%); z-index: -1; pointer-events: none; }
-
-        /* --- شاشة الدخول --- */
-        #intro-video-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #040c16; display: flex; justify-content: center; align-items: center; z-index: 1000000; transition: 1s ease-in-out; }
-        .ball-glow { font-size: 80px; color: #fff; filter: drop-shadow(0 0 20px var(--main)); animation: pulseLogo 2s infinite; }
-        .intro-hide { opacity: 0; visibility: hidden; transform: scale(1.1); }
-        @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-
-        /* --- الهيدر والروابط --- */
-        .promo-sticky-container { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
-        .promo-bar { background: rgba(6, 22, 38, 0.9); backdrop-filter: blur(15px); color: #fff; padding: 15px; text-align: center; border-bottom: 2px solid var(--main); }
-        .promo-text { font-size: 13px; max-width: 900px; margin: auto; }
-        .social-links { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
-        .social-btn { display: flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 11px; color: #fff; }
-        .btn-wa { background: var(--whatsapp); } .btn-snap { background: var(--snapchat); color: #000; } .btn-x { background: #000; }
-        header { background: #fff; padding: 12px; text-align: center; font-size: 18px; font-weight: 900; color: #061626; }
-
-        /* --- شبكة القنوات --- */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; padding: 25px; max-width: 1400px; margin: auto; }
-        .card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); border-color: rgba(225, 29, 72, 0.3); }
-
-        /* =======================================================
-           تـصـمـيـم أسـمـاء الـقـنـوات الاحـتـرافـي (Channel Info)
-           ======================================================= */
-        .c-head { 
-            padding: 15px 20px; 
-            background: linear-gradient(to left, rgba(0,0,0,0.5), transparent); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-        }
-        
-        .channel-title {
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #e2e2e2 0%, #ffffff 100%);
+            color: var(--primary-text);
+            margin: 0;
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 12px;
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        .channel-name {
-            font-family: 'Poppins', 'Tajawal', sans-serif;
-            font-size: 17px;
+        .container {
+            width: 100%;
+            max-width: 500px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 28px;
             font-weight: 700;
-            color: #fff;
-            letter-spacing: 0.5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+            color: #000;
         }
 
-        .channel-badge {
-            background: var(--main);
-            color: #fff;
-            font-size: 9px;
-            padding: 2px 8px;
-            border-radius: 4px;
+        header p {
+            color: var(--secondary-text);
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--secondary-text);
+            margin: 25px 10px 10px;
             text-transform: uppercase;
-            font-weight: 900;
+            letter-spacing: 1px;
         }
 
-        .live-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(0,0,0,0.4);
-            padding: 4px 12px;
+        .link-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 20px;
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 18px;
+            margin-bottom: 15px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.3s ease;
         }
 
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #22c55e;
-            animation: blink 1.2s infinite;
+        .link-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
         }
 
-        .live-text {
-            font-size: 11px;
-            font-weight: 700;
-            color: #22c55e;
-            text-transform: uppercase;
+        .link-info h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 600;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.8); }
+        .link-url {
+            font-size: 13px;
+            color: var(--accent-blue);
+            word-break: break-all;
+            font-family: monospace;
+            background: rgba(0, 113, 227, 0.05);
+            padding: 5px 10px;
+            border-radius: 8px;
+            display: block;
+            margin-top: 5px;
         }
-        /* ======================================================= */
 
-        video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
-
-        /* زر التشغيل الزجاجي الفخم */
-        .play-btn-premium { 
-            width: 90%; margin: 20px auto; display: flex; justify-content: center; align-items: center; gap: 12px;
-            background: rgba(225, 29, 72, 0.05); backdrop-filter: blur(5px); color: #fff; 
-            border: 1.5px solid rgba(225, 29, 72, 0.4); padding: 15px; border-radius: 50px; 
-            font-weight: 900; font-size: 16px; cursor: pointer; position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5); overflow: hidden; animation: borderPulse 2s infinite ease-in-out;
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
         }
-        .play-btn-premium:hover { background: var(--main); border-color: var(--main); box-shadow: 0 8px 30px rgba(225, 29, 72, 0.8); transform: translateY(-4px) scale(1.03); }
-        @keyframes borderPulse { 0%, 100% { border-color: rgba(225, 29, 72, 0.4); } 50% { border-color: rgba(225, 29, 72, 0.8); } }
 
-        footer { text-align: center; padding: 50px; }
-        .footer-counter { background: rgba(255,255,255,0.02); padding: 20px 45px; border-radius: 20px; display: inline-block; border: 1px solid rgba(255,255,255,0.05); }
-        #count-num { font-size: 40px; color: #22c55e; font-weight: 900; }
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-visit {
+            background: var(--primary-text);
+            color: white;
+        }
+
+        .btn-visit:hover { background: #333; }
+
+        .btn-copy {
+            background: #fff;
+            color: var(--primary-text);
+            border: 1px solid #d2d2d7;
+        }
+
+        .btn-copy:hover { background: #f5f5f7; }
+
+        .btn-copy.copied {
+            background: var(--success-green);
+            color: white;
+            border-color: var(--success-green);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 13px;
+            color: var(--secondary-text);
+        }
     </style>
 </head>
 <body>
 
-    <div class="bg-pattern-animated"></div>
-    <div class="side-glow"></div>
+<div class="container">
+    <header>
+        <h1>لوحة روابطي الخاصة</h1>
+        <p>إدارة سريعة ومنظمة لمشاريعك</p>
+    </header>
 
-    <div id="intro-video-wrap">
-        <div style="text-align:center;">
-            <i class="fas fa-futbol ball-glow"></i>
-            <h1 style="color:#fff; font-size:45px; font-weight:900; margin-top:20px;">الخدمة الرقمية</h1>
+    <div class="section-title">الموقع الأول</div>
+    
+    <div class="link-card">
+        <div class="link-info">
+            <h3>موقع الجماعة الرسمي</h3>
+            <span class="link-url" id="url1">https://d-service.pro/s/</span>
+        </div>
+        <div class="actions">
+            <a href="https://d-service.pro/s/" target="_blank" class="btn btn-visit">انتقال للموقع</a>
+            <button onclick="copyLink('url1', this)" class="btn btn-copy">نسخ الرابط</button>
         </div>
     </div>
 
-    <div class="promo-sticky-container">
-        <div class="promo-bar">
-            <div class="promo-text">هذه الصفحة مقدمة مجاناً من <strong>متجر الخدمة الرقمية</strong> للاشتراك في الباقة كاملة تواصل واتساب</div>
-            <div class="social-links">
-                <a href="https://wa.me/966505571164" class="social-btn btn-wa"><i class="fab fa-whatsapp"></i> واتساب</a>
-                <a href="https://snapchat.com/t/4DVEkM5k" class="social-btn btn-snap"><i class="fab fa-snapchat"></i> سناب</a>
-                <a href="https://x.com/d_service_pro?s=21" class="social-btn btn-x"><i class="fab fa-x-twitter"></i> تويتر X</a>
-            </div>
+    <div class="link-card">
+        <div class="link-info">
+            <h3>صفحة التحكم (الجماعة)</h3>
+            <span class="link-url">https://d-service.pro/s/admin.php</span>
         </div>
-        <header>📺 بوابة الرياضة - البث المباشر</header>
+        <div class="actions">
+            <a href="https://d-service.pro/s/admin.php" target="_blank" class="btn btn-visit">انتقال للموقع</a>
+        </div>
     </div>
 
-    <div class="grid">
-        <?php for($i = 1; $i <= 9; $i++): ?>
-        <div class="card">
-            <div class="c-head">
-                <div class="channel-title">
-                    <span class="channel-name">beIN Sport <?php echo $i; ?></span>
-                    <span class="channel-badge">Premium</span>
-                </div>
-                <div class="live-status">
-                    <div class="live-dot"></div>
-                    <span class="live-text">Live</span>
-                </div>
-            </div>
-            
-            <video id="vid<?php echo $i; ?>" playsinline webkit-playsinline controls poster="https://via.placeholder.com/400x225/061626/fff?text=beIN+Sports"></video>
-            
-            <button class="play-btn-premium" onclick="play('vid<?php echo $i; ?>', 'b<?php echo $i; ?>.php')">
-                 ▶ تشغيل البث الآن
-            </button>
+    <hr style="border: 0; height: 1px; background: #d2d2d7; margin: 30px 0;">
+
+    <div class="section-title">موقع وجوه السعد</div>
+
+    <div class="link-card">
+        <div class="link-info">
+            <h3>رابط الموقع الرسمي</h3>
+            <span class="link-url" id="url3">https://d-service.pro/t/s/</span>
         </div>
-        <?php endfor; ?>
+        <div class="actions">
+            <a href="https://d-service.pro/t/s/" target="_blank" class="btn btn-visit">انتقال للموقع</a>
+            <button onclick="copyLink('url3', this)" class="btn btn-copy">نسخ الرابط</button>
+        </div>
+    </div>
+
+    <div class="link-card">
+        <div class="link-info">
+            <h3>صفحة التحكم (وجوه السعد)</h3>
+            <span class="link-url">https://d-service.pro/t/s/admin.php</span>
+        </div>
+        <div class="actions">
+            <a href="https://d-service.pro/t/s/admin.php" target="_blank" class="btn btn-visit">انتقال للموقع</a>
+        </div>
     </div>
 
     <footer>
-        <div class="footer-counter">
-            <p style="margin:0; font-size:12px; opacity:0.6;">إجمالي زيارات الموقع</p>
-            <div id="count-num">0</div>
-        </div>
+        تطوير وبرمجة عثمان الزبيدي &copy; 2026
     </footer>
+</div>
 
-    <script>
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            const intro = document.getElementById('intro-video-wrap');
-            if(intro) { intro.classList.add('intro-hide'); setTimeout(() => intro.remove(), 1000); }
-        }, 3000);
-    });
-
-    function updateCounter() {
-        let count = localStorage.getItem('vCount') || 1452;
-        count = parseInt(count) + 1;
-        localStorage.setItem('vCount', count);
-        document.getElementById('count-num').innerText = count.toLocaleString();
+<script>
+    function copyLink(id, btn) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = "نسخ الرابط";
+            btn.innerText = "تم النسخ! ✓";
+            btn.classList.add('copied');
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove('copied');
+            }, 2000);
+        });
     }
+</script>
 
-    function play(id, src) {
-        var video = document.getElementById(id);
-        if (Hls.isSupported()) {
-            var hls = new Hls(); hls.loadSource(src); hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = src; video.play();
-        }
-    }
-
-    window.onload = updateCounter;
-    </script>
 </body>
 </html>
